@@ -13,12 +13,11 @@ public class TaskService implements IGeneralService<Task> {
 
 	@Autowired
 	ITaskRepository taskRepository;
-	
+
 	@Override
 	public Iterable<Task> findAll() {
 		return taskRepository.findAll();
 	}
-
 
 	@Override
 	public Task save(Task t) {
@@ -29,7 +28,7 @@ public class TaskService implements IGeneralService<Task> {
 	@Override
 	public void remove(Task model) {
 		taskRepository.delete(model);
-		
+
 	}
 
 	@Override

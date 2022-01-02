@@ -1,8 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -21,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public class TaskDetail {
 
 	@Id
@@ -33,15 +31,13 @@ public class TaskDetail {
 	private String createDate;
 	private String modifyDate;
 
-	
 	@OneToOne()
 	@JsonBackReference
 	@JoinColumn(name = "task_id")
 	private Task task;
-	
+
 	@OneToOne()
-	@JoinColumn(name="receiver_id")
+	@JoinColumn(name = "receiver_id")
 	private Employee employee;
-	
-	
+
 }

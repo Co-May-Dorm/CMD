@@ -7,12 +7,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
+import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
@@ -22,74 +23,72 @@ import com.comaymanagement.cmd.service.EmployeeService;
 
 @RestController
 @RequestMapping("/employees")
+@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
 public class EmployeesAPI {
-//	 private final Logger logger = LoggerFactory.getLogger(this.getClass()); => Xong goi method ra
+//	 private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeService employeeService;
 	@Autowired
 	DepartmentService departmentService;
+
 	// Create url find all employees
 	@GetMapping(path = "", produces = "application/json")
 	public ResponseEntity<Object> findAll() {
-		
-	List<CustomEmployeeAll> customEmployees = new ArrayList<>();
-	List<Employee> employees = employeeService.findAll();
-	
-	for(Employee e : employees) {
-		CustomEmployeeAll cEmp = new CustomEmployeeAll();
-		cEmp.setId(e.getId());
-		cEmp.setName(e.getName());
-		cEmp.setDateOfBirth(e.getDateOfBirth());
-		cEmp.setEmail(e.getEmail());
-		cEmp.setPhoneNumber(e.getPhoneNumber());
-		cEmp.setDepartmentList(e.getDepartmentList());
-		cEmp.setPositionList(e.getPositionList());
-		customEmployees.add(cEmp);
-		
-		
-	}
-		
-		if (customEmployees.size() > 0 ) {
-			return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject("OK","Query produce successfully: ", customEmployees)
-			);
-		}else {
-			
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ResponseObject("Not found","Error","")
-			);
+
+		List<CustomEmployeeAll> customEmployees = new ArrayList<>();
+		List<Employee> employees = employeeService.findAll();
+
+		for (Employee e : employees) {
+			CustomEmployeeAll cEmp = new CustomEmployeeAll();
+			cEmp.setId(e.getId());
+			cEmp.setName(e.getName());
+			cEmp.setDateOfBirth(e.getDateOfBirth());
+			cEmp.setEmail(e.getEmail());
+			cEmp.setPhoneNumber(e.getPhoneNumber());
+			cEmp.setDepartmentId(e.getDepartmentId());
+			cEmp.setPositionList(e.getPositionList());
+			customEmployees.add(cEmp);
+
+		}
+
+		if (customEmployees.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new ResponseObject("OK", "Query produce successfully: ", customEmployees));
+		} else {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Error", ""));
 		}
 	}
+
 	// Create url find employees by id
 	@GetMapping("/{id}")
 	public Optional<Employee> FindByID(@PathVariable String id) {
 
 		return employeeService.findById(id);
 	}
+
 	@GetMapping("/{id}/departments")
 	public ResponseEntity<Object> findAllDepartmentByEmployeeId(@PathVariable String id) {
-		
+
 		List<Department> departments = departmentService.findAllDepartmentByEmployeeId(id);
-		
-		if (departments.size() > 0 ) {
-			return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject("OK","Query produce successfully: ", departments)
-			);
-		}else {
-			
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-				new ResponseObject("Not found","Department not found with Employeeid= " + id,"")	
-			);
+
+		if (departments.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new ResponseObject("OK", "Query produce successfully: ", departments));
+		} else {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new ResponseObject("Not found", "Department not found with Employeeid= " + id, ""));
 		}
 	}
+
 	@GetMapping("/flag/{f}")
 	public List<Employee> FindByActiveFlag(@PathVariable Boolean f) {
 		return employeeService.findByActiveFlag(f);
 	}
-	
-	
+
 	// Example return ResponseEntity
-	
+
 //	@GetMapping("/{id}")
 //	public ResponseEntity<Object> findById(@PathVariable Long id) {
 //		Optional<Produce> produce = produceRepository.findById(id);
@@ -106,7 +105,7 @@ public class EmployeesAPI {
 //		}
 //		
 //	}
-	
+
 //	@PutMapping("/update/{id}")
 //	public ResponseEntity<ResponseObject> updateProduce(@RequestBody Produce produceUpdate,@PathVariable Long id) {
 //		Optional<Produce>  updateProduce = produceRepository.findById(id);

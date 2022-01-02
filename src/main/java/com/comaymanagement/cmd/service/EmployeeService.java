@@ -11,7 +11,7 @@ import com.comaymanagement.cmd.repository.IEmployeeRepository;
 
 @Service
 public class EmployeeService implements IGeneralService<Employee> {
-	
+
 	@Autowired
 	IEmployeeRepository employeeRepository;
 
@@ -24,6 +24,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 	public void remove(Employee employees) {
 		employeeRepository.delete(employees);
 	}
+
 	@Override
 	public Employee save(Employee employees) {
 		return employeeRepository.save(employees);
@@ -31,10 +32,11 @@ public class EmployeeService implements IGeneralService<Employee> {
 
 	@Override
 	public List<Employee> findAll() {
-		
+
 		return employeeRepository.findAll();
 	}
-	public List<Employee> findByActiveFlag(Boolean flag){
+
+	public List<Employee> findByActiveFlag(Boolean flag) {
 		return employeeRepository.findByActiveFlag(flag);
 	}
 }

@@ -3,8 +3,6 @@ package com.comaymanagement.cmd.entity;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -27,19 +25,19 @@ public class Proposal {
 	private String id;
 	
 	@OneToMany
-	@JoinColumn(name="proposal_id")
+	@JoinColumn(name = "proposal_id")
 	@JsonBackReference
 	private Set<ProposalDetail> proposalDetailList;
-	
+
 	@OneToOne()
-	@JoinColumn(name="creator_id")
+	@JoinColumn(name = "creator_id")
 	private Employee employee;
-	
+
 	@OneToOne()
-	@JoinColumn(name="status_id")
+	@JoinColumn(name = "status_id")
 	private Status status;
-	
+
 	@OneToOne()
-	@JoinColumn(name="proposal_type_id")
+	@JoinColumn(name = "proposal_type_id")
 	private ProposalType proposalType;
 }

@@ -1,8 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -16,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name="proposal_type_details")
+@Entity(name = "proposal_type_details")
 public class ProposalTypeDetail {
 	@Id
 	private String id;
@@ -26,12 +24,12 @@ public class ProposalTypeDetail {
 	private String modifyBy;
 	private String createDate;
 	private String modifyDate;
-	
+
 	@OneToOne()
-	@JoinColumn(name="proposal_type_id")
+	@JoinColumn(name = "proposal_type_id")
 	private ProposalType proposalType;
-	
+
 	@OneToOne()
-	@JoinColumn(name="data_type_id")
+	@JoinColumn(name = "data_type_id")
 	private DataType dataType;
 }

@@ -5,6 +5,8 @@ import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -14,19 +16,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "data_types")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataType {
+@Entity(name = "teams")
+public class Team {
 	@Id
 	private String id;
 	private String name;
-	private String description;
+
+	@ManyToMany
+	@JoinTable(name = "teams_employees", joinColumns = {
+			@JoinColumn(name = "team_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
+	@JsonBackReference
+	private Set<Employee> employeeList;
 
 	@OneToMany
-	@JoinColumn(name = "data_type_id")
+	@JoinColumn(name = "team_id")
 	@JsonBackReference
-	private Set<ProposalTypeDetail> proposalTypeDetailList;
+	private Set<Position> positionList;
 }

@@ -20,11 +20,12 @@ import com.comaymanagement.cmd.service.RoleService;
 public class RoleController {
 	@Autowired
 	RoleService roleService;
+
 	@GetMapping("")
-	public ResponseEntity<Object> findAll(){
+	public ResponseEntity<Object> findAll() {
 		List<CustomRoleAll> customRoles = new ArrayList<>();
 		List<Role> roles = roleService.findAll();
-		for(Role r : roles) {
+		for (Role r : roles) {
 			CustomRoleAll custom = new CustomRoleAll();
 			custom.setId(r.getId());
 			custom.setName(r.getName());
@@ -33,19 +34,17 @@ public class RoleController {
 			custom.setRoleDetailList(r.getRoleDetailList());
 			customRoles.add(custom);
 		}
-		
-		if(customRoles.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(
-					 new ResponseObject("OK","Success successfully", customRoles)
-					
-			);
-		}else {
-			return ResponseEntity.status(HttpStatus.OK).body(
-					 new ResponseObject("OK","Success successfully", "")
-					
+
+		if (customRoles.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new ResponseObject("OK", "Success successfully", customRoles)
+
+					);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Success successfully", "")
+
 			);
 		}
-		
-		
+
 	}
 }

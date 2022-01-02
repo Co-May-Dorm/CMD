@@ -46,12 +46,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.20</version><!--$NO-MVN-MAN-VER$ -->
-			<scope>provided</scope>
-		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

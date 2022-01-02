@@ -9,14 +9,16 @@ import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.repository.IDepartmentRepository;
 
 @Service
-public class DepartmentService{
+public class DepartmentService {
 	@Autowired
 	IDepartmentRepository departmentRepository;
-	public List<Department> findAllDepartmentByEmployeeId( String id){
+
+	public List<Department> findAllDepartmentByEmployeeId(String id) {
 		return departmentRepository.findAllDepartmentByEmployeeId(id);
 	}
-	public List<Department> findAll(){
+
+	public List<Department> findAll() {
 		return departmentRepository.findAll();
 	}
-	
+
 }

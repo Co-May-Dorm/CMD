@@ -3,13 +3,13 @@ package com.comaymanagement.cmd.service;
 import java.util.Optional;
 
 public interface IGeneralService<T> {
-	
-    Iterable<T> findAll();
 
-    Optional<T> findById(String id);
+	Iterable<T> findAll();
 
-    T save(T t);
+	Optional<T> findById(String id);
 
-    void remove(T model);
-    
+	T save(T t);
+
+	void remove(T model);
+
 }

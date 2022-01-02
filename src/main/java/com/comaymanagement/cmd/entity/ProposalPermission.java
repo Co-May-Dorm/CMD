@@ -1,8 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -22,19 +20,18 @@ public class ProposalPermission {
 	private String id;
 	
 	@OneToOne()
-	@JoinColumn(name="position_id")
+	@JoinColumn(name = "position_id")
 	private Position position;
-	
-	
+
 	@OneToOne()
-	@JoinColumn(name="department_id")
+	@JoinColumn(name = "department_id")
 	private Department department;
-	
+
 	@OneToOne()
-	@JoinColumn(name="employee_id")
+	@JoinColumn(name = "employee_id")
 	private Employee employee;
-	
+
 	@OneToOne()
-	@JoinColumn(name="proposal_type_id")
+	@JoinColumn(name = "proposal_type_id")
 	private ProposalType proposalType;
 }

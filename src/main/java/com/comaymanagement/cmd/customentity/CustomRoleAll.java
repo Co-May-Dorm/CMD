@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,6 +19,6 @@ public class CustomRoleAll {
 	private String id;
 	private String name;
 	private Set<Auth> authList;
-	private Set<RoleDetail> roleDetailList ;
+	private Set<RoleDetail> roleDetailList;
 	private Position position;
 }

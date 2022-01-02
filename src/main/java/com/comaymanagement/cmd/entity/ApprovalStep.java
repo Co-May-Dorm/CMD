@@ -3,8 +3,6 @@ package com.comaymanagement.cmd.entity;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -23,20 +21,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApprovalStep {
-	
+
 	@Id
 	private String id;
-	
-	
 	private String approvalStepName;
 	private Integer approvalStepIndex;
-	
+
 	@OneToOne()
-	@JoinColumn(name="proposal_type_id")
+	@JoinColumn(name = "proposal_type_id")
 	private ProposalType proposalType;
-	
+
 	@OneToMany
-	@JoinColumn(name="approval_step_id")
+	@JoinColumn(name = "approval_step_id")
 	@JsonBackReference
 	private Set<ApprovalStepDetail> approvalStepDetailList;
 }

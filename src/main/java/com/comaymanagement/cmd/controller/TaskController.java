@@ -1,16 +1,13 @@
 package com.comaymanagement.cmd.controller;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
-import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.ResponseObject;
@@ -27,17 +25,17 @@ import com.comaymanagement.cmd.service.TaskService;
 
 @RestController
 @RequestMapping("/tasks")
+@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
 public class TaskController {
 
 	@Autowired
 	TaskService taskService;
-	
+
 	@GetMapping("/{id}")
-	public ResponseEntity<Object> findById(@PathVariable String id){
-		
+	public ResponseEntity<Object> findById(@PathVariable String id) {
+
 		Optional<Task> task = taskService.findById(id);
-		
-		
+
 		if (task.get().getId() != null) {
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("OK", "Query produce successfully: ", task));
@@ -81,7 +79,7 @@ public class TaskController {
 
 	@PostMapping(path = "/insert", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<Object> saveTask(@RequestBody Task newTask) {
-		
+
 		Task task = new Task();
 		task.setEmployee(newTask.getEmployee());
 		task.setStatus(newTask.getStatus());
@@ -91,8 +89,8 @@ public class TaskController {
 //			taskDetailList.add(taskDetailItem);
 //		}
 //		task.setTaskDetailList(taskDetailList);
-		
-		if (taskService.save(task).getId()!= null) {
+
+		if (taskService.save(task).getId() != null) {
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("OK", "Query produce successfully: ", task));
 		} else {
@@ -101,6 +99,5 @@ public class TaskController {
 					.body(new ResponseObject("Not found", "Can not find task list", ""));
 		}
 	}
-
 
 }

@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repository.IRoleRepository;
+
 @Service
-public class RoleService implements IGeneralService<Role>{
+public class RoleService implements IGeneralService<Role> {
 	@Autowired
 	IRoleRepository roleRepository;
+
 	@Override
 	public List<Role> findAll() {
 		return roleRepository.findAll();
@@ -32,7 +34,7 @@ public class RoleService implements IGeneralService<Role>{
 	@Override
 	public void remove(Role model) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
