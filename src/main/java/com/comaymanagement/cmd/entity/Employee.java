@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -34,7 +35,10 @@ public class Employee {
 	private String modifyBy;
 	private String createDate;
 	private String modifyDate;
-	private String departmentId;
+	
+	@OneToOne()
+	@JoinColumn(name = "department_id")
+	private Department department;
 
 	@ManyToMany
 	@JoinTable(name = "positions_has_employees", joinColumns = {

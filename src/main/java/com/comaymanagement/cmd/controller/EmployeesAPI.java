@@ -45,7 +45,7 @@ public class EmployeesAPI {
 			cEmp.setDateOfBirth(e.getDateOfBirth());
 			cEmp.setEmail(e.getEmail());
 			cEmp.setPhoneNumber(e.getPhoneNumber());
-			cEmp.setDepartmentId(e.getDepartmentId());
+			cEmp.setDepartment(e.getDepartment());
 			cEmp.setPositionList(e.getPositionList());
 			customEmployees.add(cEmp);
 

@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.customentity;
 
 import java.util.Set;
 
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 
 import lombok.AllArgsConstructor;
@@ -21,5 +22,5 @@ public class CustomEmployeeAll {
 	private String email;
 	private String phoneNumber;
 	private Set<Position> positionList;
-	private String departmentId;
+	private Department department;
 }
