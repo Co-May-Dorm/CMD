@@ -22,5 +22,5 @@ public class CustomEmployeeAll {
 	private String email;
 	private String phoneNumber;
 	private Set<Position> positionList;
-	private Department department;
+	private Department departmentId;
 }

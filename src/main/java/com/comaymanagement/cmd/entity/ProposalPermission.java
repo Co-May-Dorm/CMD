@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "proposal_permissions")
+@Entity(name = "proposals_permissions")
 public class ProposalPermission {
 	@Id
 	private String id;

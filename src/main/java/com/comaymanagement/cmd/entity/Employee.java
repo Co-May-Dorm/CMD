@@ -38,10 +38,10 @@ public class Employee {
 	
 	@OneToOne()
 	@JoinColumn(name = "department_id")
-	private Department department;
+	private Department departmentId;
 
 	@ManyToMany
-	@JoinTable(name = "positions_has_employees", joinColumns = {
+	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "position_id", referencedColumnName = "id") })
 	@JsonBackReference
