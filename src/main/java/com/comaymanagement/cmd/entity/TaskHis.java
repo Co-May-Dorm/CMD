@@ -1,6 +1,7 @@
 package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
@@ -15,6 +16,9 @@ import lombok.Setter;
 @Setter
 @Entity(name = "task_his")
 public class TaskHis {
+	
+	@Id
+	private int uniqueNumber;
 	
 	@OneToOne
 	@JoinColumn(name = "task_id")
