@@ -55,12 +55,12 @@ public class Employee {
 	@OneToMany
 	@JoinColumn(name = "creator_id")
 	@JsonBackReference
-	private Set<Task> taskList;
-
+	private Set<Task> taskListCreated;
+	
 	@OneToMany
 	@JoinColumn(name = "receiver_id")
 	@JsonBackReference
-	private Set<TaskDetail> taskDetailList;
+	private Set<Task> taskListReceived;
 
 	@OneToMany
 	@JoinColumn(name = "creator_id")
