@@ -21,6 +21,7 @@ public class Task {
 	private String title;
 	private String description;
 	private String createDate;
+	private String finishDate;
 	
 	@OneToOne()
 	@JoinColumn(name = "creator_id", nullable = false)
