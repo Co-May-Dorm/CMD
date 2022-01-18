@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +25,8 @@ import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Status;
 import com.comaymanagement.cmd.entity.Task;
+import com.comaymanagement.cmd.service.EmployeeService;
+import com.comaymanagement.cmd.service.StatusService;
 import com.comaymanagement.cmd.service.TaskService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -36,6 +39,12 @@ public class TaskController {
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	TaskService taskService;
+	
+	@Autowired
+	EmployeeService employeeService;
+	
+	@Autowired
+	StatusService statusService;
 	
 
 	@GetMapping("/{id}")
@@ -121,48 +130,45 @@ public class TaskController {
 
 	@PostMapping("/insert")
 	@ResponseBody
-	public ResponseEntity<Object> saveTask(@RequestParam String json) {
+	public ResponseEntity<Object> saveTask(@RequestBody String json) {
 
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectSanPham;
 		try {
 			jsonObjectSanPham = jsonMapper.readTree(json);
-			JsonNode creator = jsonObjectSanPham.get("creator");
 
 			Task task = new Task();
-
+			
+			String creatorId = jsonObjectSanPham.get("creator_id").asText();
+			String receiverId = jsonObjectSanPham.get("receiver_id").asText();
+			String statusId = jsonObjectSanPham.get("status_id").asText();
+			
+			Optional<Employee> creator = employeeService.findById(creatorId);
+			Optional<Employee> receiver = employeeService.findById(receiverId);
+			Optional<Status> status = statusService.findById(statusId);
+			
 			task.setId(jsonObjectSanPham.get("id").asText());
+			task.setCreator(creator.get());
+			task.setReceiver(receiver.get());
+			task.setStatus(status.get());
+			task.setTitle(jsonObjectSanPham.get("title").asText());
+			task.setDescription(jsonObjectSanPham.get("description").asText());
+			task.setCreateDate(jsonObjectSanPham.get("createDate").asText());
+			task.setFinishDate(jsonObjectSanPham.get("finishDate").asText());
 
-			Employee creatorDetails = new Employee();
-			creatorDetails.setId(creator.get("id").asText());
-			creatorDetails.setName(creator.get("name").asText());
-			creatorDetails.setDateOfBirth(creator.get("dateOfBirth").asText());
-			creatorDetails.setEmail(creator.get("email").asText());
-			creatorDetails.setPhoneNumber(creator.get("phoneNumber").asText());
-			creatorDetails.setActiveFlag(creator.get("activeFlag").asBoolean());
-			task.setCreator(creatorDetails);
-
-			JsonNode status = jsonObjectSanPham.get("status");
-			Status statusDetails = new Status();
-			statusDetails.setId(status.get("id").asText());
-			statusDetails.setName(status.get("name").asText());
-
-			task.setStatus(statusDetails);
-
-			if (taskService.save(task).getId() != null) {
+			if (taskService.save(task) != null) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", task));
 			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("ERROR", "Can not save task", ""));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOGGER.debug("ERROR",e);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ResponseObject("ERROR", "Can not save task", ""));
-			
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
 		}
 
 	}
