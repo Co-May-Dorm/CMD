@@ -36,13 +36,14 @@ public class TaskController {
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	TaskService taskService;
+	
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> findById(@PathVariable String id) {
 
 		Optional<Task> task = taskService.findById(id);
 
-		if (task.get().getId() != null) {
+		if (task != null) {
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("OK", "Query produce successfully: ", task));
 		} else {
@@ -52,29 +53,70 @@ public class TaskController {
 		}
 	}
 
-	@GetMapping
-	public ResponseEntity<Object> findCustomTaskAlls() {
+	@GetMapping(value= "",produces = "application/json")
+	public ResponseEntity<Object> findCustomTaskAlls(				
+			@RequestParam(value="page",required = true) String page, 
+			@RequestParam(value="department",required = false) String dep, 
+			@RequestParam(value="title",required = false) String title, 
+			@RequestParam(value="status", required = false) String status,  
+			@RequestParam(value="creator", required = false) String creator, 
+			@RequestParam(value="receiver", required = false) String receiver, 
+			@RequestParam(value="dateCreated", required = false) String createDate,
+			@RequestParam(value="dateFinish", required = false) String finishDate,
+			@RequestParam(value="sort", required = false) String sort,
+			@RequestParam(value="order", required = false) String order,
+			@RequestParam(value="limit", required = false) Integer limit
+			) {
+		
+		dep = dep == null ? "":dep;
+		title = title == null ? "" : title;
+		status = status == null ? "" : status;
+		creator = creator == null ? "" : creator;
+		receiver = receiver == null ? "": receiver;
+		createDate = createDate == null ? "" : createDate;
+		finishDate = finishDate == null ? "" : finishDate;
+		sort = sort == null ? "" : sort;
+		order = order == null ? "" : order;
+		limit = limit == null ? 10 : limit;
+		sort = sort == null ? "" : sort;
+		page = (dep != "" || title != "" || status != "" || creator != "" || 
+				receiver != "" || createDate != "" || finishDate != "") ? "1" : page;
+		
+		try {
+			int offset = (Integer.valueOf(page) - 1)*limit;
+			
+			List<Task> taskList = (List<Task>) taskService.findAll();
+			List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
+			taskList = taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,limit,offset);
+			
+			for(Task task : taskList) {
+				CustomTaskAll customTask = new CustomTaskAll();
+				customTask.setTaskId(task.getId());
+				customTask.setTitle(task.getTitle());
+				customTask.setCreatorId(task.getCreator().getId());
+				customTask.setCreatorName(task.getCreator().getName());
+				customTask.setRecieverId(task.getReceiver().getId());
+				customTask.setRecieverName(task.getReceiver().getName());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setDepartmentName(task.getCreator().getDepartmentId().getName());
+				customTask.setStatusName(task.getStatus().getName());
+				
+				customTaskList.add(customTask);
+			}
+			if (customTaskList.size() > 0) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", "Query produce successfully: ", customTaskList));
+			} else {
 
-		List<Task> taskList = (List<Task>) taskService.findAll();
-		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
-
-		for (Task task : taskList) {
-			CustomTaskAll customTask = new CustomTaskAll();
-			customTask.setCreator(task.getCreator());
-			customTask.setStatus(task.getStatus());
-
-			customTaskList.add(customTask);
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body(new ResponseObject("Not found", "Can not find task list", ""));
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
-
-		if (customTaskList.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseObject("OK", "Query produce successfully: ", customTaskList));
-		} else {
-
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ResponseObject("Not found", "Can not find task list", ""));
-		}
-
 	}
 
 	@PostMapping("/insert")
@@ -123,11 +165,25 @@ public class TaskController {
 			
 		}
 
-//		Set<TaskDetail> taskDetailList = new HashSet<TaskDetail>();
-//		for(TaskDetail taskDetailItem : newTask.getTaskDetailList()) {
-//			taskDetailList.add(taskDetailItem);
-//		}
-//		task.setTaskDetailList(taskDetailList);
+	}
+	
+	//Get task list by status id 
+	@GetMapping("/status/{id}")
+	public ResponseEntity<Object> findByStatus(@PathVariable String id){
+		LOGGER.info("Get task list by status");
+		try {
+			List<Task> taskListByStatusId = taskService.findByStatusId(id);
+			if(taskListByStatusId == null) {
+				LOGGER.info("Have no task by status_id: " + id );
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("","Have no task by status_id: " + id,""));
+			}else {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK","Query produce successfully:",taskListByStatusId));
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR","Have error: ",e.getMessage()));
+		}
+
 
 	}
 

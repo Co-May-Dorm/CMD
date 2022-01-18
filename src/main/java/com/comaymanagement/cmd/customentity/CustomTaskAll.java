@@ -2,7 +2,6 @@ package com.comaymanagement.cmd.customentity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
