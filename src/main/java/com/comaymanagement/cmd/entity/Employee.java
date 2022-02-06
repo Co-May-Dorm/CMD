@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -25,6 +26,7 @@ import lombok.Setter;
 public class Employee {
 	@Id
 	private String id;
+	private Integer unique_number;
 	private String name;
 	private String dateOfBirth;
 	private String email;
@@ -35,48 +37,46 @@ public class Employee {
 	private String modifyBy;
 	private String createDate;
 	private String modifyDate;
+	private String avatar;
+	private String gender;
+	private String username;
+	private String password;
+	private boolean enableLogin;
 	
 	@OneToOne()
 	@JoinColumn(name = "department_id")
-	private Department departmentId;
+	private Department department;
 
 	@ManyToMany
 	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "position_id", referencedColumnName = "id") })
-	@JsonBackReference
-	private Set<Position> positionList;
+	private List<Position> positionList;
 
 	@OneToMany
 	@JoinColumn(name = "employee_id")
-	@JsonBackReference
-	private Set<ProposalPermission> proposalPermissionList;
+	private List<ProposalPermission> proposalPermissionList;
 
 	@OneToMany
 	@JoinColumn(name = "creator_id")
-	@JsonBackReference
-	private Set<Task> taskListCreated;
+	private List<Task> taskListCreated;
 	
 	@OneToMany
 	@JoinColumn(name = "receiver_id")
-	@JsonBackReference
-	private Set<Task> taskListReceived;
+	private List<Task> taskListReceived;
 
 	@OneToMany
 	@JoinColumn(name = "creator_id")
-	@JsonBackReference
-	private Set<Proposal> proposalList;
+	private List<Proposal> proposalList;
 
 	@OneToMany
 	@JoinColumn(name = "employee_id")
-	@JsonBackReference
-	private Set<ApprovalStepDetail> approvalStepDetailList;
+	private List<ApprovalStepDetail> approvalStepDetailList;
 
 	@ManyToMany
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "team_id", referencedColumnName = "id") })
-	@JsonBackReference
-	private Set<Team> teamList;
+	private List<Team> teamList;
 
 }

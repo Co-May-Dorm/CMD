@@ -32,7 +32,6 @@ public class Menu {
 
 	@OneToMany
 	@JoinColumn(name = "menu_id")
-	@JsonBackReference
 	private Set<Auth> authList;
 
 }

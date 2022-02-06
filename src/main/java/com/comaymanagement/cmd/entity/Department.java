@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -34,21 +35,19 @@ public class Department {
 	@OneToMany
 	@JoinColumn(name = "department_id")
 	@JsonBackReference
-	private Set<Position> positionList;
+	private List<Position> positionList;
+
+	@OneToMany
+	@JoinColumn(name = "department_id")
+	private List<ProposalPermission> proposalPermissionList;
+
+	@OneToMany
+	@JoinColumn(name = "department_id")
+	private List<ApprovalStepDetail> approvalStepDetailList;
 
 	@OneToMany
 	@JoinColumn(name = "department_id")
 	@JsonBackReference
-	private Set<ProposalPermission> proposalPermissionList;
-
-	@OneToMany
-	@JoinColumn(name = "department_id")
-	@JsonBackReference
-	private Set<ApprovalStepDetail> approvalStepDetailList;
-
-	@OneToMany
-	@JoinColumn(name = "department_id")
-	@JsonBackReference
-	private Set<Employee> employeeList;
+	private List<Employee> employeeList;
 
 }

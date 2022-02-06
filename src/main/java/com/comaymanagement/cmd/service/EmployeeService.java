@@ -44,5 +44,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 	public List<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos, String sort, String order, Integer limit, Integer offset) {
 		return employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
 	}
-
+	public Employee saveAndFlush(Employee e) {
+		return employeeRepository.saveAndFlush(e);
+	}
+	
 }

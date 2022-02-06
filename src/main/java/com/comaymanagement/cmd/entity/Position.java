@@ -32,18 +32,20 @@ public class Position {
 	private String createDate;
 	private String modifyBy;
 	private String modifyDate;
-
-	@OneToMany
-	@JoinColumn(name = "position_id")
-	@JsonBackReference
-	private Set<Role> roleList;
+	private String roleId;
 
 	@OneToOne()
 	@JoinColumn(name = "department_id", insertable = false, updatable = false)
+	@JsonBackReference
 	private Department department;
-
+	
+	@OneToOne()
+	@JoinColumn(name = "team_id", insertable = false, updatable = false)
+	@JsonBackReference
+	Team team;
+	
 	@ManyToMany()
-	@JoinTable(name = "positions_has_employees", joinColumns = {
+	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "position_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
 	@JsonBackReference

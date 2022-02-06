@@ -108,7 +108,7 @@ public class TaskController {
 				customTask.setRecieverName(task.getReceiver().getName());
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(task.getCreator().getDepartmentId().getName());
+				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
 				customTask.setStatusName(task.getStatus().getName());
 				
 				customTaskList.add(customTask);
