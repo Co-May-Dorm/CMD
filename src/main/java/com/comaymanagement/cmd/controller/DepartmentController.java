@@ -28,7 +28,7 @@ public class DepartmentController {
 	public ResponseEntity<Object> findAll() {
 
 		List<CustomDepartmentAll> customDepartments = new ArrayList<>();
-		List<Department> departments = departmentService.findAll();
+		List<Department> departments = null;
 		for (Department d : departments) {
 			CustomDepartmentAll custom = new CustomDepartmentAll();
 			custom.setId(d.getId());

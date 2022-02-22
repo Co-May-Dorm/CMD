@@ -27,7 +27,7 @@ public class RoleController {
 	@GetMapping("")
 	public ResponseEntity<Object> findAll() {
 		List<CustomRoleAll> customRoles = new ArrayList<>();
-		List<Role> roles = roleService.findAll();
+		List<Role> roles = null;
 		for (Role r : roles) {
 			CustomRoleAll custom = new CustomRoleAll();
 			custom.setId(r.getId());

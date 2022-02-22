@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.entity;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -24,7 +25,9 @@ public class ApprovalStep {
 
 	@Id
 	private String id;
+	@Column(name="approval_step_name")
 	private String approvalStepName;
+	@Column(name="approval_step_index")
 	private Integer approvalStepIndex;
 
 	@OneToOne()

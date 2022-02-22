@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.comaymanagement.cmd.entity.Task;
 
 @Repository
-public interface ITaskRepository extends JpaRepository<Task, String> {
+public interface ITaskRepository {
 	
 	@Query( value = "Select * FROM tasks WHERE tasks.status_id = :status_id", nativeQuery = true)
 	List<Task> findByStatusId(@Param("status_id") String statusId);

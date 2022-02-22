@@ -9,43 +9,44 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
+import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 
 @Service
 public class EmployeeService implements IGeneralService<Employee> {
 
 	@Autowired
-	IEmployeeRepository employeeRepository;
-
-	@Override
-	public Optional<Employee> findById(String id) {
-		return employeeRepository.findById(id);
-	}
-
-	@Override
-	public void remove(Employee employees) {
-		employeeRepository.delete(employees);
-	}
-
-	@Override
-	public Employee save(Employee employees) {
-		return employeeRepository.save(employees);
-	}
-
-	@Override
-	public List<Employee> findAll() {
-
-		return employeeRepository.findAll();
-	}
-
-	public List<Employee> findByActiveFlag(Boolean flag) {
-		return employeeRepository.findByActiveFlag(flag);
-	}
+	EmployeeRepositoryImpl employeeRepository;
 	
 	public List<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos, String sort, String order, Integer limit, Integer offset) {
 		return employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
 	}
-	public Employee saveAndFlush(Employee e) {
-		return employeeRepository.saveAndFlush(e);
+
+	@Override
+	public Iterable<Employee> findAll() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
+	@Override
+	public Optional<Employee> findById(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Employee save(Employee t) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public void remove(Employee model) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

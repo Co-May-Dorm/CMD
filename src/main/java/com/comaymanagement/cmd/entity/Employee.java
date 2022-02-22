@@ -3,7 +3,9 @@ package com.comaymanagement.cmd.entity;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -28,26 +30,35 @@ public class Employee {
 	private String id;
 	private Integer unique_number;
 	private String name;
+	@Column(name="date_of_birth")
 	private String dateOfBirth;
 	private String email;
+	@Column(name="phone_number")
 	private String phoneNumber;
+	@Column(name="active_flag")
 	private boolean activeFlag;
+	@Column(name="manager_id")
 	private String managerId;
+	@Column(name="create_by")
 	private String createBy;
+	@Column(name="modify_by")
 	private String modifyBy;
+	@Column(name="create_date")
 	private String createDate;
+	@Column(name="modify_date")
 	private String modifyDate;
 	private String avatar;
 	private String gender;
 	private String username;
 	private String password;
+	@Column(name="enable_login")
 	private boolean enableLogin;
 	
 	@OneToOne()
 	@JoinColumn(name = "department_id")
 	private Department department;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "position_id", referencedColumnName = "id") })

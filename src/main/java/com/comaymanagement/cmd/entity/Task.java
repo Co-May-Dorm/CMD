@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -20,7 +21,9 @@ public class Task {
 	private String id;
 	private String title;
 	private String description;
+	@Column(name="")
 	private String createDate;
+	@Column(name="")
 	private String finishDate;
 	
 	@OneToOne()

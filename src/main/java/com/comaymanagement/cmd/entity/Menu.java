@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.entity;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -23,11 +24,15 @@ public class Menu {
 
 	@Id
 	private String id;
+	@Column(name="parent_id")
 	private String parentId;
 	private String url;
 	private String name;
+	@Column(name="order_index")
 	private Integer orderIndex;
+	@Column(name="create_date")
 	private String createDate;
+	@Column(name="update_date")
 	private String updateDate;
 
 	@OneToMany

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.comaymanagement.cmd.entity.Status;
 
 @Repository
-public interface IStatusRepositoty extends JpaRepository<Status, String> {
+public interface IStatusRepositoty {
 
 }

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.comaymanagement.cmd.entity.Department;
 
-public interface IDepartmentRepository extends JpaRepository<Department, String> {
+public interface IDepartmentRepository{
 
 	@Query(value = "Select * FROM cmd.departments dp inner join cmd.departments_employees de "
 			+ "on dp.id = de.department_id " + "where de.employee_id = :id ", nativeQuery = true)

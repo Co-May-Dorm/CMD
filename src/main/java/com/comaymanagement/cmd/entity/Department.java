@@ -3,6 +3,7 @@ package com.comaymanagement.cmd.entity;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -25,11 +26,17 @@ public class Department {
 	@Id
 	private String id;
 	private String name;
+	@Column(name="farther_department_id")
 	private String fatherDepartmentId;
+	@Column(name="manager_id")
 	private String managerId;
+	@Column(name="create_by")
 	private String createBy;
+	@Column(name="create_date")
 	private String createDate;
+	@Column(name="modify_by")
 	private String modifyBy;
+	@Column(name="modify_date")
 	private String modifyDate;
 
 	@OneToMany

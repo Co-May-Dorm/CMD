@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -18,11 +19,17 @@ import lombok.Setter;
 public class ProposalTypeDetail {
 	@Id
 	private String id;
+	@Column(name="field_id")
 	private String fieldId;
+	@Column(name="field_name")
 	private String fieldName;
+	@Column(name="create_by")
 	private String createBy;
+	@Column(name="modify_by")
 	private String modifyBy;
+	@Column(name="create_date")
 	private String createDate;
+	@Column(name="modify_date")
 	private String modifyDate;
 
 	@OneToOne()

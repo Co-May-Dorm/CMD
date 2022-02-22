@@ -7,31 +7,38 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.entity.Status;
 import com.comaymanagement.cmd.repository.IStatusRepositoty;
+import com.comaymanagement.cmd.repositoryimpl.StatusRepositotyImpl;
 
 @Service
 public class StatusService implements IGeneralService<Status> {
 	
 	@Autowired
-	IStatusRepositoty statusRepositoty;
+	StatusRepositotyImpl statusRepositoty;
 
 	@Override
 	public Iterable<Status> findAll() {
-		return statusRepositoty.findAll();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Optional<Status> findById(String id) {
-		return statusRepositoty.findById(id);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Status save(Status t) {
-		return statusRepositoty.save(t);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public void remove(Status model) {
-		statusRepositoty.delete(model);
+		// TODO Auto-generated method stub
+		
 	}
+
+
 	
 }

@@ -8,33 +8,14 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.repository.ITaskRepository;
+import com.comaymanagement.cmd.repositoryimpl.TaskRepositoryImpl;
 
 @Service
 public class TaskService implements IGeneralService<Task> {
 
 	@Autowired
-	ITaskRepository taskRepository;
+	TaskRepositoryImpl taskRepository;
 
-	@Override
-	public Iterable<Task> findAll() {
-		return taskRepository.findAll();
-	}
-
-	@Override
-	public Task save(Task t) {
-		return taskRepository.save(t);
-	}
-
-	@Override
-	public void remove(Task model) {
-		taskRepository.delete(model);
-
-	}
-
-	@Override
-	public Optional<Task> findById(String id) {
-		return taskRepository.findById(id);
-	}
 	
 	public List<Task> findByStatusId(String id){
 		return taskRepository.findByStatusId(id);
@@ -51,6 +32,26 @@ public class TaskService implements IGeneralService<Task> {
 			 Integer limit,
 			 Integer offset){
 		return taskRepository.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,limit,offset);
+	}
+	@Override
+	public Iterable<Task> findAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public Optional<Task> findById(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public Task save(Task t) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void remove(Task model) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

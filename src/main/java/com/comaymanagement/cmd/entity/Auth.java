@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -20,8 +21,11 @@ public class Auth {
 	@Id
 	private String id;
 	private Boolean permission;
+	@Column(name="active_flag")
 	private Boolean activeFlag;
+	@Column(name="create_date")
 	private String createDate;
+	@Column(name="update_date")
 	private String updateDate;
 
 	@OneToOne()

@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.entity;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -27,11 +28,17 @@ public class Position {
 	@Id
 	private String id;
 	private String name;
+	@Column(name="is_manager")
 	private Boolean isManager;
+	@Column(name="create_by")
 	private String createBy;
+	@Column(name="create_date")
 	private String createDate;
+	@Column(name="modify_by")
 	private String modifyBy;
+	@Column(name="modify_date")
 	private String modifyDate;
+	@Column(name="role_id")
 	private String roleId;
 
 	@OneToOne()

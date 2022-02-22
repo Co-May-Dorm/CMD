@@ -23,7 +23,6 @@ import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
-import com.comaymanagement.cmd.repository.EmployeeRepoImpl;
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
 
@@ -36,8 +35,6 @@ public class EmployeesController {
 	EmployeeService employeeService;
 	@Autowired
 	DepartmentService departmentService;
-	@Autowired
-	EmployeeRepoImpl empRepo;
 	List<Employee> employeeList;
 	List<CustomEmployeeAll> cusEmpList;
 	
@@ -54,7 +51,6 @@ public class EmployeesController {
 				@RequestParam(value="order", required = false) String order,
 				@RequestParam(value="limit", required = false) Integer limit
 				){
-		List<Employee> newEmpList = empRepo.findOrderedBySeatNumberLimitedTo(15);
 		name = name == null ? "" : name.trim();
 		dob = dob == null ? "" : dob.trim();
 		email = email == null ? "" : email.trim();
@@ -62,11 +58,9 @@ public class EmployeesController {
 		dep = dep == null ? "" : dep.trim();
 		pos = pos == null ? "" : pos.trim();
 		page = page == null ? "1" : page.trim();
-		page = (name != "" || dob != "" || email != "" || phone != "" || dep != "" || pos!="") ? "1" : page;
-		
 		
 		// Fix number of employee per page
-		limit = 115;
+		limit = 15;
 		try {
 			//Caculator offset
 			int offset = (Integer.parseInt(page) - 1) * limit;
@@ -75,7 +69,7 @@ public class EmployeesController {
 				sort = "emp.unique_number";
 			}
 			if(order == null || order == "") {
-				order = "desc";
+				order = "asc";
 			}
 			employeeList= employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
 			cusEmpList = new ArrayList<>();

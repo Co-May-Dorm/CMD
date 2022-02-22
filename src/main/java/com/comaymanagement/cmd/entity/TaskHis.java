@@ -18,7 +18,7 @@ import lombok.Setter;
 public class TaskHis {
 	
 	@Id
-	private int uniqueNumber;
+	private int unique_number;
 	
 	@OneToOne
 	@JoinColumn(name = "task_id")

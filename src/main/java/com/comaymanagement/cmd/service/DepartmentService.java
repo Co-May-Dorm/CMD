@@ -7,18 +7,16 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.repository.IDepartmentRepository;
+import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 
 @Service
 public class DepartmentService {
 	@Autowired
-	IDepartmentRepository departmentRepository;
+	DepartmentRepositoryImpl departmentRepository;
 
 	public List<Department> findAllDepartmentByEmployeeId(String id) {
 		return departmentRepository.findAllDepartmentByEmployeeId(id);
 	}
 
-	public List<Department> findAll() {
-		return departmentRepository.findAll();
-	}
-
+	
 }

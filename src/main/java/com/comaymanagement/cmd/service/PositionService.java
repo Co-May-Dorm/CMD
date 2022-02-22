@@ -8,16 +8,12 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.repository.IPositionRepository;
+import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
 
 @Service
 public class PositionService implements IGeneralService<Position> {
 	@Autowired
-	IPositionRepository positionRepository;
-
-	@Override
-	public List<Position> findAll() {
-		return positionRepository.findAll();
-	}
+	PositionRepositoryImpl positionRepository;
 
 	@Override
 	public Optional<Position> findById(String id) {
@@ -36,5 +32,12 @@ public class PositionService implements IGeneralService<Position> {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public Iterable<Position> findAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
