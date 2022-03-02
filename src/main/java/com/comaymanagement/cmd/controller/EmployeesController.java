@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,7 @@ public class EmployeesController {
 	EmployeeService employeeService;
 	@Autowired
 	DepartmentService departmentService;
-	List<Employee> employeeList;
-	List<CustomEmployeeAll> cusEmpList;
+	Set<CustomEmployeeAll> cusEmployeeList;
 	
 	@GetMapping(value= "",produces = "application/json")
 	public  ResponseEntity<Object> paggingAllEmployee(
@@ -66,54 +66,17 @@ public class EmployeesController {
 			int offset = (Integer.parseInt(page) - 1) * limit;
 
 			if(sort==null || sort == "") {
-				sort = "emp.unique_number";
+				sort = "uniqueNumber";
 			}
 			if(order == null || order == "") {
 				order = "desc";
 			}
-			employeeList= employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
-			cusEmpList = new ArrayList<>();
 			
-			for(Employee e : employeeList) {
-				CustomEmployeeAll cusEmp = new CustomEmployeeAll();
-				cusEmp.setUnique_number(e.getUnique_number());
-				cusEmp.setId(e.getId());
-				cusEmp.setName(e.getName());
-				cusEmp.setAvatar(e.getAvatar());
-				cusEmp.setGender(e.getGender());
-				cusEmp.setDateOfBirth(e.getDateOfBirth());
-				cusEmp.setEmail(e.getEmail());
-				cusEmp.setPhoneNumber(e.getPhoneNumber());
-				
-				Department department = e.getDepartment();
-				CustomDepartmentAll cusDep = new CustomDepartmentAll();
-				cusDep.setId(department.getId());
-				cusDep.setName(department.getName());
-				cusEmp.setDepartment(cusDep);
-				
-				List<Position> posList =  e.getPositionList();
-				List<CustomPositionAll> cusPosList =  new ArrayList<>();
-				for(Position p : posList) {
-					CustomPositionAll cusPos = new CustomPositionAll();
-					cusPos.setId(p.getId());
-					cusPos.setName(p.getName());
-					cusPos.setIsManager(p.getIsManager());
-					cusPos.setRoleId(p.getRoleId());
-					cusPosList.add(cusPos);
-				}
-				cusEmp.setPositionList(cusPosList);
-				
-				
-				User user = new User();
-				user.setUsername(e.getUsername());
-				user.setEnableLogin(e.isEnableLogin());
-				cusEmp.setUser(user);
-				
-				cusEmpList.add(cusEmp);
-			}
-			 if(cusEmpList.size() > 0) {
+			cusEmployeeList= employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
+			
+			 if(cusEmployeeList.size() > 0) {
 					
-					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK","Successfully:", cusEmpList));
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK","Successfully:", cusEmployeeList));
 				}else {
 					return ResponseEntity.status(HttpStatus.NOT_FOUND)
 							.body(new ResponseObject("Not found", "Not found", ""));

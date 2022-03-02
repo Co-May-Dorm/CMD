@@ -1,6 +1,7 @@
 package com.comaymanagement.cmd.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,7 +37,7 @@ public interface IEmployeeRepository {
 //										@Param("limit") Integer limit,
 //										@Param("offset") Integer offset
 //										);
-	public List<Employee> employeePaging(
+	public Set<Employee> employeePaging(
 										String name, 
 										String dob, 
 										String email, 

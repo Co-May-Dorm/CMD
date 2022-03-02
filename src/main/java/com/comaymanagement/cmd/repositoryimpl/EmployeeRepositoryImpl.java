@@ -2,8 +2,10 @@ package com.comaymanagement.cmd.repositoryimpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Query;
 
@@ -35,9 +37,9 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 	}
 
 	@Override
-	public List<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
+	public Set<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
 			String sort, String order, Integer limit, Integer offset) {
-		List<Employee> employeeList = new ArrayList<>();
+		Set<Employee> employeeList = new HashSet<>();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
 		hql.append("inner join emp.positionList as pos inner join emp.department as dep ");
@@ -47,7 +49,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
 		hql.append("and pos.name like CONCAT('%',:pos,'%') ");
-		hql.append("order by " + sort +" " + order);
+		hql.append("order by emp." + sort +" " + order);
 		try {
 			Session session = this.sessionFactory.getCurrentSession();
 			System.out.println(hql.toString());
@@ -59,7 +61,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 			query.setParameter("dep", dep);
 			query.setParameter("pos", pos);
 			query.setFirstResult(0);
-			query.setMaxResults(5);
+			query.setMaxResults(15);
 			
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[])it.next();
