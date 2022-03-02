@@ -21,9 +21,9 @@ public class Task {
 	private String id;
 	private String title;
 	private String description;
-	@Column(name="")
+	@Column(name="create_date")
 	private String createDate;
-	@Column(name="")
+	@Column(name="finish_date")
 	private String finishDate;
 	
 	@OneToOne()
