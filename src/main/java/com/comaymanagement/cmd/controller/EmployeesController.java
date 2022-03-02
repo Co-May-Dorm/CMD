@@ -69,7 +69,7 @@ public class EmployeesController {
 				sort = "emp.unique_number";
 			}
 			if(order == null || order == "") {
-				order = "asc";
+				order = "desc";
 			}
 			employeeList= employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
 			cusEmpList = new ArrayList<>();

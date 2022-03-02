@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
+import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
 
 @Repository
@@ -45,9 +47,10 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
 		hql.append("and pos.name like CONCAT('%',:pos,'%') ");
-//		hql.append("order by :orderBy ");
+		hql.append("order by " + sort +" " + order);
 		try {
 			Session session = this.sessionFactory.getCurrentSession();
+			System.out.println(hql.toString());
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
 			query.setParameter("dob", dob);
@@ -55,13 +58,12 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 			query.setParameter("phone", phone);
 			query.setParameter("dep", dep);
 			query.setParameter("pos", pos);
-//			query.setParameter("orderBy", sort + " " + order);
-//			query.setParameter("order", order);
-			query.setFirstResult(1);
-			query.setMaxResults(limit);
+			query.setFirstResult(0);
+			query.setMaxResults(5);
 			
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[])it.next();
+				Position po = (Position) ob[1];
 				employeeList.add((Employee)ob[0]);
 				}
 		} catch (Exception e) {
