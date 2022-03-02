@@ -28,7 +28,8 @@ import lombok.Setter;
 public class Employee {
 	@Id
 	private String id;
-	private Integer unique_number;
+	@Column(name="unique_number")
+	private Integer uniqueNumber;
 	private String name;
 	@Column(name="date_of_birth")
 	private String dateOfBirth;
