@@ -1,7 +1,5 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +7,6 @@ import java.util.Set;
 
 import javax.persistence.Query;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -18,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
@@ -76,4 +72,32 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 		return employeeList;
 	}
 
+	@Override
+	@Transactional
+	public String addEmployee(Employee emp) {
+		Session session = sessionFactory.getCurrentSession();
+		
+		try {
+			String id = (String) session.save(emp);
+			return id;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return "" ;
+		}
+		
+	}
+
+	@Override
+	@Transactional
+	public String updateEmployee(Employee emp) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			 session.update(emp);
+			return "1";
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return "0";
+		}
+	}
+	
 }

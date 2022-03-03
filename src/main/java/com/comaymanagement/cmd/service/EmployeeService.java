@@ -6,23 +6,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.comaymanagement.cmd.constant.DefaultPassword;
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.customentity.User;
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
 public class EmployeeService implements IGeneralService<Employee> {
-
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeRepositoryImpl employeeRepository;
 
@@ -74,7 +80,61 @@ public class EmployeeService implements IGeneralService<Employee> {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Not found", ""));
 		}
 	}
+	public ResponseEntity<Object> addEmployee(String json) {
+		Employee emp = new Employee();
+		User user = new User();
+		List<Position> positionList = new ArrayList<>();
+		Department dep = new Department();
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectEmployee;
+		JsonNode jsonObjectPosition;
+		JsonNode jsonObjectDepartment;
+		JsonNode jsonLoginAccount;
+		try {
+			jsonObjectEmployee = jsonMapper.readTree(json);
+			jsonObjectPosition = jsonObjectEmployee.get("positionList");
+			jsonObjectDepartment = jsonObjectEmployee.get("department");
+			dep.setId(jsonObjectDepartment.get("id").asText());
+			dep.setName(jsonObjectDepartment.get("name").asText());
+			jsonLoginAccount = jsonObjectEmployee.get("user");
+			emp.setId(jsonObjectEmployee.get("id").asText());
+			emp.setName(jsonObjectEmployee.get("name").asText());
+			emp.setAvatar(jsonObjectEmployee.get("avatar").asText());
+			emp.setGender(jsonObjectEmployee.get("gender").asText());
+			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
+			emp.setEmail(jsonObjectEmployee.get("email").asText());
+			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
+			emp.setDepartment(dep);
+			emp.setUsername(jsonLoginAccount.get("username").asText());
+			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
+			if(emp.isEnableLogin()) {
+				emp.setPassword(DefaultPassword.PASSWORD);
+			}
+			for(JsonNode p : jsonObjectPosition) {
+				Position pos = new Position();
+				pos.setId(p.get("id").asText());
+				pos.setName(p.get("name").asText());
+				positionList.add(pos);
+			}
+			emp.setPositionList(positionList);
+			
+		} catch (Exception e) {
+			logger.error("paggingAllEmployee()",e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("Error", e.getMessage(), ""));
+		}
+		String id = employeeRepository.addEmployee(emp);
+		if(id!="") {
+			return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseObject("OK", id+"", emp));
+		}else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error",id+"",emp));
 
+		}
+	}
+	
+	public String updateEmployee(Employee emp) {
+		return employeeRepository.updateEmployee(emp);
+	}
 	@Override
 	public Iterable<Employee> findAll() {
 		// TODO Auto-generated method stub

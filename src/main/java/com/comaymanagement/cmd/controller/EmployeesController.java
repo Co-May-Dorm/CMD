@@ -12,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
@@ -87,18 +89,10 @@ public class EmployeesController {
 	}
 	 
 	
-	@PostMapping(value= "",produces = "application/json")
-	public ResponseEntity<Object> addEmployee(@RequestParam String json) {
-		JsonMapper jsonMapper = new JsonMapper();
-		JsonNode jsonObjectEmployee;
-		try {
-			jsonObjectEmployee = jsonMapper.readTree(json);
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return null;
-		
-		
+	@PostMapping(value= "/add")
+	@ResponseBody
+	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
+		return employeeService.addEmployee(json);
 	}
 	
 	// Example return ResponseEntity
