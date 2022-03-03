@@ -17,8 +17,8 @@ public class TaskService implements IGeneralService<Task> {
 	TaskRepositoryImpl taskRepository;
 
 	
-	public List<Task> findByStatusId(String id){
-		return taskRepository.findByStatusId(id);
+	public List<Task> findByStatusId(String statusId,String sort,String order,Integer limit,Integer offset){
+		return taskRepository.findByStatusId(statusId,sort,order,limit,offset);
 	}
 	public List<Task> findAllTask( String dep, 
 			 String title, 
