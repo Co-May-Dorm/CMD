@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,8 @@ import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @RestController
 @RequestMapping("/employees")
@@ -36,7 +39,7 @@ public class EmployeesController {
 	EmployeeService employeeService;
 	@Autowired
 	DepartmentService departmentService;
-	Set<CustomEmployeeAll> cusEmployeeList;
+	
 	
 	@GetMapping(value= "",produces = "application/json")
 	public  ResponseEntity<Object> paggingAllEmployee(
@@ -58,36 +61,46 @@ public class EmployeesController {
 		dep = dep == null ? "" : dep.trim();
 		pos = pos == null ? "" : pos.trim();
 		page = page == null ? "1" : page.trim();
-		
+		ResponseEntity<Object> cusEmployeeList;
 		// Fix number of employee per page
 		limit = 15;
 		try {
 			//Caculator offset
 			int offset = (Integer.parseInt(page) - 1) * limit;
-
+			
+			// Order by defaut
 			if(sort==null || sort == "") {
 				sort = "uniqueNumber";
 			}
 			if(order == null || order == "") {
 				order = "desc";
 			}
-			
+			//Call to service
 			cusEmployeeList= employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
 			
-			 if(cusEmployeeList.size() > 0) {
-					
-					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK","Successfully:", cusEmployeeList));
-				}else {
-					return ResponseEntity.status(HttpStatus.NOT_FOUND)
-							.body(new ResponseObject("Not found", "Not found", ""));
-				}
 		} catch (Exception e) {
 			logger.error("paggingAllEmployee()",e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseObject("Error", e.getMessage(), ""));
 		}
+		return cusEmployeeList;
 	}
 	 
+	
+	@PostMapping(value= "",produces = "application/json")
+	public ResponseEntity<Object> addEmployee(@RequestParam String json) {
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectEmployee;
+		try {
+			jsonObjectEmployee = jsonMapper.readTree(json);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+		
+		
+	}
+	
 	// Example return ResponseEntity
 
 //	@GetMapping("/{id}")
