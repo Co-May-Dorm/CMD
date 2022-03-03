@@ -49,5 +49,6 @@ public interface IEmployeeRepository {
 										Integer limit,
 										Integer offset
 										);
-
+	public String addEmployee(Employee emp);
+	public String updateEmployee(Employee emp);
 }
