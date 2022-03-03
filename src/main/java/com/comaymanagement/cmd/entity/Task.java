@@ -19,11 +19,12 @@ import lombok.Setter;
 public class Task {
 	@Id
 	private String id;
+	private Integer unique_number;
 	private String title;
 	private String description;
-	@Column(name="create_date")
+	@Column(name= "create_date")
 	private String createDate;
-	@Column(name="finish_date")
+	@Column(name= "finish_date")
 	private String finishDate;
 	
 	@OneToOne()
