@@ -95,7 +95,6 @@ public class EmployeeService implements IGeneralService<Employee> {
 			jsonObjectPosition = jsonObjectEmployee.get("positionList");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
 			dep.setId(jsonObjectDepartment.get("id").asText());
-			dep.setName(jsonObjectDepartment.get("name").asText());
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 			emp.setId(jsonObjectEmployee.get("id").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
@@ -113,7 +112,6 @@ public class EmployeeService implements IGeneralService<Employee> {
 			for(JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
 				pos.setId(p.get("id").asText());
-				pos.setName(p.get("name").asText());
 				positionList.add(pos);
 			}
 			emp.setPositionList(positionList);
