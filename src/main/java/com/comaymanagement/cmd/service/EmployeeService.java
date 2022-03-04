@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -35,11 +36,11 @@ public class EmployeeService implements IGeneralService<Employee> {
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order, Integer limit, Integer offset) {
-		Set<Employee> employeeList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
+		List<Employee> employeeList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
 				limit, offset);
-		Set<CustomEmployeeAll> cusEmpList = new HashSet<>();
-		for (Employee e : employeeList) {
-			CustomEmployeeAll cusEmp = new CustomEmployeeAll();
+		List<CustomEmployeeAll> cusEmpList = new ArrayList();
+		for(Employee e : employeeList) {
+        	CustomEmployeeAll cusEmp = new CustomEmployeeAll();
 			CustomDepartmentAll cusDep = new CustomDepartmentAll();
 			List<CustomPositionAll> cusPositionList = new ArrayList<>();
 
@@ -80,6 +81,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Not found", ""));
 		}
 	}
+	// Add and edit employee
 	public ResponseEntity<Object> addEmployee(String json) {
 		Employee emp = new Employee();
 		User user = new User();
@@ -94,6 +96,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positionList");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
+			emp.setUniqueNumber(jsonObjectEmployee.get("uniqueNumber").asInt());
 			dep.setId(jsonObjectDepartment.get("id").asText());
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 			emp.setId(jsonObjectEmployee.get("id").asText());
@@ -104,10 +107,13 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
 			emp.setDepartment(dep);
-			emp.setUsername(jsonLoginAccount.get("username").asText());
 			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
-			if(emp.isEnableLogin()) {
+		// (If uniqueNumber == null) => add, else => edit (Password editing is not allowed)
+			if(emp.isEnableLogin() && emp.getUniqueNumber() !=null) {
+				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
+			}else {
+				emp.setUsername(jsonLoginAccount.get("username").asText());
 			}
 			for(JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
@@ -121,18 +127,29 @@ public class EmployeeService implements IGeneralService<Employee> {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		String id = employeeRepository.addEmployee(emp);
-		if(id!="") {
-			return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseObject("OK", id+"", emp));
-		}else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error",id+"",emp));
+		// (If uniqueNumber == null) => add, else => edit
+		if(emp.getUniqueNumber() != null) {
+			// update status: 1: successful, 0: fail
+			String updateStatus = employeeRepository.editEmployee(emp);
+			if(updateStatus!="") {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus+"", emp));
+			}else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error",updateStatus+"",emp));
 
+			}
+		}else {
+			String message = employeeRepository.addEmployee(emp);
+			if(message!="") {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Update successful!", message+"", emp));
+			}else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Update error!",message+"",emp));
+
+			}
 		}
+		
 	}
 	
-	public String updateEmployee(Employee emp) {
-		return employeeRepository.updateEmployee(emp);
-	}
+		
 	@Override
 	public Iterable<Employee> findAll() {
 		// TODO Auto-generated method stub
