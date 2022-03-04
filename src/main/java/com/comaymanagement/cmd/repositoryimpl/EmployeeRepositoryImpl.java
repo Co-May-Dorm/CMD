@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -33,9 +34,9 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 	}
 
 	@Override
-	public Set<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
+	public List<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
 			String sort, String order, Integer limit, Integer offset) {
-		Set<Employee> employeeList = new HashSet<>();
+		List<Employee> employeeList = new ArrayList();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
 		hql.append("inner join emp.positionList as pos inner join emp.department as dep ");
@@ -46,9 +47,8 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
 		hql.append("and pos.name like CONCAT('%',:pos,'%') ");
 		hql.append("order by emp." + sort +" " + order);
+		Session session = this.sessionFactory.getCurrentSession();
 		try {
-			Session session = this.sessionFactory.getCurrentSession();
-			System.out.println(hql.toString());
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
 			query.setParameter("dob", dob);
@@ -57,11 +57,10 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 			query.setParameter("dep", dep);
 			query.setParameter("pos", pos);
 			query.setFirstResult(0);
-			query.setMaxResults(15);
+			query.setMaxResults(3);
 			
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[])it.next();
-				Position po = (Position) ob[1];
 				employeeList.add((Employee)ob[0]);
 				}
 		} catch (Exception e) {
@@ -71,17 +70,29 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 		
 		return employeeList;
 	}
-
+	public boolean checkEmployeeIdExisted(String id) {
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from employees emp where emp.id = " + id;
+		try {
+			Query query = session.createQuery(hql.toString());
+			if(query.getFirstResult()>0) {
+				return true;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in checkEmployeeIdExisted() ", e);
+		}
+		
+		return false;
+	}
 	@Override
 	@Transactional
 	public String addEmployee(Employee emp) {
 		Session session = sessionFactory.getCurrentSession();
-		
 		try {
 			String id = (String) session.save(emp);
 			return id;
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			LOGGER.error("Error has occured in addEmployee() ", e);
 			return "" ;
 		}
 		
@@ -89,13 +100,13 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository{
 
 	@Override
 	@Transactional
-	public String updateEmployee(Employee emp) {
+	public String editEmployee(Employee emp) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			 session.update(emp);
 			return "1";
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			LOGGER.error("Error has occured in editEmployee() ", e);
 			return "0";
 		}
 	}

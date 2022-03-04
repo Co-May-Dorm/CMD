@@ -37,7 +37,7 @@ public interface IEmployeeRepository {
 //										@Param("limit") Integer limit,
 //										@Param("offset") Integer offset
 //										);
-	public Set<Employee> employeePaging(
+	public List<Employee> employeePaging(
 										String name, 
 										String dob, 
 										String email, 
@@ -50,5 +50,6 @@ public interface IEmployeeRepository {
 										Integer offset
 										);
 	public String addEmployee(Employee emp);
-	public String updateEmployee(Employee emp);
+	public String editEmployee(Employee emp);
+	public boolean checkEmployeeIdExisted(String id);
 }
