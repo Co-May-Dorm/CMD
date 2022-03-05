@@ -1,11 +1,8 @@
 package com.comaymanagement.cmd.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +36,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 		List<Employee> employeeList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
 				limit, offset);
 		List<CustomEmployeeAll> cusEmpList = new ArrayList();
-		for(Employee e : employeeList) {
-        	CustomEmployeeAll cusEmp = new CustomEmployeeAll();
+		for (Employee e : employeeList) {
+			CustomEmployeeAll cusEmp = new CustomEmployeeAll();
 			CustomDepartmentAll cusDep = new CustomDepartmentAll();
 			List<CustomPositionAll> cusPositionList = new ArrayList<>();
 
@@ -81,6 +78,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Not found", ""));
 		}
 	}
+
 	// Add and edit employee
 	public ResponseEntity<Object> addEmployee(String json) {
 		Employee emp = new Employee();
@@ -92,11 +90,25 @@ public class EmployeeService implements IGeneralService<Employee> {
 		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonLoginAccount;
+		int uniqueNumber = -1;
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
+
+			JsonNode tmp = jsonObjectEmployee.get("uniqueNumber");
+			if (tmp != null) {
+				uniqueNumber = jsonObjectEmployee.get("uniqueNumber").asInt();
+			}
+//			emp = employeeRepository.load(uniqueNumber);
+//			Check employee id existed
+			boolean isExisted = employeeRepository.checkEmployeeIdExisted(uniqueNumber,
+					jsonObjectEmployee.get("id").asText());
+
+			if (isExisted) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
+			}
 			jsonObjectPosition = jsonObjectEmployee.get("positionList");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
-			emp.setUniqueNumber(jsonObjectEmployee.get("uniqueNumber").asInt());
 			dep.setId(jsonObjectDepartment.get("id").asText());
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 			emp.setId(jsonObjectEmployee.get("id").asText());
@@ -108,48 +120,72 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
 			emp.setDepartment(dep);
 			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
-		// (If uniqueNumber == null) => add, else => edit (Password editing is not allowed)
-			if(emp.isEnableLogin() && emp.getUniqueNumber() !=null) {
+			// (If uniqueNumber == "") => add, else => edit (Password editing is not
+			// allowed)
+			if (emp.isEnableLogin() && uniqueNumber == -1) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
-			}else {
+			} else {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 			}
-			for(JsonNode p : jsonObjectPosition) {
+			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
 				pos.setId(p.get("id").asText());
 				positionList.add(pos);
 			}
 			emp.setPositionList(positionList);
-			
+
 		} catch (Exception e) {
-			logger.error("paggingAllEmployee()",e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error", e.getMessage(), ""));
+			logger.error("paggingAllEmployee()", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		// (If uniqueNumber == null) => add, else => edit
-		if(emp.getUniqueNumber() != null) {
+		// (If uniqueNumber == -1) => add, else => edit
+		if (uniqueNumber == -1) {
+			String message = employeeRepository.add(emp);
+			if (message != "") {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", message + "", emp));
+
+			}
+		} else {
 			// update status: 1: successful, 0: fail
-			String updateStatus = employeeRepository.editEmployee(emp);
-			if(updateStatus!="") {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus+"", emp));
-			}else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error",updateStatus+"",emp));
-
-			}
-		}else {
-			String message = employeeRepository.addEmployee(emp);
-			if(message!="") {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Update successful!", message+"", emp));
-			}else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Update error!",message+"",emp));
+			emp.setUniqueNumber(uniqueNumber);
+			String updateStatus = employeeRepository.edit(emp);
+			if (updateStatus != "") {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", emp));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", updateStatus + "", emp));
 
 			}
 		}
-		
+
 	}
-	
-		
+
+	// Delete employee by id
+	public ResponseEntity<Object> delete(String json) {
+		JsonMapper jsonMapper = new JsonMapper();
+		try {
+			JsonNode jsonObjectEmployee = jsonMapper.readTree(json);
+			String id = jsonObjectEmployee.get("id").asText();
+			String updateStatus = employeeRepository.delete(id);
+
+			if (updateStatus.equals("1")) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", updateStatus + "", ""));
+
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
+
+		}
+
+	}
+
 	@Override
 	public Iterable<Employee> findAll() {
 		// TODO Auto-generated method stub

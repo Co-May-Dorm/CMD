@@ -1,18 +1,13 @@
 package com.comaymanagement.cmd.repository;
 
 import java.util.List;
-import java.util.Set;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.comaymanagement.cmd.entity.Employee;
 
 public interface IEmployeeRepository {
 
 	public List<Employee> findByActiveFlag(Boolean activeFlag);
-	
+
 //	@Query(value = "select * from cmd.employees emp "
 //			+ "inner join cmd.positions_employees pos_emp on emp.id = pos_emp.employee_id "
 //			+ "inner join cmd.positions pos on pos.id = pos_emp.position_id "
@@ -37,19 +32,14 @@ public interface IEmployeeRepository {
 //										@Param("limit") Integer limit,
 //										@Param("offset") Integer offset
 //										);
-	public List<Employee> employeePaging(
-										String name, 
-										String dob, 
-										String email, 
-										String phone, 
-										String dep, 
-										String pos,
-										String sort,
-										String order,
-										Integer limit,
-										Integer offset
-										);
-	public String addEmployee(Employee emp);
-	public String editEmployee(Employee emp);
-	public boolean checkEmployeeIdExisted(String id);
+	public List<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
+			String sort, String order, Integer limit, Integer offset);
+
+	public String add(Employee emp);
+
+	public String edit(Employee emp);
+
+	public String delete(String id);
+
+	public boolean checkEmployeeIdExisted(Integer uniqueNumber, String id);
 }
