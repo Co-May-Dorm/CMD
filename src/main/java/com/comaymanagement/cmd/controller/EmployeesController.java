@@ -1,9 +1,5 @@
 package com.comaymanagement.cmd.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,43 +16,31 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
-import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
-import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
-import com.comaymanagement.cmd.customentity.CustomPositionAll;
-import com.comaymanagement.cmd.customentity.User;
-import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Employee;
-import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @RestController
 @RequestMapping("/employees")
 @CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
 public class EmployeesController {
-	 private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeService employeeService;
 	@Autowired
 	DepartmentService departmentService;
-	
-	
-	@GetMapping(value= "",produces = "application/json")
-	public  ResponseEntity<Object> paggingAllEmployee(
-				@RequestParam(value="page",required = false) String page, 
-				@RequestParam(value="name",required = false) String name, 
-				@RequestParam(value="dob",required = false) String dob, 
-				@RequestParam(value="email", required = false) String email,  
-				@RequestParam(value="phone", required = false) String phone, 
-				@RequestParam(value="dep", required = false) String dep, 
-				@RequestParam(value="pos", required = false) String pos,
-				@RequestParam(value="sort", required = false) String sort,
-				@RequestParam(value="order", required = false) String order,
-				@RequestParam(value="limit", required = false) Integer limit
-				){
+
+	@GetMapping(value = "", produces = "application/json")
+	public ResponseEntity<Object> paggingAllEmployee(@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "dob", required = false) String dob,
+			@RequestParam(value = "email", required = false) String email,
+			@RequestParam(value = "phone", required = false) String phone,
+			@RequestParam(value = "dep", required = false) String dep,
+			@RequestParam(value = "pos", required = false) String pos,
+			@RequestParam(value = "sort", required = false) String sort,
+			@RequestParam(value = "order", required = false) String order,
+			@RequestParam(value = "limit", required = false) Integer limit) {
 		name = name == null ? "" : name.trim();
 		dob = dob == null ? "" : dob.trim();
 		email = email == null ? "" : email.trim();
@@ -67,34 +52,45 @@ public class EmployeesController {
 		// Fix number of employee per page
 		limit = 15;
 		try {
-			//Caculator offset
+			// Caculator offset
 			int offset = (Integer.parseInt(page) - 1) * limit;
-			
+
 			// Order by defaut
-			if(sort==null || sort == "") {
+			if (sort == null || sort == "") {
 				sort = "uniqueNumber";
 			}
-			if(order == null || order == "") {
+			if (order == null || order == "") {
 				order = "desc";
 			}
-			//Call to service
-			cusEmployeeList= employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit, offset);
-			
+			// Call to service
+			cusEmployeeList = employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit,
+					offset);
+
 		} catch (Exception e) {
-			logger.error("paggingAllEmployee()",e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error", e.getMessage(), ""));
+			logger.error("paggingAllEmployee()", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 		return cusEmployeeList;
 	}
-	 
-	
-	@PostMapping(value= "/add")
+
+	@PostMapping(value = "/add")
 	@ResponseBody
 	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
 		return employeeService.addEmployee(json);
 	}
-	
+
+	@PostMapping(value = "/edit")
+	@ResponseBody
+	public ResponseEntity<Object> editEmployee(@RequestBody String json) {
+		return employeeService.addEmployee(json);
+	}
+
+	@PutMapping(value = "/delete")
+	@ResponseBody
+	public ResponseEntity<Object> deleteEmployee(@RequestBody String json) {
+		return employeeService.delete(json);
+	}
+
 	// Example return ResponseEntity
 
 //	@GetMapping("/{id}")
