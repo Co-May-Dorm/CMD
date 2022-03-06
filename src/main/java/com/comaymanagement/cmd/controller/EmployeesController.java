@@ -39,21 +39,17 @@ public class EmployeesController {
 			@RequestParam(value = "dep", required = false) String dep,
 			@RequestParam(value = "pos", required = false) String pos,
 			@RequestParam(value = "sort", required = false) String sort,
-			@RequestParam(value = "order", required = false) String order,
-			@RequestParam(value = "limit", required = false) Integer limit) {
-		name = name == null ? "" : name.trim();
-		dob = dob == null ? "" : dob.trim();
-		email = email == null ? "" : email.trim();
-		phone = phone == null ? "" : phone.trim();
-		dep = dep == null ? "" : dep.trim();
-		pos = pos == null ? "" : pos.trim();
+			@RequestParam(value = "order", required = false) String order) {
+	
+		//test
 		page = page == null ? "1" : page.trim();
 		ResponseEntity<Object> cusEmployeeList;
 		// Fix number of employee per page
-		limit = 15;
+		int limit = 15;
+		int offset = (Integer.parseInt(page) - 1) * limit;
 		try {
 			// Caculator offset
-			int offset = (Integer.parseInt(page) - 1) * limit;
+			
 
 			// Order by defaut
 			if (sort == null || sort == "") {
