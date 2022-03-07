@@ -49,7 +49,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 				sort = "uniqueNumber";
 			}
 			if (order == null || order == "") {
-				order = "asc";
+				order = "desc";
 			}
 		List<Employee> employeeList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
 				limit, offset);
