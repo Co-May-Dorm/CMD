@@ -52,48 +52,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 			if (order == null || order == "") {
 				order = "desc";
 			}
-		List<Employee> employeeList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
+		List<CustomEmployeeAll> cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
 				limit, offset);
-		List<CustomEmployeeAll> cusEmpList = new ArrayList();
-		for (Employee e : employeeList) {
-			CustomEmployeeAll cusEmp = new CustomEmployeeAll();
-			CustomDepartmentAll cusDep = new CustomDepartmentAll();
-			List<CustomPositionAll> cusPositionList = new ArrayList<>();
-
-			cusDep.setId(e.getDepartment().getId());
-			cusDep.setName(e.getDepartment().getName());
-			cusDep.setManagerId(e.getDepartment().getManagerId());
-
-			// Add position list
-			for (Position p : e.getPositionList()) {
-				CustomPositionAll cusPos = new CustomPositionAll();
-				Role role = new Role();
-				role.setId(p.getRole().getId());
-				role.setName(p.getRole().getName());
-				cusPos.setId(p.getId());
-				cusPos.setName(p.getName());
-				cusPos.setIsManager(p.getIsManager());
-				cusPos.setRole(role);
-				cusPositionList.add(cusPos);
-			}
-			User user = new User();
-			user.setUsername(e.getUsername());
-			user.setEnableLogin(e.isEnableLogin());
-
-			cusEmp.setUniqueNumber(e.getUniqueNumber());
-			cusEmp.setId(e.getId());
-			cusEmp.setName(e.getName());
-			cusEmp.setAvatar(e.getAvatar());
-			cusEmp.setGender(e.getGender());
-			cusEmp.setDateOfBirth(e.getDateOfBirth());
-			cusEmp.setEmail(e.getEmail());
-			cusEmp.setPhoneNumber(e.getPhoneNumber());
-			cusEmp.setDepartment(cusDep);
-			cusEmp.setPositionList(cusPositionList);
-			cusEmp.setUser(user);
-
-			cusEmpList.add(cusEmp);
-		}
+		
 		if (cusEmpList.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", cusEmpList));
 		} else {

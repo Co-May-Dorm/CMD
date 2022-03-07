@@ -11,13 +11,13 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repository.IDepartmentRepository;
@@ -85,6 +85,49 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository{
 			LOGGER.error("Error has occured in DepartmentRepositoryImpl at findAll() ", e);
 		}
 		return cusDepList;
+	}
+	
+	@Transactional
+	public boolean isExisted(String id, String uniqueNumber) {
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from departments dep where dep.id = :id and dep.uniqueNumber != :uniqueNumber";
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("id", id);
+			query.setParameter("uniqueNumber", uniqueNumber);
+			List<Department> tmp = (List<Department>) query.getResultList();
+			if(tmp.size()>0) {
+				return true;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentRepositoryImpl at isExisted() ", e);
+		}
+		return false;
+	}
+	
+	@Transactional
+	@Override
+	public String add(Department dep) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			String id = (String) session.save(dep);
+			return id;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentRepositoryImpl at add() ", e);
+		}
+		return "";
+	}
+
+	@Override
+	public String edit(Department dep) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String delete(String id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
