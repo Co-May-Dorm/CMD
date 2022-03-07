@@ -19,6 +19,7 @@ import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
+import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repository.IDepartmentRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -52,10 +53,13 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository{
 				cusDep.setFatherDepartmentId(tmp.getFatherDepartmentId());
 				for(Position pos : tmp.getPositionList()) {
 					CustomPositionAll cusPos = new CustomPositionAll();
+					Role role = new Role();
+					role.setId(pos.getRole().getId());
+					role.setName(pos.getRole().getName());
 					cusPos.setId(pos.getId());
 					cusPos.setName(pos.getName());
 					cusPos.setIsManager(pos.getIsManager());
-					cusPos.setRoleId(pos.getRoleId());
+					cusPos.setRole(role);
 					cusPosList.add(cusPos);
 				}
 				cusDep.setPositionList(cusPosList);

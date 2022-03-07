@@ -17,6 +17,6 @@ public class CustomPositionAll {
 	private String id;
 	private String name;
 	private Boolean isManager;
-	private String roleId;
+	private Role role;
 	
 }

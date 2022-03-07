@@ -38,8 +38,11 @@ public class Position {
 	private String modifyBy;
 	@Column(name="modify_date")
 	private String modifyDate;
-	@Column(name="role_id")
-	private String roleId;
+	
+	@OneToOne
+	@JoinColumn(name="role_id")
+	@JsonBackReference
+	private Role role;
 
 	@OneToOne()
 	@JoinColumn(name = "department_id", insertable = false, updatable = false)

@@ -20,6 +20,7 @@ import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -66,10 +67,13 @@ public class EmployeeService implements IGeneralService<Employee> {
 			// Add position list
 			for (Position p : e.getPositionList()) {
 				CustomPositionAll cusPos = new CustomPositionAll();
+				Role role = new Role();
+				role.setId(p.getRole().getId());
+				role.setName(p.getRole().getName());
 				cusPos.setId(p.getId());
 				cusPos.setName(p.getName());
 				cusPos.setIsManager(p.getIsManager());
-				cusPos.setRoleId(p.getRoleId());
+				cusPos.setRole(role);
 				cusPositionList.add(cusPos);
 			}
 			User user = new User();
