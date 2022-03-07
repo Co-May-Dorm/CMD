@@ -46,7 +46,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		hql.append("and emp.email like CONCAT('%',:email,'%') ");
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
-		hql.append("and pos.name like CONCAT('%',:pos,'%') ");
+		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team is null and pos.department is not null ");
 		hql.append("order by emp." + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
 		try {

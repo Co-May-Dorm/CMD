@@ -31,7 +31,8 @@ public class EmployeesController {
 	DepartmentService departmentService;
 
 	@GetMapping(value = "", produces = "application/json")
-	public ResponseEntity<Object> paggingAllEmployee(@RequestParam(value = "page", required = false) String page,
+	public ResponseEntity<Object> paggingAllEmployee(
+			@RequestParam(value = "page", required = false) String page,
 			@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "dob", required = false) String dob,
 			@RequestParam(value = "email", required = false) String email,
@@ -39,38 +40,8 @@ public class EmployeesController {
 			@RequestParam(value = "dep", required = false) String dep,
 			@RequestParam(value = "pos", required = false) String pos,
 			@RequestParam(value = "sort", required = false) String sort,
-			@RequestParam(value = "order", required = false) String order,
-			@RequestParam(value = "limit", required = false) Integer limit) {
-		name = name == null ? "" : name.trim();
-		dob = dob == null ? "" : dob.trim();
-		email = email == null ? "" : email.trim();
-		phone = phone == null ? "" : phone.trim();
-		dep = dep == null ? "" : dep.trim();
-		pos = pos == null ? "" : pos.trim();
-		page = page == null ? "1" : page.trim();
-		ResponseEntity<Object> cusEmployeeList;
-		// Fix number of employee per page
-		limit = 15;
-		try {
-			// Caculator offset
-			int offset = (Integer.parseInt(page) - 1) * limit;
-
-			// Order by defaut
-			if (sort == null || sort == "") {
-				sort = "uniqueNumber";
-			}
-			if (order == null || order == "") {
-				order = "desc";
-			}
-			// Call to service
-			cusEmployeeList = employeeService.employeePaging(name, dob, email, phone, dep, pos, sort, order, limit,
-					offset);
-
-		} catch (Exception e) {
-			logger.error("paggingAllEmployee()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
-		}
-		return cusEmployeeList;
+			@RequestParam(value = "order", required = false) String order) {
+		return employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
 	}
 
 	@PostMapping(value = "/add")

@@ -31,8 +31,26 @@ public class EmployeeService implements IGeneralService<Employee> {
 	EmployeeRepositoryImpl employeeRepository;
 
 	// Find all employee and search
-	public ResponseEntity<Object> employeePaging(String name, String dob, String email, String phone, String dep,
-			String pos, String sort, String order, Integer limit, Integer offset) {
+	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone, String dep,
+			String pos, String sort, String order) {
+		name = name == null ? "" : name.trim();
+		dob = dob == null ? "" : dob.trim();
+		email = email == null ? "" : email.trim();
+		phone = phone == null ? "" : phone.trim();
+		dep = dep == null ? "" : dep.trim();
+		pos = pos == null ? "" : pos.trim();
+		page = page == null ? "1" : page.trim();
+		int limit = 15;
+			// Caculator offset
+			int offset = (Integer.parseInt(page) - 1) * limit;
+
+			// Order by defaut
+			if (sort == null || sort == "") {
+				sort = "uniqueNumber";
+			}
+			if (order == null || order == "") {
+				order = "asc";
+			}
 		List<Employee> employeeList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
 				limit, offset);
 		List<CustomEmployeeAll> cusEmpList = new ArrayList();
