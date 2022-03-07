@@ -8,7 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
@@ -25,25 +28,7 @@ public class DepartmentController {
 	DepartmentService departmentService;
 
 	@GetMapping("")
-	public ResponseEntity<Object> findAll() {
-
-		List<CustomDepartmentAll> customDepartments = new ArrayList<>();
-		List<Department> departments = null;
-		for (Department d : departments) {
-			CustomDepartmentAll custom = new CustomDepartmentAll();
-			custom.setId(d.getId());
-			custom.setName(d.getName());
-			custom.setFatherDepartmentId(d.getFatherDepartmentId());
-			custom.setPositionList(d.getPositionList());
-			customDepartments.add(custom);
-		}
-
-		if (customDepartments.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseObject("OK", "Query produce successfully: ", customDepartments));
-		} else {
-
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Error", ""));
-		}
+	public ResponseEntity<Object> findAll(@RequestParam(value = "name", required = false) String name) {
+		return departmentService.findAll(name);
 	}
 }

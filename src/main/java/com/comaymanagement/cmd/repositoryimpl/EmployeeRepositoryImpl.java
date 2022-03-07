@@ -20,8 +20,7 @@ import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
 
 @Repository
-@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-//@Transactional(rollbackFor = Exception.class)
+@Transactional(rollbackFor = Exception.class)
 public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
 	@Autowired
@@ -33,6 +32,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		return null;
 	}
 
+	// find all employee with position in department
 	@Override
 	@Transactional
 	public List<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
