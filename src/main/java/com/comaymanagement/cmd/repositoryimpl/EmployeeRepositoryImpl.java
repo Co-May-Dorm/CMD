@@ -11,12 +11,16 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
+import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
+import com.comaymanagement.cmd.customentity.CustomPositionAll;
+import com.comaymanagement.cmd.customentity.User;
 import com.comaymanagement.cmd.entity.Employee;
+import com.comaymanagement.cmd.entity.Position;
+import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
 
 @Repository
@@ -35,7 +39,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	// find all employee with position in department
 	@Override
 	@Transactional
-	public List<Employee> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
+	public List<CustomEmployeeAll> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
 			String sort, String order, Integer limit, Integer offset) {
 		List<Employee> employeeList = new ArrayList();
 		StringBuilder hql = new StringBuilder();
@@ -49,6 +53,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team is null and pos.department is not null ");
 		hql.append("order by emp." + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
+		List<CustomEmployeeAll> cusEmpList = new ArrayList();
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
@@ -64,12 +69,51 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				Object[] ob = (Object[]) it.next();
 				employeeList.add((Employee) ob[0]);
 			}
+			for (Employee e : employeeList) {
+				CustomEmployeeAll cusEmp = new CustomEmployeeAll();
+				CustomDepartmentAll cusDep = new CustomDepartmentAll();
+				List<CustomPositionAll> cusPositionList = new ArrayList<>();
+
+				cusDep.setId(e.getDepartment().getId());
+				cusDep.setName(e.getDepartment().getName());
+				cusDep.setManagerId(e.getDepartment().getManagerId());
+
+				// Add position list
+				for (Position p : e.getPositionList()) {
+					CustomPositionAll cusPos = new CustomPositionAll();
+					Role role = new Role();
+					role.setId(p.getRole().getId());
+					role.setName(p.getRole().getName());
+					cusPos.setId(p.getId());
+					cusPos.setName(p.getName());
+					cusPos.setIsManager(p.getIsManager());
+					cusPos.setRole(role);
+					cusPositionList.add(cusPos);
+				}
+				User user = new User();
+				user.setUsername(e.getUsername());
+				user.setEnableLogin(e.isEnableLogin());
+
+				cusEmp.setUniqueNumber(e.getUniqueNumber());
+				cusEmp.setId(e.getId());
+				cusEmp.setName(e.getName());
+				cusEmp.setAvatar(e.getAvatar());
+				cusEmp.setGender(e.getGender());
+				cusEmp.setDateOfBirth(e.getDateOfBirth());
+				cusEmp.setEmail(e.getEmail());
+				cusEmp.setPhoneNumber(e.getPhoneNumber());
+				cusEmp.setDepartment(cusDep);
+				cusEmp.setPositionList(cusPositionList);
+				cusEmp.setUser(user);
+
+				cusEmpList.add(cusEmp);
+			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
 
 		}
 
-		return employeeList;
+		return cusEmpList;
 	}
 
 	@Transactional
