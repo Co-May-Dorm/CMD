@@ -42,5 +42,5 @@ public interface IEmployeeRepository {
 
 	public String delete(String id);
 
-	public boolean checkEmployeeIdExisted(Integer uniqueNumber, String id);
+	public boolean checkEmployeeIdExisted(String id);
 }
