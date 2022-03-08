@@ -24,6 +24,6 @@ public class RoleController {
 			@RequestParam(value = "order", required = false) String order,
 			@RequestParam(value = "limit", required = false) Integer limit,
 			@RequestParam(value = "page", required = false) String page) {
-		return roleService.findAllRole(sort, order, limit, page);
+		return roleService.findAllRole(sort, order, page);
 	}
 }

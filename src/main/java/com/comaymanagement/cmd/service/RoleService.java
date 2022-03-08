@@ -24,10 +24,10 @@ public class RoleService implements IGeneralService<Role> {
 	
 	private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	
-	public ResponseEntity<Object> findAllRole(String sort, String order, Integer limit, String page) {
+	public ResponseEntity<Object> findAllRole(String sort, String order, String page) {
 		try {
 
-			List<CustomRoleAll> customRoleAlls = roleRepository.findAllRole(sort, order, limit, page);
+			List<CustomRoleAll> customRoleAlls = roleRepository.findAllRole(sort, order, page);
 
 			if(customRoleAlls == null) {
 				LOGGER.info("NOT FOUND");
