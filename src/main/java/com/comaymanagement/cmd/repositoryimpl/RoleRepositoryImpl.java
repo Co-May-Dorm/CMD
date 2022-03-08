@@ -31,9 +31,9 @@ public class RoleRepositoryImpl implements IRoleRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoleRepositoryImpl.class);
 	
 	@Override
-	public List<CustomRoleAll> findAllRole(String sort, String order, Integer limit, String page) {
+	public List<CustomRoleAll> findAllRole(String sort, String order, String page) {
 		order = order == null ? "r.unique_number" : order.trim();
-		limit = limit == null ? 10 : limit;
+		int limit =10;
 		sort = sort == null ? "DESC" : sort.trim();
 		page = page == null ? "1" : page.trim();
 		

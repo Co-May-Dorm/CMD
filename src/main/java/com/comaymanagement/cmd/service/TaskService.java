@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Task;
-import com.comaymanagement.cmd.repository.ITaskRepository;
 import com.comaymanagement.cmd.repositoryimpl.TaskRepositoryImpl;
 
 @Service
@@ -25,10 +24,10 @@ public class TaskService implements IGeneralService<Task> {
 	@Autowired
 	TaskRepositoryImpl taskRepository;
 
-	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, Integer limit, String page) {
+	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, String page) {
 		try {
 
-			List<CustomTaskAll> taskListByStatusId = taskRepository.findByStatusId(statusId,sort,order,limit,page);
+			List<CustomTaskAll> taskListByStatusId = taskRepository.findByStatusId(statusId,sort,order,page);
 			
 
 			if(taskListByStatusId == null) {
@@ -45,13 +44,13 @@ public class TaskService implements IGeneralService<Task> {
 	}
 
 	public ResponseEntity<Object> findAllTask(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String sort, String order, Integer limit, String page) {
+			String createDate, String finishDate, String sort, String order, String page) {
 
 		List<CustomTaskAll> taskList = new ArrayList<CustomTaskAll>();
 		try {
 
 			taskList = taskRepository.findAllTask(dep, title, status, creator, receiver, createDate,
-					finishDate, sort, order, limit, page);
+					finishDate, sort, order, page);
 
 			if (taskList.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)

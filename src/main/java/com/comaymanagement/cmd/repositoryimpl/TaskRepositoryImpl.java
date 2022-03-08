@@ -11,13 +11,10 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
-import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.repository.ITaskRepository;
 
@@ -32,13 +29,13 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	@Transactional
-	public List<CustomTaskAll> findByStatusId(String statusId,String sort,String order,Integer limit,String page) {
+	public List<CustomTaskAll> findByStatusId(String statusId,String sort,String order,String page) {
 		List<Task> taskList = new ArrayList<Task>();
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("WHERE t.status.id = :statusId");
 		order = order == null ? "t.unique_number" : order;
-		limit = limit == null ? 10 : limit;
+		int limit = 15;
 		sort = sort == null ? "DESC" : sort;
 		page = page == null ? "1" : page;
 		try {
@@ -81,7 +78,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	@Override
 	@Transactional
 	public List<CustomTaskAll> findAllTask(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String sort, String order, Integer limit, String page) {
+			String createDate, String finishDate, String sort, String order, String page) {
 		dep = dep == null ? " " : dep;
 		title = title == null ? " " : title;
 		status = status == null ? " " : status;
@@ -91,7 +88,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		finishDate = finishDate == null ? " " : finishDate;
 		order = order == null ? "t.unique_number" : order;
 		sort = sort == null ? "DESC" : sort;
-		limit = limit == null ? 10 : limit;
+		int limit = 10;
 		page = page == null ? "1" : page;
 
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();

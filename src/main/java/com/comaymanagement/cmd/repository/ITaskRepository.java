@@ -12,7 +12,6 @@ public interface ITaskRepository {
 	List<CustomTaskAll> findByStatusId(@Param("status_id") String statusId,
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("limit") Integer limit,
 			@Param("offset") String page);
 	
 	List<CustomTaskAll> findAllTask( 
@@ -25,6 +24,5 @@ public interface ITaskRepository {
 			@Param("finishDate") String finishDate,
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("limit") Integer limit,
 			@Param("offset") String page);
 }

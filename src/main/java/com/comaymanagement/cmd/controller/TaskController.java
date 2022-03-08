@@ -1,7 +1,5 @@
 package com.comaymanagement.cmd.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
-import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Status;
@@ -77,7 +74,7 @@ public class TaskController {
 			@RequestParam(value="limit", required = false) Integer limit
 			) {
 		LOGGER.info("Get task list");
-		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,limit,page);
+		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,page);
 			
 
 	}
@@ -132,11 +129,9 @@ public class TaskController {
 	public ResponseEntity<Object> findByStatus(@PathVariable String statusId,
 			@RequestParam(value="page",required = false) String page, 
 			@RequestParam(value="sort", required = false) String sort,
-			@RequestParam(value="order", required = false) String order,
-			@RequestParam(value="limit", required = false) Integer limit){
-
+			@RequestParam(value="order", required = false) String order){
 		LOGGER.info("Get task list by status");
-		return taskService.findByStatusId(statusId, sort, order, limit, page);
+		return taskService.findByStatusId(statusId, sort, order, page);
 
 
 
