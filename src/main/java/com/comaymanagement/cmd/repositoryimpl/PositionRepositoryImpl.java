@@ -56,5 +56,22 @@ public class PositionRepositoryImpl implements IPositionRepository {
 		}
 		return customPositionAlls;
 	}
+
+	@Override
+	public Integer CountTotalItem() {
+		Integer count = null;
+		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM positions");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			@SuppressWarnings("rawtypes")
+			List list = query.getResultList();
+			count = Integer.valueOf(list.get(0).toString());
+		}catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return count;
+	}
 	
 }

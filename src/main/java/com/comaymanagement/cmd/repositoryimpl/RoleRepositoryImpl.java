@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.customentity.CustomRoleAll;
+import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repository.IRoleRepository;
 @Repository
@@ -31,12 +32,7 @@ public class RoleRepositoryImpl implements IRoleRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoleRepositoryImpl.class);
 	
 	@Override
-	public List<CustomRoleAll> findAllRole(String sort, String order, String page) {
-		order = order == null ? "r.unique_number" : order.trim();
-		int limit =10;
-		sort = sort == null ? "DESC" : sort.trim();
-		page = page == null ? "1" : page.trim();
-		
+	public List<CustomRoleAll> findAllRole(String sort, String order, String page,Integer limit) {
 		List<Role> roles = new ArrayList<Role>();
 		List<CustomRoleAll> customRoleList = new ArrayList<CustomRoleAll>();
 		StringBuilder hql = new StringBuilder("FROM roles AS r ");
@@ -71,5 +67,21 @@ public class RoleRepositoryImpl implements IRoleRepository {
 		return customRoleList;
 	}
 
+	@Override
+	public Integer CountTotalItem() {
+		Integer count = null;
+		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM roles");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			@SuppressWarnings("rawtypes")
+			List list = query.getResultList();
+			count = Integer.valueOf(list.get(0).toString());
+		}catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return count;
+	}
 
 }
