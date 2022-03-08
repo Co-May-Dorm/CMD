@@ -48,6 +48,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository{
 				Object[] ob = (Object[]) it.next();
 				CustomDepartmentAll cusDep = new CustomDepartmentAll();
 				Department tmp = (Department) ob[0];
+				cusDep.setUniqueNumber(tmp.getUniqueNumber());
 				cusDep.setId(tmp.getId());
 				cusDep.setName(tmp.getName());
 				cusDep.setFatherDepartmentId(tmp.getFatherDepartmentId());
@@ -88,7 +89,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository{
 	}
 	
 	@Transactional
-	public boolean isExisted(String id, String uniqueNumber) {
+	public boolean isExisted(Integer uniqueNumber, String id) {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "from departments dep where dep.id = :id and dep.uniqueNumber != :uniqueNumber";
 		try {
@@ -120,8 +121,14 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository{
 
 	@Override
 	public String edit(Department dep) {
-		// TODO Auto-generated method stub
-		return null;
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			session.update(dep);
+			return "1";
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentRepositoryImpl at edit() ", e);
+			return "0";
+		}
 	}
 
 	@Override

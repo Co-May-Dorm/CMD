@@ -22,9 +22,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Department {
-
+	
 	@Id
 	private String id;
+	@Column(name="unique_number")
+	private Integer uniqueNumber;
 	private String name;
 	@Column(name="farther_department_id")
 	private String fatherDepartmentId;
