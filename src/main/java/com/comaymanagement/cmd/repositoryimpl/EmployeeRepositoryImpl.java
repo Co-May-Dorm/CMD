@@ -117,13 +117,12 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	}
 
 	@Transactional
-	public boolean checkEmployeeIdExisted(Integer uniqueNumber, String id) {
+	public boolean checkEmployeeIdExisted(String id) {
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from employees emp where emp.id = :id and emp.uniqueNumber != :uniqueNumber";
+		String hql = "from employees emp where emp.id = :id";
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("id", id);
-			query.setParameter("uniqueNumber", uniqueNumber);
 			List<Employee> list = (List<Employee>) query.getResultList();
 			if (list.size() > 0) {
 				return true;
