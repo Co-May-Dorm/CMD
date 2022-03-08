@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.repository.query.Param;
 
+import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Task;
 
 
@@ -15,7 +16,7 @@ public interface ITaskRepository {
 			@Param("limit") Integer limit,
 			@Param("offset") Integer offset);
 	
-	List<Task> findAllTask( 
+	List<CustomTaskAll> findAllTask( 
 			@Param("dep") String dep, 
 			@Param("title") String title, 
 			@Param("status") String status, 

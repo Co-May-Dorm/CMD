@@ -17,6 +17,7 @@ public class CustomTaskAll {
 	
 	@Id
 	private String taskId;
+	private Integer uniqueNumber;
 	private String creatorId;
 	private String creatorName;
 	private String recieverId;
