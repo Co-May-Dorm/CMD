@@ -1,10 +1,6 @@
 package com.comaymanagement.cmd.customentity;
 
-import java.util.Set;
-
-import com.comaymanagement.cmd.entity.Auth;
-import com.comaymanagement.cmd.entity.Position;
-import com.comaymanagement.cmd.entity.RoleDetail;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +14,5 @@ import lombok.Setter;
 public class CustomRoleAll {
 	private String id;
 	private String name;
-	private Set<Auth> authList;
-	private Set<RoleDetail> roleDetailList;
-	private Position position;
+	private List<CustomPositionAll> positions;
 }
