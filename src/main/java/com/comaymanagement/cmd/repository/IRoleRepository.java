@@ -1,9 +1,15 @@
 package com.comaymanagement.cmd.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-import com.comaymanagement.cmd.entity.Role;
+import org.springframework.data.repository.query.Param;
+
+import com.comaymanagement.cmd.customentity.CustomRoleAll;
 
 public interface IRoleRepository {
-
+	List<CustomRoleAll> findAllRole(
+			@Param("sort") String sort,
+			@Param("order") String order,
+			@Param("limit") Integer limit,
+			@Param("page") String page);
 }
