@@ -1,9 +1,13 @@
 package com.comaymanagement.cmd.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-import com.comaymanagement.cmd.entity.Position;
+import org.springframework.data.repository.query.Param;
+
+import com.comaymanagement.cmd.customentity.CustomPositionAll;
 
 public interface IPositionRepository{
 
+	List<CustomPositionAll> findAllByRoleId(
+			@Param("roleID") String roleId);
 }

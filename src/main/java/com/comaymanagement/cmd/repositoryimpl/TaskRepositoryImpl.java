@@ -11,10 +11,13 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
+import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.repository.ITaskRepository;
 
@@ -29,11 +32,17 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	@Transactional
-	public List<Task> findByStatusId(String statusId,String sort,String order,Integer limit,Integer offset) {
+	public List<CustomTaskAll> findByStatusId(String statusId,String sort,String order,Integer limit,String page) {
 		List<Task> taskList = new ArrayList<Task>();
+		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("WHERE t.status.id = :statusId");
+		order = order == null ? "t.unique_number" : order;
+		limit = limit == null ? 10 : limit;
+		sort = sort == null ? "DESC" : sort;
+		page = page == null ? "1" : page;
 		try {
+			int offset = (Integer.valueOf(page) - 1) * limit;
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
@@ -47,17 +56,44 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				Task task = (Task) obj;		
 				taskList.add(task);
 			}
+			for(Task task : taskList) {
+				CustomTaskAll customTask = new CustomTaskAll();
+				customTask.setTaskId(task.getId());
+				customTask.setTitle(task.getTitle());
+				customTask.setCreatorId(task.getCreator().getId());
+				customTask.setCreatorName(task.getCreator().getName());
+				customTask.setRecieverId(task.getReceiver().getId());
+				customTask.setRecieverName(task.getReceiver().getName());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
+				customTask.setStatusName(task.getStatus().getName());
+				
+				customTaskList.add(customTask);
+			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
-		
-		return taskList;
+
+		return customTaskList;
 	}
 
 	@Override
 	@Transactional
 	public List<CustomTaskAll> findAllTask(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String sort, String order, Integer limit, Integer offset) {
+			String createDate, String finishDate, String sort, String order, Integer limit, String page) {
+		dep = dep == null ? " " : dep;
+		title = title == null ? " " : title;
+		status = status == null ? " " : status;
+		creator = creator == null ? " " : creator;
+		receiver = receiver == null ? " " : receiver;
+		createDate = createDate == null ? " " : createDate;
+		finishDate = finishDate == null ? " " : finishDate;
+		order = order == null ? "t.unique_number" : order;
+		sort = sort == null ? "DESC" : sort;
+		limit = limit == null ? 10 : limit;
+		page = page == null ? "1" : page;
+
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
 		List<Task> taskList = new ArrayList<Task>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
@@ -74,6 +110,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("order by " + order + " " + sort);
 
 		try {
+			int offset = (Integer.valueOf(page) - 1) * limit;
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());

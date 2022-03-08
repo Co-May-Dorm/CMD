@@ -134,42 +134,10 @@ public class TaskController {
 			@RequestParam(value="sort", required = false) String sort,
 			@RequestParam(value="order", required = false) String order,
 			@RequestParam(value="limit", required = false) Integer limit){
-		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
+
 		LOGGER.info("Get task list by status");
-		
-		order = order == null ? "t.unique_number" : order;
-		limit = limit == null ? 10 : limit;
-		sort = sort == null ? "DESC" : sort;
-		page = page == null ? "1" : page;
-		try {
-			int offset = (Integer.valueOf(page) - 1) * limit;
-			List<Task> taskListByStatusId = taskService.findByStatusId(statusId,sort,order,limit,offset);
-			
-			for(Task task : taskListByStatusId) {
-				CustomTaskAll customTask = new CustomTaskAll();
-				customTask.setTaskId(task.getId());
-				customTask.setTitle(task.getTitle());
-				customTask.setCreatorId(task.getCreator().getId());
-				customTask.setCreatorName(task.getCreator().getName());
-				customTask.setRecieverId(task.getReceiver().getId());
-				customTask.setRecieverName(task.getReceiver().getName());
-				customTask.setCreateDate(task.getCreateDate());
-				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
-				customTask.setStatusName(task.getStatus().getName());
-				
-				customTaskList.add(customTask);
-			}
-			if(taskListByStatusId == null) {
-				LOGGER.info("Have no task by status_id: " + statusId );
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("","Have no task by status_id: " + statusId,""));
-			}else {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK","Query produce successfully:",customTaskList));
-			}
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR","Have error: ",e.getMessage()));
-		}
+		return taskService.findByStatusId(statusId, sort, order, limit, page);
+
 
 
 	}
