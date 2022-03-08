@@ -38,7 +38,7 @@ public class RoleService implements IGeneralService<Role> {
 			pagination.setTotalItem(roleRepository.CountTotalItem());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("taskList", customRoleAlls);
-			results.put("Pagination", pagination);
+			results.put("pagination", pagination);
 			if(customRoleAlls == null) {
 				LOGGER.info("NOT FOUND");
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Have error:","NOT FOUND",""));
