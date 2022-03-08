@@ -65,7 +65,7 @@ public class TaskController {
 	@GetMapping(value= "",produces = "application/json")
 	public ResponseEntity<Object> findCustomTaskAlls(				
 			@RequestParam(value="page",required = false) String page, 
-			@RequestParam(value="department",required = false) String dep, 
+			@RequestParam(value="dep",required = false) String dep, 
 			@RequestParam(value="title",required = false) String title, 
 			@RequestParam(value="status", required = false) String status,  
 			@RequestParam(value="creator", required = false) String creator, 
@@ -77,55 +77,9 @@ public class TaskController {
 			@RequestParam(value="limit", required = false) Integer limit
 			) {
 		LOGGER.info("Get task list");
-		dep = dep == null ? " ":dep;
-		title = title == null ? " " : title;
-		status = status == null ? " " : status;
-		creator = creator == null ? " " : creator;
-		receiver = receiver == null ? " ": receiver;
-		createDate = createDate == null ? " " : createDate;
-		finishDate = finishDate == null ? " " : finishDate;
-		sort = sort == null ? " " : sort;
-		order = order == null ? "t.unique_number" : order;
-		limit = limit == null ? 10 : limit;
-		sort = sort == null ? "DESC" : sort;
-		page = (dep != "" || title != "" || status != "" || creator != "" || 
-				receiver != "" || createDate != "" || finishDate != "") ? "1" : page;
-		
-		try {
-			int offset = (Integer.valueOf(page) - 1)*limit;
+		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,limit,page);
 			
-			List<Task> taskList = (List<Task>) taskService.findAll();
-			List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
-			taskList = taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,limit,offset);
-			
-			for(Task task : taskList) {
-				CustomTaskAll customTask = new CustomTaskAll();
-				customTask.setTaskId(task.getId());
-				customTask.setTitle(task.getTitle());
-				customTask.setCreatorId(task.getCreator().getId());
-				customTask.setCreatorName(task.getCreator().getName());
-				customTask.setRecieverId(task.getReceiver().getId());
-				customTask.setRecieverName(task.getReceiver().getName());
-				customTask.setCreateDate(task.getCreateDate());
-				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
-				customTask.setStatusName(task.getStatus().getName());
-				
-				customTaskList.add(customTask);
-			}
-			if (customTaskList.size() > 0) {
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("OK", "Query produce successfully: ", customTaskList));
-			} else {
 
-				return ResponseEntity.status(HttpStatus.NOT_FOUND)
-						.body(new ResponseObject("Not found", "Can not find task list", ""));
-			}
-		} catch (Exception e) {
-			LOGGER.error("ERROR:" + e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("ERROR", e.getMessage(), ""));
-		}
 	}
 
 	@PostMapping("/insert")
@@ -183,7 +137,6 @@ public class TaskController {
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
 		LOGGER.info("Get task list by status");
 		
-		sort = sort == null ? " " : sort;
 		order = order == null ? "t.unique_number" : order;
 		limit = limit == null ? 10 : limit;
 		sort = sort == null ? "DESC" : sort;

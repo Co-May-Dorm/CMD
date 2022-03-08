@@ -28,6 +28,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	private SessionFactory sessionFactory;
 
 	@Override
+	@Transactional
 	public List<Task> findByStatusId(String statusId,String sort,String order,Integer limit,Integer offset) {
 		List<Task> taskList = new ArrayList<Task>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
@@ -54,10 +55,11 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public List<Task> findAllTask(String dep, String title, String status, String creator, String receiver,
+	@Transactional
+	public List<CustomTaskAll> findAllTask(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, Integer limit, Integer offset) {
-		List<Task> taskList = new ArrayList<Task>();
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
+		List<Task> taskList = new ArrayList<Task>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
 		hql.append("INNER JOIN t.status as s ");
@@ -93,11 +95,28 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				Employee employeeReceived = (Employee) obj[3];*/		
 				taskList.add(task);
 			}
+
+			for (Task task : taskList) {
+				CustomTaskAll customTask = new CustomTaskAll();
+				customTask.setTaskId(task.getId());
+				customTask.setUniqueNumber(task.getUnique_number());
+				customTask.setTitle(task.getTitle());
+				customTask.setCreatorId(task.getCreator().getId());
+				customTask.setCreatorName(task.getCreator().getName());
+				customTask.setRecieverId(task.getReceiver().getId());
+				customTask.setRecieverName(task.getReceiver().getName());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
+				customTask.setStatusName(task.getStatus().getName());
+
+				customTaskList.add(customTask);
+			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
 
-		return taskList;
+		return customTaskList;
 	}
 
 }
