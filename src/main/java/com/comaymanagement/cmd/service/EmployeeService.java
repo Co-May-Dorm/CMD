@@ -2,7 +2,9 @@ package com.comaymanagement.cmd.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.customentity.User;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
+import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
@@ -54,9 +57,12 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 		List<CustomEmployeeAll> cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
 				limit, offset);
-		
+		Pagination pagination = new Pagination();
+		Map<String, Object> result = new TreeMap<>();
+		result.put("pagination", pagination);
+		result.put("employees", cusEmpList);
 		if (cusEmpList.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", cusEmpList));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Not found", ""));
 		}
@@ -73,18 +79,13 @@ public class EmployeeService implements IGeneralService<Employee> {
 		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonLoginAccount;
-		int uniqueNumber = -1;
+		
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 
 			JsonNode tmp = jsonObjectEmployee.get("uniqueNumber");
-			if (tmp != null) {
-				uniqueNumber = jsonObjectEmployee.get("uniqueNumber").asInt();
-			}
-//			emp = employeeRepository.load(uniqueNumber);
 //			Check employee id existed
-			boolean isExisted = employeeRepository.checkEmployeeIdExisted(uniqueNumber,
-					jsonObjectEmployee.get("id").asText());
+			boolean isExisted = employeeRepository.checkEmployeeIdExisted(jsonObjectEmployee.get("id").asText());
 
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
@@ -105,11 +106,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
 			// (If uniqueNumber == "") => add, else => edit (Password editing is not
 			// allowed)
-			if (emp.isEnableLogin() && uniqueNumber == -1) {
+			if (emp.isEnableLogin()) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
-			} else {
-				emp.setUsername(jsonLoginAccount.get("username").asText());
 			}
 			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
@@ -122,31 +121,67 @@ public class EmployeeService implements IGeneralService<Employee> {
 			logger.error("paggingAllEmployee()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		// (If uniqueNumber == -1) => add, else => edit
-		if (uniqueNumber == -1) {
-			String message = employeeRepository.add(emp);
-			if (message != "") {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
-			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", message + "", emp));
-
-			}
+		String message = employeeRepository.add(emp);
+		if (message != "") {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", "employee" + emp));
 		} else {
-			// update status: 1: successful, 0: fail
-			emp.setUniqueNumber(uniqueNumber);
-			String updateStatus = employeeRepository.edit(emp);
-			if (updateStatus != "") {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", emp));
-			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", updateStatus + "", emp));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("Error", message + "", emp));
 
-			}
 		}
 
 	}
+	public ResponseEntity<Object> edit(String json) {
+		Employee emp = new Employee();
+		User user = new User();
+		List<Position> positionList = new ArrayList<>();
+		Department dep = new Department();
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectEmployee;
+		JsonNode jsonObjectPosition;
+		JsonNode jsonObjectDepartment;
+		JsonNode jsonLoginAccount;
+		try {
+			jsonObjectEmployee = jsonMapper.readTree(json);
+//			Check employee id existed
+			jsonObjectPosition = jsonObjectEmployee.get("positionList");
+			jsonObjectDepartment = jsonObjectEmployee.get("department");
+			dep.setId(jsonObjectDepartment.get("id").asText());
+			jsonLoginAccount = jsonObjectEmployee.get("user");
+			emp.setUniqueNumber(jsonObjectEmployee.get("uniqueNumber").asInt());
+			emp.setId(jsonObjectEmployee.get("id").asText());
+			emp.setName(jsonObjectEmployee.get("name").asText());
+			emp.setAvatar(jsonObjectEmployee.get("avatar").asText());
+			emp.setGender(jsonObjectEmployee.get("gender").asText());
+			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
+			emp.setEmail(jsonObjectEmployee.get("email").asText());
+			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
+			emp.setDepartment(dep);
+			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
+			// (If uniqueNumber == "") => add, else => edit (Password editing is not
+			// allowed)
+			emp.setUsername(jsonLoginAccount.get("username").asText());
+			for (JsonNode p : jsonObjectPosition) {
+				Position pos = new Position();
+				pos.setId(p.get("id").asText());
+				positionList.add(pos);
+			}
+			emp.setPositionList(positionList);
 
+		} catch (Exception e) {
+			logger.error("paggingAllEmployee()", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+		}
+		String message = employeeRepository.edit(emp);
+		if (message != "") {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("Error", message + "", emp));
+
+		}
+
+	}
 	// Delete employee by id
 	public ResponseEntity<Object> delete(String json) {
 		JsonMapper jsonMapper = new JsonMapper();

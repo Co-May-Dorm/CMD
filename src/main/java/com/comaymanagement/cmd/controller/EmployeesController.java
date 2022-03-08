@@ -53,7 +53,7 @@ public class EmployeesController {
 	@PostMapping(value = "/edit")
 	@ResponseBody
 	public ResponseEntity<Object> editEmployee(@RequestBody String json) {
-		return employeeService.addEmployee(json);
+		return employeeService.edit(json);
 	}
 
 	@PutMapping(value = "/delete")

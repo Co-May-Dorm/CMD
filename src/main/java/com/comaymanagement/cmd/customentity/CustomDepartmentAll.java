@@ -15,6 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomDepartmentAll {
+	private Integer uniqueNumber;
 	private String id;
 	private String name;
 	private String fatherDepartmentId;

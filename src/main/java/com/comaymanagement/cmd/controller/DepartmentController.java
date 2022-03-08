@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,9 +32,13 @@ public class DepartmentController {
 	public ResponseEntity<Object> findAll(@RequestParam(value = "name", required = false) String name) {
 		return departmentService.findAll(name);
 	}
-//	public ResponseEntity<Object> add(@RequestBody String json){
-//		
-//		
-//		return 
-//	}
+	
+	@PostMapping("/add")
+	public ResponseEntity<Object> add(@RequestBody String json){
+		return departmentService.add(json);
+	}
+	
+	public ResponseEntity<Object> edit(@RequestBody String json){
+		return departmentService.add(json);
+	}
 }
