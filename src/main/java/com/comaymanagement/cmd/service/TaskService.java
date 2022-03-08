@@ -25,28 +25,33 @@ public class TaskService implements IGeneralService<Task> {
 	@Autowired
 	TaskRepositoryImpl taskRepository;
 
-	public List<Task> findByStatusId(String statusId, String sort, String order, Integer limit, Integer offset) {
-		return taskRepository.findByStatusId(statusId, sort, order, limit, offset);
+	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, Integer limit, String page) {
+		try {
+
+			List<CustomTaskAll> taskListByStatusId = taskRepository.findByStatusId(statusId,sort,order,limit,page);
+			
+
+			if(taskListByStatusId == null) {
+				LOGGER.info("Have no task by status_id: " + statusId );
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("","Have no task by status_id: " + statusId,""));
+			}else {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK","Query produce successfully:",taskListByStatusId));
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR","Have error: ",e.getMessage()));
+		}
+
 	}
 
 	public ResponseEntity<Object> findAllTask(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, Integer limit, String page) {
-		dep = dep == null ? " " : dep;
-		title = title == null ? " " : title;
-		status = status == null ? " " : status;
-		creator = creator == null ? " " : creator;
-		receiver = receiver == null ? " " : receiver;
-		createDate = createDate == null ? " " : createDate;
-		finishDate = finishDate == null ? " " : finishDate;
-		order = order == null ? "t.unique_number" : order;
-		sort = sort == null ? "DESC" : sort;
-		limit = limit == null ? 10 : limit;
-		page = page == null ? "1" : page;
+
 		List<CustomTaskAll> taskList = new ArrayList<CustomTaskAll>();
 		try {
-			int offset = (Integer.valueOf(page) - 1) * limit;
+
 			taskList = taskRepository.findAllTask(dep, title, status, creator, receiver, createDate,
-					finishDate, sort, order, limit, offset);
+					finishDate, sort, order, limit, page);
 
 			if (taskList.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)

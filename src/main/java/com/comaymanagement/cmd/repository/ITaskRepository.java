@@ -5,16 +5,15 @@ import java.util.List;
 import org.springframework.data.repository.query.Param;
 
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
-import com.comaymanagement.cmd.entity.Task;
 
 
 public interface ITaskRepository {
 	
-	List<Task> findByStatusId(@Param("status_id") String statusId,
+	List<CustomTaskAll> findByStatusId(@Param("status_id") String statusId,
 			@Param("sort") String sort,
 			@Param("order") String order,
 			@Param("limit") Integer limit,
-			@Param("offset") Integer offset);
+			@Param("offset") String page);
 	
 	List<CustomTaskAll> findAllTask( 
 			@Param("dep") String dep, 
@@ -27,5 +26,5 @@ public interface ITaskRepository {
 			@Param("sort") String sort,
 			@Param("order") String order,
 			@Param("limit") Integer limit,
-			@Param("offset") Integer offset);
+			@Param("offset") String page);
 }
