@@ -10,5 +10,7 @@ public interface IRoleRepository {
 	List<CustomRoleAll> findAllRole(
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("page") String page);
+			@Param("page") String page,
+			@Param("limit") Integer limit);
+	Integer CountTotalItem();
 }

@@ -10,4 +10,6 @@ public interface IPositionRepository{
 
 	List<CustomPositionAll> findAllByRoleId(
 			@Param("roleID") Integer roleId);
+	Integer CountTotalItem();
+
 }

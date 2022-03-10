@@ -12,7 +12,8 @@ public interface ITaskRepository {
 	List<CustomTaskAll> findByStatusId(@Param("status_id") String statusId,
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("offset") String page);
+			@Param("offset") String page,
+			@Param("limit") Integer limit);
 	
 	List<CustomTaskAll> findAllTask( 
 			@Param("dep") String dep, 
@@ -24,5 +25,7 @@ public interface ITaskRepository {
 			@Param("finishDate") String finishDate,
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("offset") String page);
+			@Param("offset") String page,
+			@Param("limit") Integer limit);
+	Integer CountTotalItem();
 }
