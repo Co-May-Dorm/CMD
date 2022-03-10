@@ -29,7 +29,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	@Transactional
-	public List<CustomTaskAll> findByStatusId(String statusId,String sort,String order,String page) {
+	public List<CustomTaskAll> findByStatusId(String statusId, String sort, String order, String page) {
 		List<Task> taskList = new ArrayList<Task>();
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
@@ -44,18 +44,18 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
 			query.setParameter("statusId", statusId);
-			
+
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object obj = (Object) it.next();
-				Task task = (Task) obj;		
+				Task task = (Task) obj;
 				taskList.add(task);
 			}
-			for(Task task : taskList) {
+			for (Task task : taskList) {
 				CustomTaskAll customTask = new CustomTaskAll();
-				customTask.setTaskId(task.getId());
+				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
 				customTask.setCreatorId(task.getCreator().getId());
 				customTask.setCreatorName(task.getCreator().getName());
@@ -65,7 +65,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
 				customTask.setStatusName(task.getStatus().getName());
-				
+
 				customTaskList.add(customTask);
 			}
 		} catch (Exception e) {
@@ -102,8 +102,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
 		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
 		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
-		/*hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
-		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");*/
+		/*
+		 * hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
+		 * hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
+		 */
 		hql.append("order by " + order + " " + sort);
 
 		try {
@@ -116,24 +118,26 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("status", status);
 			query.setParameter("creator", creator);
 			query.setParameter("receiver", receiver);
-			/*query.setParameter("createDate", createDate);
-			query.setParameter("finishDate", finishDate);*/
+			/*
+			 * query.setParameter("createDate", createDate);
+			 * query.setParameter("finishDate", finishDate);
+			 */
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
-				/*Employee employeeCreated = (Employee) obj[1];
-				Status taskStatus = (Status)obj[2];
-				Employee employeeReceived = (Employee) obj[3];*/		
+				/*
+				 * Employee employeeCreated = (Employee) obj[1]; Status taskStatus =
+				 * (Status)obj[2]; Employee employeeReceived = (Employee) obj[3];
+				 */
 				taskList.add(task);
 			}
 
 			for (Task task : taskList) {
 				CustomTaskAll customTask = new CustomTaskAll();
-				customTask.setTaskId(task.getId());
-				customTask.setUniqueNumber(task.getUnique_number());
+				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
 				customTask.setCreatorId(task.getCreator().getId());
 				customTask.setCreatorName(task.getCreator().getName());

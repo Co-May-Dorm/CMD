@@ -12,7 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomRoleAll {
-	private String id;
+	private Integer id;
+	private String code;
 	private String name;
 	private List<CustomPositionAll> positions;
 }

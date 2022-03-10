@@ -16,8 +16,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomEmployeeAll {
-	private Integer uniqueNumber;
-	private String id;
+	private Integer id;
+	private String code;
 	private String name;
 	private String avatar;
 	private String gender;

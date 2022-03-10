@@ -98,7 +98,7 @@ public class TaskController {
 			Optional<Employee> receiver = employeeService.findById(receiverId);
 			Optional<Status> status = statusService.findById(statusId);
 			
-			task.setId(jsonObjectSanPham.get("id").asText());
+			task.setId(jsonObjectSanPham.get("id").asInt());
 			task.setCreator(creator.get());
 			task.setReceiver(receiver.get());
 			task.setStatus(status.get());

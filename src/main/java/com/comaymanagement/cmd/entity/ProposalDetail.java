@@ -2,6 +2,8 @@ package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -18,7 +20,9 @@ import lombok.Setter;
 @Entity(name = "proposal_details")
 public class ProposalDetail {
 	@Id
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private String code;
 	@Column(name="field_id")
 	private String fieldId;
 	private String content;

@@ -39,8 +39,8 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	// find all employee with position in department
 	@Override
 	@Transactional
-	public List<CustomEmployeeAll> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
-			String sort, String order, Integer limit, Integer offset) {
+	public List<CustomEmployeeAll> employeePaging(String name, String dob, String email, String phone, String dep,
+			String pos, String sort, String order, Integer limit, Integer offset) {
 		List<Employee> employeeList = new ArrayList();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
@@ -94,8 +94,8 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				user.setUsername(e.getUsername());
 				user.setEnableLogin(e.isEnableLogin());
 
-				cusEmp.setUniqueNumber(e.getUniqueNumber());
 				cusEmp.setId(e.getId());
+				cusEmp.setCode(e.getCode());
 				cusEmp.setName(e.getName());
 				cusEmp.setAvatar(e.getAvatar());
 				cusEmp.setGender(e.getGender());
@@ -117,14 +117,16 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	}
 
 	@Transactional
-	public boolean checkEmployeeIdExisted(String id) {
+	public boolean checkEmployeeIdExisted(Integer id, String code) {
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from employees emp where emp.id = :id";
+		String hql = "select count(*) employees emp where emp.code = :code and emp.id != :id";
 		try {
 			Query query = session.createQuery(hql.toString());
-			query.setParameter("id", id);
-			List<Employee> list = (List<Employee>) query.getResultList();
-			if (list.size() > 0) {
+			query.setParameter("code", code);
+			query.setParameter("id", code);
+			List<Employee> list = query.getResultList();
+			Integer count = Integer.valueOf(list.get(0).toString());
+			if (count > 0) {
 				return true;
 			}
 		} catch (Exception e) {
@@ -163,7 +165,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	}
 
 	@Transactional
-	public String delete(String id) {
+	public String delete(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			Employee emp = new Employee();
