@@ -2,6 +2,8 @@ package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -18,8 +20,9 @@ import lombok.Setter;
 @Entity(name = "tasks")
 public class Task {
 	@Id
-	private String id;
-	private Integer unique_number;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private String code;
 	private String title;
 	private String description;
 	@Column(name= "create_date")

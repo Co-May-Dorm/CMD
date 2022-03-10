@@ -40,7 +40,7 @@ public interface IEmployeeRepository {
 
 	public String edit(Employee emp);
 
-	public String delete(String id);
+	public String delete(Integer id);
 
-	public boolean checkEmployeeIdExisted(String id);
+	public boolean checkEmployeeIdExisted(Integer id, String code);
 }

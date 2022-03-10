@@ -15,12 +15,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CustomTaskAll {
 	
-	@Id
-	private String taskId;
-	private Integer uniqueNumber;
-	private String creatorId;
+	private Integer id;
+	private String code;
+	private Integer creatorId;
 	private String creatorName;
-	private String recieverId;
+	private Integer recieverId;
 	private String recieverName;
 	private String statusName;
 	private String title;

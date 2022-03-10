@@ -14,7 +14,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class CustomPositionAll {
-	private String id;
+	private Integer id;
+	private String code;
 	private String name;
 	private Boolean isManager;
 	private Role role;

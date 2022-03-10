@@ -1,6 +1,8 @@
 package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -18,7 +20,8 @@ import lombok.Setter;
 public class TaskHis {
 	
 	@Id
-	private int unique_number;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 	
 	@OneToOne
 	@JoinColumn(name = "task_id")

@@ -27,7 +27,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 	SessionFactory sessionFactory;
 	
 	@Override
-	public List<CustomPositionAll> findAllByRoleId(String roleId) {
+	public List<CustomPositionAll> findAllByRoleId(Integer roleId) {
 		StringBuilder hql = new StringBuilder("FROM positions WHERE role_id = :roleId");
 		List <CustomPositionAll> customPositionAlls = new ArrayList<CustomPositionAll>();
 		List <Position> positions = new ArrayList<Position>();

@@ -25,7 +25,7 @@ public class PositionService implements IGeneralService<Position> {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-	public ResponseEntity<Object> findAllByRoleId(String roleId) {
+	public ResponseEntity<Object> findAllByRoleId(Integer roleId) {
 		List<CustomPositionAll> customPositionAlls = new ArrayList<CustomPositionAll>();;
 
 		try {

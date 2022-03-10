@@ -1,6 +1,8 @@
 package com.comaymanagement.cmd.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -18,8 +20,9 @@ import lombok.Setter;
 public class ApprovalStepDetail {
 
 	@Id
-	private String id;
-
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private String code;
 	@OneToOne()
 	@JoinColumn(name = "approval_step_id", insertable = false, updatable = false)
 	private ApprovalStep approvalStep;

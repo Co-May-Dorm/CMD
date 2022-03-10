@@ -3,6 +3,8 @@ package com.comaymanagement.cmd.entity;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -22,7 +24,9 @@ import lombok.Setter;
 @Entity(name = "proposals")
 public class Proposal {
 	@Id
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private String code;
 	
 	@OneToMany
 	@JoinColumn(name = "proposal_id")

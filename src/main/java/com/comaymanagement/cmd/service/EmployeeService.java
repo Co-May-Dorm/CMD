@@ -50,7 +50,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 
 			// Order by defaut
 			if (sort == null || sort == "") {
-				sort = "uniqueNumber";
+				sort = "id";
 			}
 			if (order == null || order == "") {
 				order = "desc";
@@ -79,44 +79,38 @@ public class EmployeeService implements IGeneralService<Employee> {
 		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonLoginAccount;
-		
+		Integer id = -1;
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
-
-			JsonNode tmp = jsonObjectEmployee.get("uniqueNumber");
+			jsonObjectPosition = jsonObjectEmployee.get("positionList");
+			jsonObjectDepartment = jsonObjectEmployee.get("department");
+			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee id existed
-			boolean isExisted = employeeRepository.checkEmployeeIdExisted(jsonObjectEmployee.get("id").asText());
-
+			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, jsonObjectEmployee.get("code").asText());
+			
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
 			}
-			jsonObjectPosition = jsonObjectEmployee.get("positionList");
-			jsonObjectDepartment = jsonObjectEmployee.get("department");
-			dep.setId(jsonObjectDepartment.get("id").asText());
-			jsonLoginAccount = jsonObjectEmployee.get("user");
-			emp.setId(jsonObjectEmployee.get("id").asText());
+			emp.setCode(jsonObjectEmployee.get("code").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
 			emp.setAvatar(jsonObjectEmployee.get("avatar").asText());
 			emp.setGender(jsonObjectEmployee.get("gender").asText());
 			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
-			emp.setDepartment(dep);
-			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
-			// (If uniqueNumber == "") => add, else => edit (Password editing is not
-			// allowed)
 			if (emp.isEnableLogin()) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
 			}
 			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
-				pos.setId(p.get("id").asText());
+				pos.setId(p.get("id").asInt());
 				positionList.add(pos);
 			}
+			dep.setId(jsonObjectDepartment.get("id").asInt());
 			emp.setPositionList(positionList);
-
+			emp.setDepartment(dep);
 		} catch (Exception e) {
 			logger.error("paggingAllEmployee()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
@@ -141,32 +135,42 @@ public class EmployeeService implements IGeneralService<Employee> {
 		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonLoginAccount;
+		
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
-//			Check employee id existed
 			jsonObjectPosition = jsonObjectEmployee.get("positionList");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
-			dep.setId(jsonObjectDepartment.get("id").asText());
+			Integer id = jsonObjectEmployee.get("id") != null ? jsonObjectEmployee.get("id").asInt() : null;
+			if(id == null) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "id cannot be null", ""));
+			}
+//			Check employee id existed
+			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, jsonObjectEmployee.get("code").asText());
+			if (isExisted) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
+			}
 			jsonLoginAccount = jsonObjectEmployee.get("user");
-			emp.setUniqueNumber(jsonObjectEmployee.get("uniqueNumber").asInt());
-			emp.setId(jsonObjectEmployee.get("id").asText());
+			emp.setId(jsonObjectEmployee.get("id").asInt());
+			emp.setCode(jsonObjectEmployee.get("code").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
 			emp.setAvatar(jsonObjectEmployee.get("avatar").asText());
 			emp.setGender(jsonObjectEmployee.get("gender").asText());
 			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
-			emp.setDepartment(dep);
 			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
 			// (If uniqueNumber == "") => add, else => edit (Password editing is not
 			// allowed)
 			emp.setUsername(jsonLoginAccount.get("username").asText());
 			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
-				pos.setId(p.get("id").asText());
+				pos.setId(p.get("id").asInt());
 				positionList.add(pos);
 			}
+			dep.setId(jsonObjectDepartment.get("id").asInt());
 			emp.setPositionList(positionList);
+			emp.setDepartment(dep);
 
 		} catch (Exception e) {
 			logger.error("paggingAllEmployee()", e);
@@ -187,7 +191,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		JsonMapper jsonMapper = new JsonMapper();
 		try {
 			JsonNode jsonObjectEmployee = jsonMapper.readTree(json);
-			String id = jsonObjectEmployee.get("id").asText();
+			Integer id = jsonObjectEmployee.get("id").asInt();
 			String updateStatus = employeeRepository.delete(id);
 
 			if (updateStatus.equals("1")) {

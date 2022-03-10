@@ -27,7 +27,7 @@ public class PositionController {
 	PositionService positionService;
 
 	@GetMapping("/{roleId}")
-	public ResponseEntity<Object> findAll(@PathVariable(value = "roleId", required = true) String roleId) {
+	public ResponseEntity<Object> findAll(@PathVariable(value = "roleId", required = true) Integer roleId) {
 		return positionService.findAllByRoleId(roleId);
 	}
 }
