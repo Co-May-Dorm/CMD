@@ -28,7 +28,7 @@ public class TaskService implements IGeneralService<Task> {
 	TaskRepositoryImpl taskRepository;
 
 	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, String page) {
-		order = order == null ? "t.unique_number" : order;
+		order = order == null ? "t.id" : order;
 		sort = sort == null ? "DESC" : sort;		
 		page = page == null ? "1" : page;
 		try {
@@ -63,7 +63,7 @@ public class TaskService implements IGeneralService<Task> {
 		receiver = receiver == null ? " " : receiver;
 		createDate = createDate == null ? " " : createDate;
 		finishDate = finishDate == null ? " " : finishDate;
-		order = order == null ? "t.unique_number" : order;
+		order = order == null ? "t.id" : order;
 		sort = sort == null ? "DESC" : sort;		
 		page = page == null ? "1" : page;
 		List<CustomTaskAll> taskList = new ArrayList<CustomTaskAll>();
