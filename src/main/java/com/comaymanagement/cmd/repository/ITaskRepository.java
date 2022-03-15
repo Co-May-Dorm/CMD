@@ -27,5 +27,5 @@ public interface ITaskRepository {
 			@Param("order") String order,
 			@Param("offset") String page,
 			@Param("limit") Integer limit);
-	Integer CountTotalItem();
+	Integer CountTotalItemTaskAll();
 }
