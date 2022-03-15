@@ -37,7 +37,7 @@ public class TaskService implements IGeneralService<Task> {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(page);
-			pagination.setTotalItem(taskRepository.CountTotalItem());
+			pagination.setTotalItem(taskRepository.CountTotalItemTaskAll());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("taskList", taskListByStatusId);
 			results.put("pagination", pagination);
@@ -56,16 +56,16 @@ public class TaskService implements IGeneralService<Task> {
 
 	public ResponseEntity<Object> findAllTask(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, String page) {
-		dep = dep == null ? " " : dep;
-		title = title == null ? " " : title;
-		status = status == null ? " " : status;
-		creator = creator == null ? " " : creator;
-		receiver = receiver == null ? " " : receiver;
-		createDate = createDate == null ? " " : createDate;
-		finishDate = finishDate == null ? " " : finishDate;
-		order = order == null ? "t.id" : order;
-		sort = sort == null ? "DESC" : sort;		
-		page = page == null ? "1" : page;
+		dep = dep == null ? "" : dep.trim();
+		title = title == null ? "" : title.trim();
+		status = status == null ? "" : status.trim();
+		creator = creator == null ? "" : creator.trim();
+		receiver = receiver == null ? "" : receiver.trim();
+		createDate = createDate == null ? "" : createDate.trim();
+		finishDate = finishDate == null ? "" : finishDate.trim();
+		order = order == null ? "t.id" : order.trim();
+		sort = sort == null ? "DESC" : sort.trim();		
+		page = page == null ? "1" : page.trim();
 		List<CustomTaskAll> taskList = new ArrayList<CustomTaskAll>();
 		try {
 			int limit = 15;
@@ -74,7 +74,7 @@ public class TaskService implements IGeneralService<Task> {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(page);
-			pagination.setTotalItem(taskRepository.CountTotalItem());
+			pagination.setTotalItem(taskRepository.CountTotalItemTaskAll());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("taskList", taskList);

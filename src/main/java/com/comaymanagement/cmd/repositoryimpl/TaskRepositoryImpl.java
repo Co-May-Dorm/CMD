@@ -141,9 +141,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public Integer CountTotalItem() {
+	public Integer CountTotalItemTaskAll() {
 		Integer count = null;
 		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS t ");
+		hql.append("INNER JOIN t.creator as c ");
+		hql.append("INNER JOIN t.status as s ");
+		hql.append("INNER JOIN t.receiver as r ");
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
