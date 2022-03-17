@@ -181,14 +181,27 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 	@Transactional
 	@Override
-	public Integer getTotal() {
+	public Integer getTotal(String name, String dob, String email, String phone, String dep,
+			String pos) {
 		Session session = sessionFactory.getCurrentSession();
 		Integer count = 0;
-		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM employees AS emp ");
-		hql.append("INNER JOIN emp.positionList as pos  ");
-		hql.append("INNER JOIN emp.department as dep");
+		StringBuilder hql = new StringBuilder();
+		hql.append("SELECT COUNT(*) FROM employees emp ");
+		hql.append("inner join emp.positionList as pos inner join emp.department as dep ");
+		hql.append("where emp.name like CONCAT('%',:name,'%') ");
+		hql.append("and emp.dateOfBirth like CONCAT('%',:dob,'%') ");
+		hql.append("and emp.email like CONCAT('%',:email,'%') ");
+		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
+		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
+		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team is null and pos.department is not null ");
 		try {
 		Query query = session.createQuery(hql.toString());
+		query.setParameter("name", name);
+		query.setParameter("dob", dob);
+		query.setParameter("email", email);
+		query.setParameter("phone", phone);
+		query.setParameter("dep", dep);
+		query.setParameter("pos", pos);
 		count = Integer.valueOf(query.getResultList().get(0).toString());
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in getTotal() ", e);
