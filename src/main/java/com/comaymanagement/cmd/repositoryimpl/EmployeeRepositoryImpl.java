@@ -119,12 +119,12 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	@Transactional
 	public boolean checkEmployeeIdExisted(Integer id, String code) {
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "select count(*) employees emp where emp.code = :code and emp.id != :id";
+		String hql = "select count(*) from employees emp where emp.code = :code and emp.id != :id";
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("code", code);
-			query.setParameter("id", code);
-			List<Employee> list = query.getResultList();
+			query.setParameter("id", id);
+			List list = query.getResultList();
 			Integer count = Integer.valueOf(list.get(0).toString());
 			if (count > 0) {
 				return true;
@@ -138,15 +138,15 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 	@Override
 	@Transactional
-	public String add(Employee emp) {
+	public Integer add(Employee emp) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 
-			String id = (String) session.save(emp);
+			Integer id = (Integer) session.save(emp);
 			return id;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee() ", e);
-			return "";
+			return -1;
 		}
 
 	}

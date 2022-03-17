@@ -90,7 +90,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee id existed
-			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, jsonObjectEmployee.get("code").asText());
+			String code = jsonObjectEmployee.get("code").asText();
+			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, code);
 			
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
@@ -103,7 +104,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
-			if (emp.isEnableLogin()) {
+			Boolean isEnableLogin = jsonLoginAccount.get("enableLogin").asBoolean();
+			if (isEnableLogin) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
 			}
@@ -119,12 +121,12 @@ public class EmployeeService implements IGeneralService<Employee> {
 			logger.error("paggingAllEmployee()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		String message = employeeRepository.add(emp);
-		if (message != "") {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", "employee" + emp));
+		Integer idAdded = employeeRepository.add(emp);
+		if (idAdded != -1) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + emp));
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error", message + "", emp));
+					.body(new ResponseObject("Error", idAdded + "", emp));
 
 		}
 
@@ -177,7 +179,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setDepartment(dep);
 
 		} catch (Exception e) {
-			logger.error("paggingAllEmployee()", e);
+			logger.error("Error has occured in paggingAllEmployee()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 		String message = employeeRepository.edit(emp);
