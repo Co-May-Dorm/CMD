@@ -44,6 +44,7 @@ public interface IEmployeeRepository {
 
 	public boolean checkEmployeeIdExisted(Integer id, String code);
 	
-	public Integer getTotal();
+	public Integer getTotal(String name, String dob, String email, String phone, String dep,
+			String pos);
 		
 }

@@ -57,7 +57,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 		Pagination pagination = new Pagination();
 		Map<String, Object> result = new TreeMap<>();
-		Integer total = employeeRepository.getTotal();
+		Integer total = employeeRepository.getTotal(name, dob, email, phone, dep, pos);
 		pagination.setLimit(limit);
 		pagination.setPage(page);
 		pagination.setTotalItem(total);
@@ -118,7 +118,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setPositionList(positionList);
 			emp.setDepartment(dep);
 		} catch (Exception e) {
-			logger.error("paggingAllEmployee()", e);
+			logger.error("Error has occured in addEmployee()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 		Integer idAdded = employeeRepository.add(emp);
@@ -179,7 +179,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setDepartment(dep);
 
 		} catch (Exception e) {
-			logger.error("Error has occured in paggingAllEmployee()", e);
+			logger.error("Error has occured in edit()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 		String message = employeeRepository.edit(emp);
