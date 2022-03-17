@@ -105,6 +105,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
 			Boolean isEnableLogin = jsonLoginAccount.get("enableLogin").asBoolean();
+			emp.setEnableLogin(isEnableLogin);
 			if (isEnableLogin) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
@@ -151,7 +152,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "id cannot be null", ""));
 			}
 //			Check employee id existed
-			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, jsonObjectEmployee.get("code").asText());
+			String code = jsonObjectEmployee.get("code").asText();
+			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
@@ -165,10 +167,15 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
-			emp.setEnableLogin(jsonLoginAccount.get("enableLogin").asBoolean());
-			// (If uniqueNumber == "") => add, else => edit (Password editing is not
-			// allowed)
-			emp.setUsername(jsonLoginAccount.get("username").asText());
+			Boolean isEnableLogin = jsonLoginAccount.get("enableLogin").asBoolean();
+			emp.setEnableLogin(isEnableLogin);
+			// Cannot edit password
+			if(isEnableLogin) {
+				emp.setUsername(jsonLoginAccount.get("username").asText());
+				emp.setPassword(DefaultPassword.PASSWORD);
+			}else {
+				emp.setUsername(jsonLoginAccount.get("username").asText());
+			}
 			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
 				pos.setId(p.get("id").asInt());

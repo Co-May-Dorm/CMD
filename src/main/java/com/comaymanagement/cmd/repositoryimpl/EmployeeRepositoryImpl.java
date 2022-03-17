@@ -50,7 +50,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		hql.append("and emp.email like CONCAT('%',:email,'%') ");
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
-		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team is null and pos.department is not null ");
+		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team.id is null and pos.department.id is not null ");
 		hql.append("order by emp." + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
 		List<CustomEmployeeAll> cusEmpList = new ArrayList();
@@ -80,15 +80,18 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 				// Add position list
 				for (Position p : e.getPositionList()) {
-					CustomPositionAll cusPos = new CustomPositionAll();
-					Role role = new Role();
-					role.setId(p.getRole().getId());
-					role.setName(p.getRole().getName());
-					cusPos.setId(p.getId());
-					cusPos.setName(p.getName());
-					cusPos.setIsManager(p.getIsManager());
-					cusPos.setRole(role);
-					cusPositionList.add(cusPos);
+					if(p.getDepartment()!=null && p.getTeam()==null) {
+						CustomPositionAll cusPos = new CustomPositionAll();
+						Role role = new Role();
+						role.setId(p.getRole().getId());
+						role.setName(p.getRole().getName());
+						cusPos.setId(p.getId());
+						cusPos.setName(p.getName());
+						cusPos.setIsManager(p.getIsManager());
+						cusPos.setRole(role);
+						cusPositionList.add(cusPos);
+					}
+					
 				}
 				User user = new User();
 				user.setUsername(e.getUsername());
