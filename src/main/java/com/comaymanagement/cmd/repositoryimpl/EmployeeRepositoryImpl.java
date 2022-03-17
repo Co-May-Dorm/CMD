@@ -115,7 +115,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 		return cusEmpList;
 	}
-
+	
 	@Transactional
 	public boolean checkEmployeeIdExisted(Integer id, String code) {
 		Session session = sessionFactory.getCurrentSession();
@@ -177,6 +177,23 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			return "0";
 		}
 
+	}
+
+	@Transactional
+	@Override
+	public Integer getTotal() {
+		Session session = sessionFactory.getCurrentSession();
+		Integer count = 0;
+		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM employees AS emp ");
+		hql.append("INNER JOIN emp.positionList as pos  ");
+		hql.append("INNER JOIN emp.department as dep");
+		try {
+		Query query = session.createQuery(hql.toString());
+		count = Integer.valueOf(query.getResultList().get(0).toString());
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in getTotal() ", e);
+		}
+		return count;
 	}
 
 }

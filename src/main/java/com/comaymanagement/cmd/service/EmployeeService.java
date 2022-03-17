@@ -55,10 +55,14 @@ public class EmployeeService implements IGeneralService<Employee> {
 			if (order == null || order == "") {
 				order = "desc";
 			}
-		List<CustomEmployeeAll> cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
-				limit, offset);
 		Pagination pagination = new Pagination();
 		Map<String, Object> result = new TreeMap<>();
+		Integer total = employeeRepository.getTotal();
+		pagination.setLimit(limit);
+		pagination.setPage(page);
+		pagination.setTotalItem(total);
+		List<CustomEmployeeAll> cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
+				limit, offset);
 		result.put("pagination", pagination);
 		result.put("employees", cusEmpList);
 		if (cusEmpList.size() > 0) {
