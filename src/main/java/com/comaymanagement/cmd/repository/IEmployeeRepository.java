@@ -36,7 +36,7 @@ public interface IEmployeeRepository {
 	public List<CustomEmployeeAll> employeePaging(String name, String dob, String email, String phone, String dep, String pos,
 			String sort, String order, Integer limit, Integer offset);
 
-	public String add(Employee emp);
+	public Integer add(Employee emp);
 
 	public String edit(Employee emp);
 
