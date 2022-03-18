@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @RestController
 @RequestMapping("/tasks")
-@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
+@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
 public class TaskController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -43,7 +43,7 @@ public class TaskController {
 	@Autowired
 	StatusService statusService;
 	
-
+	/*
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> findById(@PathVariable String id) {
 
@@ -57,7 +57,7 @@ public class TaskController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new ResponseObject("Not found", "Can not find task list", ""));
 		}
-	}
+	}*/
 
 	@GetMapping(value= "",produces = "application/json")
 	public ResponseEntity<Object> findCustomTaskAlls(				
@@ -75,10 +75,8 @@ public class TaskController {
 			) {
 		LOGGER.info("Get task list");
 		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,page);
-			
-
 	}
-
+	/*
 	@PostMapping("/insert")
 	@ResponseBody
 	public ResponseEntity<Object> saveTask(@RequestBody String json) {
@@ -122,8 +120,8 @@ public class TaskController {
 					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
 		}
 
-	}
-	
+	}*/
+
 	//Get task list by status id 
 	@GetMapping(value="/status/{statusId}",produces = "application/json")
 	public ResponseEntity<Object> findByStatus(@PathVariable String statusId,
@@ -132,9 +130,17 @@ public class TaskController {
 			@RequestParam(value="order", required = false) String order){
 		LOGGER.info("Get task list by status");
 		return taskService.findByStatusId(statusId, sort, order, page);
-
-
-
+	}
+	
+	//Get task list by status ids 
+	@PostMapping(value="/status",produces = "application/json")
+	public ResponseEntity<Object> findByStatusIds(
+			@RequestBody String json,
+			@RequestParam(value="page",required = false) String page, 
+			@RequestParam(value="sort", required = false) String sort,
+			@RequestParam(value="order", required = false) String order){
+		LOGGER.info("Get task list by status ids");
+		return taskService.findByStatusIds(json, sort, order, page);
 	}
 
 }

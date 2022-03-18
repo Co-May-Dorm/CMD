@@ -9,7 +9,8 @@ import com.comaymanagement.cmd.customentity.CustomTaskAll;
 
 public interface ITaskRepository {
 	
-	List<CustomTaskAll> findByStatusId(@Param("status_id") String statusId,
+	List<CustomTaskAll> findByStatusId(
+			@Param("status_id") String statusId,
 			@Param("sort") String sort,
 			@Param("order") String order,
 			@Param("offset") String page,
@@ -28,4 +29,11 @@ public interface ITaskRepository {
 			@Param("offset") String page,
 			@Param("limit") Integer limit);
 	Integer CountTotalItemTaskAll();
+	Integer CountTotalItemFindByIds();
+	List<CustomTaskAll> findByStatusIds(
+			@Param("status_id") List<String> statusIds,
+			@Param("sort") String sort,
+			@Param("order") String order,
+			@Param("offset") String page,
+			@Param("limit") Integer limit);
 }
