@@ -38,7 +38,7 @@ public interface IEmployeeRepository {
 
 	public Integer add(Employee emp);
 
-	public String edit(Employee emp);
+	public Integer edit(Employee emp);
 
 	public String delete(Integer id);
 

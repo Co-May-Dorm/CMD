@@ -33,7 +33,7 @@ public class Department {
 	@Column(name="farther_department_id")
 	private Integer fatherDepartmentId;
 	@Column(name="manager_id")
-	private String managerId;
+	private Integer managerId;
 	@Column(name="create_by")
 	private String createBy;
 	@Column(name="create_date")

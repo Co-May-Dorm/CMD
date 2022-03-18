@@ -13,4 +13,5 @@ public interface IPositionRepository{
 			@Param("roleID") Integer roleId);
 	Integer CountTotalItem();
 	Integer save(Position p);
+	Integer edit(Position p);
 }

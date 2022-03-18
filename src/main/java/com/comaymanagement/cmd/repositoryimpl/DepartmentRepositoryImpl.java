@@ -122,19 +122,19 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	}
 
 	@Override
-	public String edit(Department dep) {
+	public Integer edit(Department dep) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			session.update(dep);
-			return "1";
+			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentRepositoryImpl at edit() ", e);
-			return "0";
+			return 0;
 		}
 	}
 
 	@Override
-	public String delete(String id) {
+	public Integer delete(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -85,5 +85,16 @@ public class PositionRepositoryImpl implements IPositionRepository {
 			return -1;
 		}
 	}
+	@Override
+	public Integer edit(Position p) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			session.update(p);
+			return 1;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentRepositoryImpl at edit() ", e);
+			return 0;
+		}
+	}
 	
 }
