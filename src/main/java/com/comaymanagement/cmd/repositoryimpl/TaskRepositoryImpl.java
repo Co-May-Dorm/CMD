@@ -30,7 +30,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	@Transactional
-	public List<CustomTaskAll> findByStatusId(String statusId,String sort,String order,String page,Integer limit) {
+	public List<CustomTaskAll> findByStatusId(String statusId, String sort, String order, String page, Integer limit) {
 		List<Task> taskList = new ArrayList<Task>();
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
@@ -88,10 +88,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
 		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
 		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
-		/*
-		 * hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
-		 * hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
-		 */
+		//hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
+		//hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
+
 		hql.append("order by " + order + " " + sort);
 
 		try {
@@ -104,19 +103,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("status", status);
 			query.setParameter("creator", creator);
 			query.setParameter("receiver", receiver);
-			/*
-			 * query.setParameter("createDate", createDate);
-			 * query.setParameter("finishDate", finishDate);
-			 */
+			//query.setParameter("createDate", createDate);
+			//query.setParameter("finishDate", finishDate);
+
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
-				/*
-				 * Employee employeeCreated = (Employee) obj[1]; Status taskStatus =
-				 * (Status)obj[2]; Employee employeeReceived = (Employee) obj[3];
-				 */
 				taskList.add(task);
 			}
 			for (Task task : taskList) {
@@ -136,10 +130,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
-
 		return customTaskList;
 	}
-
+	
 	@Override
 	public Integer CountTotalItemTaskAll() {
 		Integer count = null;
@@ -154,7 +147,58 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			@SuppressWarnings("rawtypes")
 			List list = query.getResultList();
 			count = Integer.parseInt(list.get(0).toString());
-		}catch (Exception e) {
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CustomTaskAll> findByStatusIds(List<String> statusIds, String sort, String order, String page,
+			Integer limit) {
+		List<Task> tasks = new ArrayList<Task>();
+		List<CustomTaskAll> customTasks = new ArrayList<CustomTaskAll>();
+		StringBuilder hql = new StringBuilder("SELECT * FROM tasks AS t ");
+		hql.append("WHERE status_id IN (?1)");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			query.setParameter(1, statusIds);
+			tasks = query.getResultList();
+			for(Task item : tasks) {
+				CustomTaskAll task = new CustomTaskAll();
+				task.setId(item.getId());
+				task.setTitle(item.getTitle());
+				task.setCreatorId(item.getCreator().getId());
+				task.setCreatorName(item.getCreator().getName());
+				task.setRecieverId(item.getReceiver().getId());
+				task.setRecieverName(item.getReceiver().getName());
+				task.setCreateDate(item.getCreateDate());
+				task.setFinishDate(item.getFinishDate());
+				task.setDepartmentName(item.getCreator().getDepartment().getName());
+				task.setStatusName(item.getStatus().getName());
+				customTasks.add(task);
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return customTasks;
+	}
+	@Override
+	public Integer CountTotalItemFindByIds() {
+		Integer count = null;
+		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS t ");
+		hql.append("WHERE status_id IN (?1)");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			@SuppressWarnings("rawtypes")
+			List list = query.getResultList();
+			count = Integer.parseInt(list.get(0).toString());
+		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
 		return count;

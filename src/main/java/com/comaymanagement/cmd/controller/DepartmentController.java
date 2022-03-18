@@ -23,7 +23,7 @@ import com.comaymanagement.cmd.service.DepartmentService;
 
 @RestController
 @RequestMapping("/departments")
-@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
+@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
 public class DepartmentController {
 	@Autowired
 	DepartmentService departmentService;
