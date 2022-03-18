@@ -13,7 +13,7 @@ import com.comaymanagement.cmd.service.RoleService;
 
 @RestController
 @RequestMapping("/roles")
-@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
+@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
 public class RoleController {
 	@Autowired
 	RoleService roleService;
