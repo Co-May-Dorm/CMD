@@ -91,7 +91,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		//hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
 		//hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
 
-		hql.append("order by " + order + " " + sort);
+		hql.append("order by t." + sort + " " + order );
 
 		try {
 			int offset = (Integer.valueOf(page) - 1) * limit;
@@ -134,15 +134,26 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 	
 	@Override
-	public Integer CountTotalItemTaskAll() {
+	public Integer CountTotalItemTaskAll(String dep, String title, String status, String creator, String receiver) {
 		Integer count = null;
 		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
 		hql.append("INNER JOIN t.status as s ");
 		hql.append("INNER JOIN t.receiver as r ");
+		hql.append("WHERE c.department.name LIKE CONCAT('%',:dep,'%') ");
+		hql.append("AND t.title LIKE CONCAT('%',:title,'%') ");
+		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
+		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
+		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
+		
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
+			query.setParameter("dep", dep);
+			query.setParameter("title", title);
+			query.setParameter("status", status);
+			query.setParameter("creator", creator);
+			query.setParameter("receiver", receiver);
 			LOGGER.info(hql.toString());
 			@SuppressWarnings("rawtypes")
 			List list = query.getResultList();
