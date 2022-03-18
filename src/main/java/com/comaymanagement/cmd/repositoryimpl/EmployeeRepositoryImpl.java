@@ -190,7 +190,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		Integer count = 0;
 		StringBuilder hql = new StringBuilder();
 		hql.append("SELECT COUNT(*) FROM employees emp ");
-		hql.append("inner join emp.positionList as pos inner join emp.department as dep ");
+		hql.append("inner join emp.positions as pos inner join emp.department as dep ");
 		hql.append("where emp.name like CONCAT('%',:name,'%') ");
 		hql.append("and emp.dateOfBirth like CONCAT('%',:dob,'%') ");
 		hql.append("and emp.email like CONCAT('%',:email,'%') ");
