@@ -50,7 +50,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 
 			// Order by defaut
 			if (sort == null || sort == "") {
-				sort = "id";
+				sort = "emp.id";
 			}
 			if (order == null || order == "") {
 				order = "desc";
