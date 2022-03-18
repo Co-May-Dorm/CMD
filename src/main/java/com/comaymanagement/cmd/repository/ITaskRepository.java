@@ -28,7 +28,7 @@ public interface ITaskRepository {
 			@Param("order") String order,
 			@Param("offset") String page,
 			@Param("limit") Integer limit);
-	Integer CountTotalItemTaskAll();
+	Integer CountTotalItemTaskAll(String dep, String title, String status, String creator, String receiver);
 	Integer CountTotalItemFindByIds();
 	List<CustomTaskAll> findByStatusIds(
 			@Param("status_id") List<String> statusIds,

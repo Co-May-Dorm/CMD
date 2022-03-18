@@ -30,8 +30,8 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 	TaskRepositoryImpl taskRepository;
 
 	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, String page) {
-		order = order == null ? "t.id" : order;
-		sort = sort == null ? "DESC" : sort;
+		order = order == null ? "DESC" : order;
+		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page;
 		try {
 			int limit = 15;
@@ -39,7 +39,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(page);
-			pagination.setTotalItem(taskRepository.CountTotalItemTaskAll());
+			//pagination.setTotalItem(taskRepository.CountTotalItemTaskAll());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("tasks", tasksByStatusId);
 			results.put("pagination", pagination);
@@ -68,8 +68,8 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		receiver = receiver == null ? "" : receiver.trim();
 		createDate = createDate == null ? "" : createDate.trim();
 		finishDate = finishDate == null ? "" : finishDate.trim();
-		order = order == null ? "t.id" : order.trim();
-		sort = sort == null ? "DESC" : sort.trim();
+		order = order == null ? "DESC" : order;
+		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page.trim();
 		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
 		try {
@@ -79,7 +79,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(page);
-			pagination.setTotalItem(taskRepository.CountTotalItemTaskAll());
+			pagination.setTotalItem(taskRepository.CountTotalItemTaskAll(dep, title, status, creator, receiver));
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("tasks", tasks);
@@ -88,9 +88,8 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
 			} else {
-
 				return ResponseEntity.status(HttpStatus.NOT_FOUND)
-						.body(new ResponseObject("Not found", "Can not find task list", ""));
+						.body(new ResponseObject("Not found", "Can not find task list", tasks));
 			}
 		} catch (Exception e) {
 			LOGGER.error("ERROR:" + e.getMessage());
@@ -101,8 +100,8 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 
 	@SuppressWarnings("unused")
 	public ResponseEntity<Object> findByStatusIds(String json, String sort, String order, String page) {
-		order = order == null ? "t.id" : order.trim();
-		sort = sort == null ? "DESC" : sort.trim();
+		order = order == null ? "DESC" : order;
+		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page.trim();
 		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
 		try {
