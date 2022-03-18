@@ -79,7 +79,7 @@ public class DepartmentService implements IGeneralService<Department> {
 		Integer id = -1;
 		try {
 			jsonObjectDepartment = jsonMapper.readTree(json);
-			jsonObjectPosition = jsonObjectDepartment.get("positionList");
+			jsonObjectPosition = jsonObjectDepartment.get("positions");
 //			Check department code existed
 			String code = jsonObjectDepartment.get("code").asText();
 			boolean isExisted = departmentRepository.isExisted(id, code);

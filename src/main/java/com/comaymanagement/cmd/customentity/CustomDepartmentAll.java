@@ -20,6 +20,6 @@ public class CustomDepartmentAll {
 	private String name;
 	private Integer fatherDepartmentId;
 	private String managerId;
-	private List<CustomPositionAll> positionList;
+	private List<CustomPositionAll> positions;
 	private String description;
 }
