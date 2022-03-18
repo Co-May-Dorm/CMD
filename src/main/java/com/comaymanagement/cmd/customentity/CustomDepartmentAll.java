@@ -21,5 +21,5 @@ public class CustomDepartmentAll {
 	private String fatherDepartmentId;
 	private String managerId;
 	private List<CustomPositionAll> positionList;
-
+	private String description;
 }

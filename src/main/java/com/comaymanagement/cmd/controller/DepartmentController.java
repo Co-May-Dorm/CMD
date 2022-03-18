@@ -33,10 +33,10 @@ public class DepartmentController {
 		return departmentService.findAll(name);
 	}
 	
-//	@PostMapping("/add")
-//	public ResponseEntity<Object> add(@RequestBody String json){
-//		return departmentService.add(json);
-//	}
+	@PostMapping("/add")
+	public ResponseEntity<Object> add(@RequestBody String json){
+		return departmentService.save(json);
+	}
 //	
 //	public ResponseEntity<Object> edit(@RequestBody String json){
 //		return departmentService.add(json);

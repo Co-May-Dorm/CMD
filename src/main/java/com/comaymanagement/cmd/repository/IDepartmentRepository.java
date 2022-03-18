@@ -16,8 +16,8 @@ public interface IDepartmentRepository{
 			+ "on dp.id = de.department_id " + "where de.employee_id = :id ", nativeQuery = true)
 	public List<Department> findAllDepartmentByEmployeeId(@PathParam("id") String id);
 	public List<CustomDepartmentAll> findAll(String name);
-	public String add(Department dep);
+	public Integer save(Department dep);
 	public String edit(Department dep);
 	public String delete(String id);
-		
+	public boolean isExisted(Integer id, String code);
 }

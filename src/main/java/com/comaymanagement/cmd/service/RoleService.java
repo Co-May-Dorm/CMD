@@ -59,7 +59,7 @@ public class RoleService implements IGeneralService<Role> {
 	}
 
 	@Override
-	public Role save(Role t) {
+	public ResponseEntity<Object> save(Role t) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -72,6 +72,12 @@ public class RoleService implements IGeneralService<Role> {
 
 	@Override
 	public Iterable<Role> findAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<Object> save(String json) {
 		// TODO Auto-generated method stub
 		return null;
 	}

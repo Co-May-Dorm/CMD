@@ -42,7 +42,9 @@ public class Department {
 	private String modifyBy;
 	@Column(name="modify_date")
 	private String modifyDate;
-
+	@Column(name="description")
+	private String description;
+	
 	@OneToMany
 	@JoinColumn(name = "department_id")
 	@JsonBackReference

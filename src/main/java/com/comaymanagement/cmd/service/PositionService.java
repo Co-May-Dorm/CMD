@@ -13,13 +13,19 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.entity.Team;
 import com.comaymanagement.cmd.repository.IPositionRepository;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
 public class PositionService implements IGeneralService<Position> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	PositionRepositoryImpl positionRepository;
 
@@ -57,18 +63,55 @@ public class PositionService implements IGeneralService<Position> {
 	}
 
 	@Override
-	public Position save(Position t) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResponseEntity<Object> save(String json) {
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectPosition;
+		Position p = new Position();
+		Department dep = new Department();
+		Role role = new Role();
+		Team team = new Team();
+		Integer id = -1;
+		try {
+			jsonObjectPosition = jsonMapper.readTree(json);
+			p.setCode(jsonObjectPosition.get("code").asText());
+			p.setName(jsonObjectPosition.get("name").asText());
+			p.setIsManager(jsonObjectPosition.get("isManager").asBoolean());
+			team.setId(jsonObjectPosition.get("teamId").asInt());
+			dep.setId(jsonObjectPosition.get("departmentId").asInt());
+			role.setId(jsonObjectPosition.get("roleId").asInt());
+			p.setTeam(team);
+			p.setDepartment(dep);
+			p.setRole(role);
+			Integer idAdded = positionRepository.save(p);
+			if (idAdded != -1) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", idAdded + "", p));
+			}
+		} catch (Exception e) {
+			logger.error("Error has occured in PositionService at save()", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+		}
 	}
-
+	
+	@Override
+	public ResponseEntity<Object> save(Position p) {
+		Integer idAdded = positionRepository.save(p);
+		if (idAdded != -1) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("Error", idAdded + "", p));
+		}
+	}
 	@Override
 	public void remove(Position model) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+
 	public Iterable<Position> findAll() {
 		// TODO Auto-generated method stub
 		return null;

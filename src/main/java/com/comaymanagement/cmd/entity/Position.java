@@ -49,12 +49,12 @@ public class Position {
 	private Role role;
 
 	@OneToOne()
-	@JoinColumn(name = "department_id", insertable = false, updatable = false)
+	@JoinColumn(name = "department_id")
 	@JsonBackReference
 	private Department department;
 	
 	@OneToOne()
-	@JoinColumn(name = "team_id", insertable = false, updatable = false)
+	@JoinColumn(name = "team_id")
 	@JsonBackReference
 	Team team;
 	

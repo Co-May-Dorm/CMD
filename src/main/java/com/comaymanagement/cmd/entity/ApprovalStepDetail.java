@@ -24,7 +24,7 @@ public class ApprovalStepDetail {
 	private Integer id;
 	private String code;
 	@OneToOne()
-	@JoinColumn(name = "approval_step_id", insertable = false, updatable = false)
+	@JoinColumn(name = "approval_step_id")
 	private ApprovalStep approvalStep;
 
 	@OneToOne()

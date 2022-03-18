@@ -89,9 +89,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 			jsonObjectPosition = jsonObjectEmployee.get("positionList");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
 			jsonLoginAccount = jsonObjectEmployee.get("user");
-//			Check employee id existed
+//			Check employee code existed
 			String code = jsonObjectEmployee.get("code").asText();
-			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, code);
+			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
 			
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
@@ -118,18 +118,19 @@ public class EmployeeService implements IGeneralService<Employee> {
 			dep.setId(jsonObjectDepartment.get("id").asInt());
 			emp.setPositionList(positionList);
 			emp.setDepartment(dep);
+			Integer idAdded = employeeRepository.add(emp);
+			if (idAdded != -1) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + emp));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", idAdded + "", emp));
+
+			}
 		} catch (Exception e) {
 			logger.error("Error has occured in addEmployee()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		Integer idAdded = employeeRepository.add(emp);
-		if (idAdded != -1) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + emp));
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error", idAdded + "", emp));
-
-		}
+		
 
 	}
 	public ResponseEntity<Object> edit(String json) {
@@ -153,7 +154,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 //			Check employee id existed
 			String code = jsonObjectEmployee.get("code").asText();
-			boolean isExisted = employeeRepository.checkEmployeeIdExisted(id, code);
+			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
@@ -184,19 +185,19 @@ public class EmployeeService implements IGeneralService<Employee> {
 			dep.setId(jsonObjectDepartment.get("id").asInt());
 			emp.setPositionList(positionList);
 			emp.setDepartment(dep);
+			String message = employeeRepository.edit(emp);
+			if (message != "") {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", message + "", emp));
 
+			}
 		} catch (Exception e) {
 			logger.error("Error has occured in edit()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		String message = employeeRepository.edit(emp);
-		if (message != "") {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error", message + "", emp));
-
-		}
+		
 
 	}
 	// Delete employee by id
@@ -234,7 +235,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 	}
 
 	@Override
-	public Employee save(Employee t) {
+	public ResponseEntity<Object> save(Employee t) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -243,6 +244,12 @@ public class EmployeeService implements IGeneralService<Employee> {
 	public void remove(Employee model) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public ResponseEntity<Object> save(String json) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
