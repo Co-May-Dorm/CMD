@@ -14,8 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.entity.Status;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.repositoryimpl.TaskRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -74,16 +76,15 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
 		try {
 			int limit = 15;
-			tasks = taskRepository.findAllTask(dep, title, status, creator, receiver, createDate, finishDate, sort,
+			tasks = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, sort,
 					order, page, limit);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(page);
-			pagination.setTotalItem(taskRepository.CountTotalItemTaskAll(dep, title, status, creator, receiver));
+			pagination.setTotalItem(taskRepository.countAll(dep, title, status, creator, receiver));
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("tasks", tasks);
-
 			if (results.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
@@ -116,7 +117,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(page);
-			pagination.setTotalItem(taskRepository.CountTotalItemFindByIds());
+			pagination.setTotalItem(taskRepository.countFindByIds());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("tasks", tasks);
@@ -148,12 +149,6 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		return null;
 	}
 
-	@Override
-
-	public ResponseEntity<Object> save(CustomTaskAll t) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void remove(CustomTaskAll model) {
@@ -163,6 +158,54 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 
 	@Override
 	public ResponseEntity<Object> save(String json) {
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectSanPham;
+		try {
+			jsonObjectSanPham = jsonMapper.readTree(json);
+
+			Task task = new Task();
+			
+			String creatorId = jsonObjectSanPham.get("creator_id").asText();
+			String receiverId = jsonObjectSanPham.get("receiver_id").asText();
+			String statusId = jsonObjectSanPham.get("status_id").asText();
+			String code = jsonObjectSanPham.get("code").asText();
+			
+			Employee creator = new Employee();
+			creator.setId(Integer.parseInt(creatorId));
+			
+			Employee receiver = new Employee();
+			receiver.setId(Integer.parseInt(receiverId));
+
+			Status status = new Status();
+			status.setId(Integer.parseInt(statusId));
+			
+			task.setCode(code + taskRepository.getMaxId());
+			task.setCreator(creator);
+			task.setReceiver(receiver);
+			task.setStatus(status);
+			task.setTitle(jsonObjectSanPham.get("title").asText());
+			task.setDescription(jsonObjectSanPham.get("description").asText());
+			task.setCreateDate(jsonObjectSanPham.get("createDate").asText());
+			task.setFinishDate(jsonObjectSanPham.get("finishDate").asText());
+			Integer id = taskRepository.save(task); 
+			if ( id != null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", "Query produce successfully: ", id));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("ERROR", "Can not save task", ""));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.debug("ERROR",e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
+		}
+	}
+
+	@Override
+	public ResponseEntity<Object> save(CustomTaskAll t) {
 		// TODO Auto-generated method stub
 		return null;
 	}
