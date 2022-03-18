@@ -74,7 +74,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	@Transactional
-	public List<CustomTaskAll> findAllTask(String dep, String title, String status, String creator, String receiver,
+	public List<CustomTaskAll> findAll(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, String page, Integer limit) {
 
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
@@ -134,7 +134,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 	
 	@Override
-	public Integer CountTotalItemTaskAll(String dep, String title, String status, String creator, String receiver) {
+	public Integer countAll(String dep, String title, String status, String creator, String receiver) {
 		Integer count = null;
 		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
@@ -198,7 +198,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		return customTasks;
 	}
 	@Override
-	public Integer CountTotalItemFindByIds() {
+	public Integer countFindByIds() {
 		Integer count = null;
 		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS t ");
 		hql.append("WHERE status_id IN (?1)");
@@ -214,5 +214,38 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 		return count;
 	}
+
+	@Override
+	public Integer save(Task task) {
+		try {
+			LOGGER.info("SAVE TASK....");
+			Session session = sessionFactory.getCurrentSession();
+			return Integer.parseInt(session.save(task).toString());
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+	}
+
+	@Override
+	public Integer getMaxId() {
+		StringBuilder hql = new StringBuilder("SELECT t.id FROM tasks AS t ");
+		hql.append("INNER JOIN t.creator ");
+		hql.append("INNER JOIN t.status ");
+		hql.append("INNER JOIN t.receiver ");
+		hql.append("order by t.id DESC");
+		try {
+			LOGGER.info(hql.toString());
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			query.setMaxResults(1);
+			List tasks = query.getResultList();
+			return Integer.parseInt(tasks.get(0).toString());
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+	}
+
 
 }
