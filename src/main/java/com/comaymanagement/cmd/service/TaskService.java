@@ -151,7 +151,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 
 	@Override
 
-	public ResponseEntity<Object> save(Task t) {
+	public ResponseEntity<Object> save(CustomTaskAll t) {
 		// TODO Auto-generated method stub
 		return null;
 	}
