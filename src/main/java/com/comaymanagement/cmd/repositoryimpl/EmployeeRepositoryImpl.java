@@ -44,14 +44,14 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		List<Employee> employeeList = new ArrayList();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
-		hql.append("inner join emp.positionList as pos inner join emp.department as dep ");
+		hql.append("inner join emp.positions as pos inner join emp.department as dep ");
 		hql.append("where emp.name like CONCAT('%',:name,'%') ");
 		hql.append("and emp.dateOfBirth like CONCAT('%',:dob,'%') ");
 		hql.append("and emp.email like CONCAT('%',:email,'%') ");
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
 		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team.id is null and pos.department.id is not null ");
-		hql.append("order by emp." + sort + " " + order);
+		hql.append("order by " + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
 		List<CustomEmployeeAll> cusEmpList = new ArrayList();
 		try {
@@ -79,7 +79,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusDep.setManagerId(e.getDepartment().getManagerId());
 
 				// Add position list
-				for (Position p : e.getPositionList()) {
+				for (Position p : e.getPositions()) {
 					if(p.getDepartment()!=null && p.getTeam()==null) {
 						CustomPositionAll cusPos = new CustomPositionAll();
 						Role role = new Role();
@@ -106,7 +106,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusEmp.setEmail(e.getEmail());
 				cusEmp.setPhoneNumber(e.getPhoneNumber());
 				cusEmp.setDepartment(cusDep);
-				cusEmp.setPositionList(cusPositionList);
+				cusEmp.setPositions(cusPositionList);
 				cusEmp.setUser(user);
 
 				cusEmpList.add(cusEmp);

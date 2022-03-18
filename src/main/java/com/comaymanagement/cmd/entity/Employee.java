@@ -65,11 +65,11 @@ public class Employee {
 	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "position_id", referencedColumnName = "id") })
-	private List<Position> positionList;
+	private List<Position> positions;
 
 	@OneToMany
 	@JoinColumn(name = "employee_id")
-	private List<ProposalPermission> proposalPermissionList;
+	private List<ProposalPermission> proposalPermissions;
 
 	@OneToMany
 	@JoinColumn(name = "creator_id")
@@ -81,16 +81,16 @@ public class Employee {
 
 	@OneToMany
 	@JoinColumn(name = "creator_id")
-	private List<Proposal> proposalList;
+	private List<Proposal> proposals;
 
 	@OneToMany
 	@JoinColumn(name = "employee_id")
-	private List<ApprovalStepDetail> approvalStepDetailList;
+	private List<ApprovalStepDetail> approvalStepDetails;
 
 	@ManyToMany
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "team_id", referencedColumnName = "id") })
-	private List<Team> teamList;
+	private List<Team> teams;
 
 }

@@ -48,19 +48,19 @@ public class Department {
 	@OneToMany
 	@JoinColumn(name = "department_id")
 	@JsonBackReference
-	private List<Position> positionList;
+	private List<Position> positions;
 
 	@OneToMany
 	@JoinColumn(name = "department_id")
-	private List<ProposalPermission> proposalPermissionList;
+	private List<ProposalPermission> proposalPermissions;
 
 	@OneToMany
 	@JoinColumn(name = "department_id")
-	private List<ApprovalStepDetail> approvalStepDetailList;
+	private List<ApprovalStepDetail> approvalStepDetails;
 
 	@OneToMany
 	@JoinColumn(name = "department_id")
 	@JsonBackReference
-	private List<Employee> employeeList;
+	private List<Employee> employees;
 
 }

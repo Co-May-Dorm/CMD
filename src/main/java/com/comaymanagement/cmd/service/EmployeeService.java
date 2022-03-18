@@ -110,13 +110,15 @@ public class EmployeeService implements IGeneralService<Employee> {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
 			}
-			for (JsonNode p : jsonObjectPosition) {
-				Position pos = new Position();
-				pos.setId(p.get("id").asInt());
-				positionList.add(pos);
+			if(jsonObjectPosition.isArray()) {
+				for(JsonNode p : jsonObjectPosition) {
+					Position pos = new Position();
+					pos.setId(p.get("id").asInt());
+					positionList.add(pos);
+				}
 			}
 			dep.setId(jsonObjectDepartment.get("id").asInt());
-			emp.setPositionList(positionList);
+			emp.setPositions(positionList);
 			emp.setDepartment(dep);
 			Integer idAdded = employeeRepository.add(emp);
 			if (idAdded != -1) {
@@ -183,7 +185,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 				positionList.add(pos);
 			}
 			dep.setId(jsonObjectDepartment.get("id").asInt());
-			emp.setPositionList(positionList);
+			emp.setPositions(positionList);
 			emp.setDepartment(dep);
 			String message = employeeRepository.edit(emp);
 			if (message != "") {

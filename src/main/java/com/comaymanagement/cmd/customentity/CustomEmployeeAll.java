@@ -24,7 +24,7 @@ public class CustomEmployeeAll {
 	private String dateOfBirth;
 	private String email;
 	private String phoneNumber;
-	private List<CustomPositionAll> positionList;
+	private List<CustomPositionAll> positions;
 	private CustomDepartmentAll department;
 	private User user;
 }
