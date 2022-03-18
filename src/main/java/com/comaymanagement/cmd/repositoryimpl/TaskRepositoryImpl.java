@@ -88,8 +88,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
 		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
 		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
-		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
-		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
+		//hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
+		//hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
 
 		hql.append("order by " + order + " " + sort);
 
@@ -103,8 +103,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("status", status);
 			query.setParameter("creator", creator);
 			query.setParameter("receiver", receiver);
-			query.setParameter("createDate", createDate);
-			query.setParameter("finishDate", finishDate);
+			//query.setParameter("createDate", createDate);
+			//query.setParameter("finishDate", finishDate);
 
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
