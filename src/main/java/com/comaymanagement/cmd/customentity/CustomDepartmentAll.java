@@ -19,7 +19,7 @@ public class CustomDepartmentAll {
 	private String code;
 	private String name;
 	private Integer fatherDepartmentId;
-	private String managerId;
+	private Integer managerId;
 	private List<CustomPositionAll> positions;
 	private String description;
 }

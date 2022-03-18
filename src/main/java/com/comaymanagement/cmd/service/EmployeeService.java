@@ -68,7 +68,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		if (cusEmpList.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Not found", ""));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Not found", cusEmpList));
 		}
 	}
 
@@ -87,7 +87,6 @@ public class EmployeeService implements IGeneralService<Employee> {
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
-			jsonObjectDepartment = jsonObjectEmployee.get("department");
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee code existed
 			String code = jsonObjectEmployee.get("code").asText();
@@ -117,7 +116,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 					positionList.add(pos);
 				}
 			}
-			dep.setId(jsonObjectDepartment.get("id").asInt());
+			dep.setId(jsonObjectEmployee.get("department").asInt());
 			emp.setPositions(positionList);
 			emp.setDepartment(dep);
 			Integer idAdded = employeeRepository.add(emp);
@@ -150,10 +149,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
-			Integer id = jsonObjectEmployee.get("id") != null ? jsonObjectEmployee.get("id").asInt() : null;
-			if(id == null) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "id cannot be null", ""));
-			}
+			Integer id = jsonObjectEmployee.get("id") != null ? jsonObjectEmployee.get("id").asInt() : -1;
 //			Check employee id existed
 			String code = jsonObjectEmployee.get("code").asText();
 			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
@@ -187,8 +183,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 			dep.setId(jsonObjectDepartment.get("id").asInt());
 			emp.setPositions(positionList);
 			emp.setDepartment(dep);
-			String message = employeeRepository.edit(emp);
-			if (message != "") {
+			Integer message = employeeRepository.edit(emp);
+			if (message != 0) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)

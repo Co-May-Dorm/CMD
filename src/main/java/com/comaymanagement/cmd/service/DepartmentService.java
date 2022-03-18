@@ -69,7 +69,6 @@ public class DepartmentService implements IGeneralService<Department> {
 	}
 
 	@Override
-	@Transactional
 	public ResponseEntity<Object> save(String json) {
 		List<Position> positionList = new ArrayList<>();
 		Department dep = new Department();
@@ -91,7 +90,7 @@ public class DepartmentService implements IGeneralService<Department> {
 			dep.setCode(code);
 			dep.setName(jsonObjectDepartment.get("name").asText());
 			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asInt());
-			dep.setManagerId(jsonObjectDepartment.get("managerId").asText());
+			dep.setManagerId(jsonObjectDepartment.get("managerId").asInt());
 			dep.setDescription(jsonObjectDepartment.get("description").asText());
 			// save department..............
 			Integer idDepAdded = departmentRepository.save(dep);
@@ -128,7 +127,67 @@ public class DepartmentService implements IGeneralService<Department> {
 
 		}
 	}
+	
+	public ResponseEntity<Object> edit(String json) {
+		List<Position> positionList = new ArrayList<>();
+		Department dep = new Department();
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectDepartment;
+		JsonNode jsonObjectPosition;
+		
+		try {
+			jsonObjectDepartment = jsonMapper.readTree(json);
+			jsonObjectPosition = jsonObjectDepartment.get("positions");
+//			Check department code existed
+			Integer id = jsonObjectDepartment.get("id") != null ? jsonObjectDepartment.get("id").asInt() : -1;
+			String code = jsonObjectDepartment.get("code").asText();
+			boolean isExisted = departmentRepository.isExisted(id, code);
 
+			if (isExisted) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("Error", "Mã phòng ban này đã tồn tại!", ""));
+			}
+			dep.setId(id);
+			dep.setCode(code);
+			dep.setName(jsonObjectDepartment.get("name").asText());
+			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asInt());
+			dep.setManagerId(jsonObjectDepartment.get("managerId").asInt());
+			dep.setDescription(jsonObjectDepartment.get("description").asText());
+			// save department..............
+			Integer idDepAdded = departmentRepository.edit(dep);
+			int i = 1;
+			for (JsonNode p : jsonObjectPosition) {
+				Role role = new Role();
+				Position pos = new Position();
+				role.setId(p.get("role").get("id").asInt());
+				pos.setCode(dep.getCode() + i);
+				pos.setName(p.get("name").asText());
+				pos.setIsManager(p.get("isManager").asBoolean());
+				pos.setRole(role);
+				pos.setDepartment(dep);
+				positionList.add(pos);
+				i++;
+			}
+
+			for (Position p : positionList) {
+				Integer idAdded = positionRepository.edit(p);
+				if (idAdded == -1) {
+					LOGGER.error("Error has occured in DepartmentService at edit():");
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+				}
+			}
+			if (idDepAdded != -1) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", dep));
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentService at add() ", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+
+		}
+	}
 	@Override
 	public ResponseEntity<Object> save(Department t) {
 		// TODO Auto-generated method stub

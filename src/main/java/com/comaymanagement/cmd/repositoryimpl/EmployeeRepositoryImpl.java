@@ -156,14 +156,14 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 	@Override
 	@Transactional
-	public String edit(Employee emp) {
+	public Integer edit(Employee emp) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			session.update(emp);
-			return "1";
+			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in editEmployee() ", e);
-			return "0";
+			return 0;
 		}
 	}
 
