@@ -52,6 +52,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 				cusDep.setId(tmp.getId());
 				cusDep.setCode(tmp.getCode());
 				cusDep.setName(tmp.getName());
+				cusDep.setDescription(tmp.getDescription());
 				cusDep.setFatherDepartmentId(tmp.getFatherDepartmentId());
 				for (Position pos : tmp.getPositionList()) {
 					CustomPositionAll cusPos = new CustomPositionAll();
@@ -90,15 +91,15 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	}
 
 	@Transactional
-	public boolean isExisted(Integer uniqueNumber, String id) {
+	public boolean isExisted(Integer id, String code) {
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from departments dep where dep.id = :id and dep.uniqueNumber != :uniqueNumber";
+		String hql = "from departments dep where dep.code = :code and dep.id != :id";
 		try {
 			Query query = session.createQuery(hql.toString());
+			query.setParameter("code", code);
 			query.setParameter("id", id);
-			query.setParameter("uniqueNumber", uniqueNumber);
-			List<Department> tmp = (List<Department>) query.getResultList();
-			if (tmp.size() > 0) {
+			List list = query.getResultList();
+			if (list.size()>0) {
 				return true;
 			}
 		} catch (Exception e) {
@@ -109,15 +110,15 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 
 	@Transactional
 	@Override
-	public String add(Department dep) {
+	public Integer save(Department dep) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
-			String id = (String) session.save(dep);
+			Integer id = (Integer) session.save(dep);
 			return id;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentRepositoryImpl at add() ", e);
 		}
-		return "";
+		return -1;
 	}
 
 	@Override

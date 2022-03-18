@@ -73,5 +73,17 @@ public class PositionRepositoryImpl implements IPositionRepository {
 		}
 		return count;
 	}
+
+	@Override
+	public Integer save(Position p) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			Integer id = (Integer) session.save(p);
+			return id;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in PositionRepositoryImpl at save() ", e);
+			return -1;
+		}
+	}
 	
 }

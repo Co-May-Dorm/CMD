@@ -120,7 +120,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	}
 	
 	@Transactional
-	public boolean checkEmployeeIdExisted(Integer id, String code) {
+	public boolean checkEmployeeCodeExisted(Integer id, String code) {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "select count(*) from employees emp where emp.code = :code and emp.id != :id";
 		try {

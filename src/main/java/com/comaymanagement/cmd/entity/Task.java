@@ -31,7 +31,7 @@ public class Task {
 	private String finishDate;
 	
 	@OneToOne()
-	@JoinColumn(name = "creator_id", nullable = false)
+	@JoinColumn(name = "creator_id", nullable = true)
 	private Employee creator;
 
 	@OneToOne()
@@ -39,7 +39,7 @@ public class Task {
 	private Employee receiver;
 
 	@OneToOne()
-	@JoinColumn(name = "status_id", nullable = false)
+	@JoinColumn(name = "status_id", nullable = true)
 	private Status status;
 
 }

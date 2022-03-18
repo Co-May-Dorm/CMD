@@ -150,7 +150,8 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 	}
 
 	@Override
-	public CustomTaskAll save(CustomTaskAll t) {
+
+	public ResponseEntity<Object> save(Task t) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -159,6 +160,12 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 	public void remove(CustomTaskAll model) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public ResponseEntity<Object> save(String json) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

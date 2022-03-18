@@ -42,7 +42,7 @@ public interface IEmployeeRepository {
 
 	public String delete(Integer id);
 
-	public boolean checkEmployeeIdExisted(Integer id, String code);
+	public boolean checkEmployeeCodeExisted(Integer id, String code);
 	
 	public Integer getTotal(String name, String dob, String email, String phone, String dep,
 			String pos);

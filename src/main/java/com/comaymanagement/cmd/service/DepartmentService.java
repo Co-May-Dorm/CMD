@@ -1,25 +1,37 @@
 package com.comaymanagement.cmd.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.entity.Team;
 import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
+import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
-public class DepartmentService {
+public class DepartmentService implements IGeneralService<Department> {
 	@Autowired
 	DepartmentRepositoryImpl departmentRepository;
-
+	@Autowired
+	PositionRepositoryImpl positionRepository;
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
 
 	public List<Department> findAllDepartmentByEmployeeId(String id) {
@@ -38,82 +50,89 @@ public class DepartmentService {
 
 	}
 
-//	public ResponseEntity<Object> add(String json){
-//		List<Position> positionList = new ArrayList<>();
-//		Department dep = new Department();
-//		JsonMapper jsonMapper = new JsonMapper();
-//		JsonNode jsonObjectDepartment;
-//		JsonNode jsonObjectPosition;
-//		JsonNode jsonObjectRole;
-//		String id = -1;
-//		try {
-//			jsonObjectDepartment = jsonMapper.readTree(json);
-//			jsonObjectPosition = jsonObjectDepartment.get("positionList");
-//			JsonNode tmp = jsonObjectDepartment.get("uniqueNumber");
-//			if (tmp != null) {
-//				id = jsonObjectDepartment.get("uniqueNumber").asInt();
-//			}
-////			emp = employeeRepository.load(uniqueNumber);
-////			Check employee id existed
-//			boolean isExisted = departmentRepository.isExisted(id,
-//					jsonObjectDepartment.get("id").asText());
-//
-//			if (isExisted) {
-//				return ResponseEntity.status(HttpStatus.OK)
-//						.body(new ResponseObject("Error", "Mã phòng ban này đã tồn tại!", ""));
-//			}
-//			// get position list
-//			for(JsonNode p : jsonObjectPosition) {
-//				Role role = new Role();
-//				Position pos = new Position();
-//				role.setId(p.get("role").get("id").asText());
-//				pos.setId(p.get("id").asText());
-//				pos.setName(p.get("name").asText());
-//				pos.setIsManager(p.get("isManager").asBoolean());
-//				pos.setRole(role);
-//				positionList.add(pos);
-//			}
-//			dep.setId(jsonObjectDepartment.get("id").asText());
-//			dep.setName(jsonObjectDepartment.get("name").asText());
-//			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asText());
-//			dep.setManagerId(jsonObjectDepartment.get("managerId").asText());
-//			//save department..............
-//			departmentRepository.add(dep);
-////			int count = //Count list pos;
-////			for(Position p : positionList) {
-////				Position pos = new Position();
-////				pos.setId();
-////				pos.setDepartment(dep);
-////				//save possition.....
-////				count++;
-////			}
-//		} catch (Exception e) {
-//			LOGGER.error("Error has occured in DepartmentService at add() ", e);
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
-//
-//		}
-//		// (If uniqueNumber == -1) => add, else => edit
-//		if (id == -1) {
-//			String message = departmentRepository.add(dep);
-//			if (message != "") {
-//				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", dep));
-//			} else {
-//				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//						.body(new ResponseObject("Error", message + "", dep));
-//
-//			}
-//		} else {
-//			// update status: 1: successful, 0: fail
-//			dep.setId(id);
-//			String updateStatus = departmentRepository.edit(dep);
-//			if (updateStatus != "") {
-//				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", dep));
-//			} else {
-//				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//						.body(new ResponseObject("Error", updateStatus + "", dep));
-//
-//			}
-//		}
-//	}
+	@Override
+	public Iterable<Department> findAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Optional<Department> findById(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(Department model) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<Object> save(String json) {
+		List<Position> positionList = new ArrayList<>();
+		Department dep = new Department();
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectDepartment;
+		JsonNode jsonObjectPosition;
+		Integer id = -1;
+		try {
+			jsonObjectDepartment = jsonMapper.readTree(json);
+			jsonObjectPosition = jsonObjectDepartment.get("positionList");
+//			Check department code existed
+			String code = jsonObjectDepartment.get("code").asText();
+			boolean isExisted = departmentRepository.isExisted(id, code);
+
+			if (isExisted) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("Error", "Mã phòng ban này đã tồn tại!", ""));
+			}
+			dep.setCode(code);
+			dep.setName(jsonObjectDepartment.get("name").asText());
+			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asText());
+			dep.setManagerId(jsonObjectDepartment.get("managerId").asText());
+			dep.setDescription(jsonObjectDepartment.get("description").asText());
+			// save department..............
+			Integer idDepAdded = departmentRepository.save(dep);
+			int i = 1;
+			for (JsonNode p : jsonObjectPosition) {
+				Role role = new Role();
+				Position pos = new Position();
+				role.setId(p.get("role").get("id").asInt());
+				pos.setCode(dep.getCode() + i);
+				pos.setName(p.get("name").asText());
+				pos.setIsManager(p.get("isManager").asBoolean());
+				pos.setRole(role);
+				pos.setDepartment(dep);
+				positionList.add(pos);
+				i++;
+			}
+
+			for (Position p : positionList) {
+				Integer idAdded = positionRepository.save(p);
+				if (idAdded == -1) {
+					LOGGER.error("Error has occured in DepartmentService at save():");
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+				}
+			}
+			if (idDepAdded != -1) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", dep));
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentService at add() ", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+
+		}
+	}
+
+	@Override
+	public ResponseEntity<Object> save(Department t) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
