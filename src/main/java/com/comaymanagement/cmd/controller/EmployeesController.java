@@ -22,7 +22,7 @@ import com.comaymanagement.cmd.service.EmployeeService;
 
 @RestController
 @RequestMapping("/employees")
-@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
+@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
 public class EmployeesController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
