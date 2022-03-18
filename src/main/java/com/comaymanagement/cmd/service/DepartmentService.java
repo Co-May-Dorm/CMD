@@ -90,7 +90,7 @@ public class DepartmentService implements IGeneralService<Department> {
 			}
 			dep.setCode(code);
 			dep.setName(jsonObjectDepartment.get("name").asText());
-			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asText());
+			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asInt());
 			dep.setManagerId(jsonObjectDepartment.get("managerId").asText());
 			dep.setDescription(jsonObjectDepartment.get("description").asText());
 			// save department..............

@@ -31,7 +31,7 @@ public class Department {
 	private String code;
 	private String name;
 	@Column(name="farther_department_id")
-	private String fatherDepartmentId;
+	private Integer fatherDepartmentId;
 	@Column(name="manager_id")
 	private String managerId;
 	@Column(name="create_by")
