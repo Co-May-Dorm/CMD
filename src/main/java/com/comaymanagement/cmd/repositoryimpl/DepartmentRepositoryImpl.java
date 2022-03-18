@@ -38,7 +38,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	@Transactional
 	public List<CustomDepartmentAll> findAll(String name) {
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from departments dep inner join dep.positionList as pos where dep.name like CONCAT('%',:name,'%')";
+		String hql = "from departments dep inner join dep.positions as pos where dep.name like CONCAT('%',:name,'%')";
 		List<CustomDepartmentAll> cusDepList = new ArrayList<CustomDepartmentAll>();
 
 		try {
@@ -65,7 +65,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 					cusPos.setRole(role);
 					cusPosList.add(cusPos);
 				}
-				cusDep.setPositionList(cusPosList);
+				cusDep.setPositions(cusPosList);
 				if (cusDepList.size() <= 0) {
 					cusDepList.add(cusDep);
 				} else {

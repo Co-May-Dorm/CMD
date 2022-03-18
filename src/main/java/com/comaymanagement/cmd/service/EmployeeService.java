@@ -86,7 +86,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		Integer id = -1;
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
-			jsonObjectPosition = jsonObjectEmployee.get("positionList");
+			jsonObjectPosition = jsonObjectEmployee.get("positions");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee code existed
@@ -148,7 +148,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
-			jsonObjectPosition = jsonObjectEmployee.get("positionList");
+			jsonObjectPosition = jsonObjectEmployee.get("positions");
 			jsonObjectDepartment = jsonObjectEmployee.get("department");
 			Integer id = jsonObjectEmployee.get("id") != null ? jsonObjectEmployee.get("id").asInt() : null;
 			if(id == null) {
