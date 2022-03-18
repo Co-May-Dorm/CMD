@@ -68,7 +68,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		if (cusEmpList.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject("Not found", "Not found", cusEmpList));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", cusEmpList));
 		}
 	}
 
@@ -112,7 +112,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			if(jsonObjectPosition.isArray()) {
 				for(JsonNode p : jsonObjectPosition) {
 					Position pos = new Position();
-					pos.setId(p.get("id").asInt());
+					pos.setId(Integer.valueOf(p.toString()));
 					positionList.add(pos);
 				}
 			}
