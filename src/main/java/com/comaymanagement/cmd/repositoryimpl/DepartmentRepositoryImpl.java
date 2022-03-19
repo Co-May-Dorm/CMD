@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repository.IDepartmentRepository;
@@ -134,9 +135,18 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	}
 
 	@Override
-	public Integer delete(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer delete(Integer id) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			Employee emp = new Employee();
+			emp = session.find(Employee.class, id);
+			session.remove(emp);
+			return 1;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in delete() ", e);
+			return 0;
+		}
+
 	}
 
 }
