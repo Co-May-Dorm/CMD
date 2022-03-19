@@ -18,6 +18,6 @@ public interface IDepartmentRepository{
 	public List<CustomDepartmentAll> findAll(String name);
 	public Integer save(Department dep);
 	public Integer edit(Department dep);
-	public Integer delete(String id);
+	public Integer delete(Integer id);
 	public boolean isExisted(Integer id, String code);
 }

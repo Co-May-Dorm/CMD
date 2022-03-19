@@ -22,14 +22,14 @@ import com.comaymanagement.cmd.service.EmployeeService;
 
 @RestController
 @RequestMapping("/employees")
-@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
+//@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
 public class EmployeesController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeService employeeService;
 	@Autowired
 	DepartmentService departmentService;
-
+	@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
 	@GetMapping(value = "", produces = "application/json")
 	public ResponseEntity<Object> paggingAllEmployee(
 			@RequestParam(value = "page", required = false) String page,
@@ -43,7 +43,7 @@ public class EmployeesController {
 			@RequestParam(value = "order", required = false) String order) {
 		return employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
 	}
-
+	@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
 	@PostMapping(value = "/add")
 	@ResponseBody
 	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
