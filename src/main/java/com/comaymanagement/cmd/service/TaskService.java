@@ -209,5 +209,28 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	public ResponseEntity<Object> findById(Integer id){
+		CustomTaskAll customTask = new CustomTaskAll();
+		customTask = taskRepository.findById(id);
+		
+		try {
+			if ( id != null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", "Successfully: ", customTask));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("ERROR", "Can not save task", ""));
+			}
 
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.debug("ERROR",e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
+		
+//		
+//	return ResponseEntity.status(HttpStatus.OK)
+//				.body(new ResponseObject("OK", "Successfully:" , customTask));
+		}
+	}
 }

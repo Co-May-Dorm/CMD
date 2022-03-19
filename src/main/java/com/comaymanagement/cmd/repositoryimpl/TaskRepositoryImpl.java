@@ -247,5 +247,54 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 	}
 
+	@Override
+	public CustomTaskAll findById(Integer id) {
+		
+		CustomTaskAll customTask = new CustomTaskAll();
+		
+		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
+		hql.append(" inner join ta.creator as em");
+		hql.append(" inner join ta.receiver as em1");
+		hql.append(" inner join ta.status as st");
+		hql.append(" WHERE ta.id = :id");
+		
+		
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			query.setParameter("id",id);
+			
+			//List<CustomTaskAll> customTaskListById = new ArrayList<CustomTaskAll>();
+			//List<Task> taskById = new ArrayList<Task>();
+			
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] obj = (Object[]) it.next();
+				Task task = (Task) obj[0];
+				//taskById.add(task);
+			//}
+			//for (Task task : taskById) {
+				//CustomTaskAll customTask = new CustomTaskAll();
+
+				customTask.setId(task.getId());
+				customTask.setCode(task.getCode());
+				customTask.setTitle(task.getTitle());
+				customTask.setCreatorId(task.getCreator().getId());
+				customTask.setCreatorName(task.getCreator().getName());
+				customTask.setRecieverId(task.getReceiver().getId());
+				customTask.setRecieverName(task.getReceiver().getName());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setStatusName(task.getStatus().getName());
+				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
+				//customTaskListById.add(customTask);
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return customTask;
+	}
+	
+	
 
 }

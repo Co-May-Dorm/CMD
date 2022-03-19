@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
+import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.service.EmployeeService;
 import com.comaymanagement.cmd.service.StatusService;
 import com.comaymanagement.cmd.service.TaskService;
@@ -94,5 +95,10 @@ public class TaskController {
 		LOGGER.info("Get task list by status ids");
 		return taskService.findByStatusIds(json, sort, order, page);
 	}
+	
+	@GetMapping(value = "/{id}")
+	public ResponseEntity<Object> findById(@PathVariable Integer id){
 
+		return taskService.findById(id);
+	}
 }
