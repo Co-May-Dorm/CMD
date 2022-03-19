@@ -39,4 +39,5 @@ public interface ITaskRepository {
 			@Param("limit") Integer limit);
 	Integer save(Task task);
 	Integer getMaxId();
+	CustomTaskAll findById(Integer id);
 }
