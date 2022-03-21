@@ -20,7 +20,7 @@ import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/employees")
 public class EmployeesController {
