@@ -219,7 +219,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 						.body(new ResponseObject("OK", "Successfully: ", customTask));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("ERROR", "Can not save task", ""));
+						.body(new ResponseObject("ERROR", "Have error", ""));
 			}
 
 		} catch (Exception e) {
@@ -227,10 +227,33 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			LOGGER.debug("ERROR",e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
-		
-//		
-//	return ResponseEntity.status(HttpStatus.OK)
-//				.body(new ResponseObject("OK", "Successfully:" , customTask));
+
 		}
+	}
+	//
+	public ResponseEntity<Object> sortByStatusIds(Integer statusId,String page) {
+		page = page == null ? "1" : page.trim();
+		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
+		try {
+			tasks = taskRepository.sortByStatusIds(statusId, page);
+			int limit = 15;
+			Pagination pagination = new Pagination();
+			pagination.setLimit(limit);
+			pagination.setPage(page);
+			Map<String, Object> results = new TreeMap<String, Object>();
+			results.put("pagination", pagination);
+			results.put("tasks", tasks);
+			if (results.size() > 0) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", "Query successfully: ", results));
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body(new ResponseObject("Not found", "Can not find task list", tasks));
+			}
+		} catch (Exception e) {
+			LOGGER.error("ERROR:" + e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+		}
+
 	}
 }

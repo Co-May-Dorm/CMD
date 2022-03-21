@@ -101,4 +101,11 @@ public class TaskController {
 
 		return taskService.findById(id);
 	}
+	////
+	@GetMapping(value="/statusId/{statusId}")
+	public ResponseEntity<Object> sortByStatusIds(@PathVariable Integer statusId,
+			@RequestParam(value="page",required = false) String page){
+		LOGGER.info("Get task list by status id successfully");
+		return taskService.sortByStatusIds(statusId, page);
+	}
 }
