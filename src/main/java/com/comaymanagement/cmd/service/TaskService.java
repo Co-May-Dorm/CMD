@@ -40,7 +40,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			List<CustomTaskAll> tasksByStatusId = taskRepository.findByStatusId(statusId, sort, order, page, limit);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
-			pagination.setPage(page);
+			pagination.setPage(Integer.valueOf(page));
 			//pagination.setTotalItem(taskRepository.CountTotalItemTaskAll());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("tasks", tasksByStatusId);
@@ -80,7 +80,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 					order, page, limit);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
-			pagination.setPage(page);
+			pagination.setPage(Integer.valueOf(page));
 			pagination.setTotalItem(taskRepository.countAll(dep, title, status, creator, receiver));
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
@@ -116,7 +116,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
-			pagination.setPage(page);
+			pagination.setPage(Integer.valueOf(page));
 			pagination.setTotalItem(taskRepository.countFindByIds());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
@@ -239,7 +239,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			int limit = 15;
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
-			pagination.setPage(page);
+			pagination.setPage(Integer.valueOf(page));
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("tasks", tasks);

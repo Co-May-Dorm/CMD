@@ -34,7 +34,7 @@ public class RoleService implements IGeneralService<Role> {
 			List<CustomRoleAll> customRoleAlls = roleRepository.findAllRole(sort, order, page,limit);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
-			pagination.setPage(page);
+			pagination.setPage(Integer.valueOf(page));
 			pagination.setTotalItem(roleRepository.CountTotalItem());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("taskList", customRoleAlls);
