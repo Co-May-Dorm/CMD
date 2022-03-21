@@ -40,4 +40,6 @@ public interface ITaskRepository {
 	Integer save(Task task);
 	Integer getMaxId();
 	CustomTaskAll findById(Integer id);
+
+	List<CustomTaskAll> sortByStatusIds(Integer statusId,String page);
 }

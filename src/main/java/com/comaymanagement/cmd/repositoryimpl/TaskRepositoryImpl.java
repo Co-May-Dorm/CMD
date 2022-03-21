@@ -249,33 +249,20 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	public CustomTaskAll findById(Integer id) {
-		
 		CustomTaskAll customTask = new CustomTaskAll();
-		
 		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
 		hql.append(" inner join ta.creator as em");
 		hql.append(" inner join ta.receiver as em1");
 		hql.append(" inner join ta.status as st");
 		hql.append(" WHERE ta.id = :id");
-		
-		
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
-			query.setParameter("id",id);
-			
-			//List<CustomTaskAll> customTaskListById = new ArrayList<CustomTaskAll>();
-			//List<Task> taskById = new ArrayList<Task>();
-			
+			query.setParameter("id",id);			
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
-				//taskById.add(task);
-			//}
-			//for (Task task : taskById) {
-				//CustomTaskAll customTask = new CustomTaskAll();
-
 				customTask.setId(task.getId());
 				customTask.setCode(task.getCode());
 				customTask.setTitle(task.getTitle());
@@ -287,7 +274,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStatusName(task.getStatus().getName());
 				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
-				//customTaskListById.add(customTask);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
@@ -295,6 +281,49 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		return customTask;
 	}
 	
-	
+	//
+	@Override
+	@Transactional
+	public List<CustomTaskAll> sortByStatusIds(Integer statusId,String page) {
+		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
+		List<Task> taskList = new ArrayList<Task>();
+		//Integer id = ParseInt(statusId);
+		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
+		hql.append(" inner join ta.receiver as em");
+		hql.append(" inner join ta.status as st");
+		hql.append(" inner join ta.creator as cr");
+		//hql.append(" WHERE ta.status = "+statusId);
+		hql.append(" WHERE ta.status = :statusId");
+
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			LOGGER.info(statusId.toString());
+			query.setParameter("statusId",statusId);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] obj = (Object[]) it.next();
+				Task task = (Task) obj[0];
+				taskList.add(task);
+			}
+			for (Task task : taskList) {
+				CustomTaskAll customTask = new CustomTaskAll();
+				customTask.setId(task.getId());
+				customTask.setTitle(task.getTitle());
+				customTask.setCreatorId(task.getCreator().getId());
+				customTask.setCreatorName(task.getCreator().getName());
+				customTask.setRecieverId(task.getReceiver().getId());
+				customTask.setRecieverName(task.getReceiver().getName());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
+				customTask.setStatusName(task.getStatus().getName());
+				customTaskList.add(customTask);
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage()+"Loi");
+		}
+		return customTaskList;
+	}
 
 }
