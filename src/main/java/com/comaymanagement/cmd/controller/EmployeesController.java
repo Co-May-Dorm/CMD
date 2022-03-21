@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,10 +20,10 @@ import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
-
+@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN_LOCAL, CrossOriginConstant.REACT_ORIGIN})
 @RestController
 @RequestMapping("/employees")
-@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN_LOCAL})
+
 public class EmployeesController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
@@ -42,7 +43,12 @@ public class EmployeesController {
 			@RequestParam(value = "order", required = false) String order) {
 		return employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
 	}
-	@PostMapping(value = "/add")
+//	@PostMapping(value = "/add")
+//	@ResponseBody
+//	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
+//		return employeeService.addEmployee(json);
+//	}
+	@RequestMapping(method = RequestMethod.POST ,value = "/add")
 	@ResponseBody
 	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
 		return employeeService.addEmployee(json);
