@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Pagination {
-	private String page;
+	private Integer page;
 	private Integer limit;
 	private Integer totalItem;
 }

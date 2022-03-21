@@ -59,7 +59,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		Map<String, Object> result = new TreeMap<>();
 		Integer total = employeeRepository.getTotal(name, dob, email, phone, dep, pos);
 		pagination.setLimit(limit);
-		pagination.setPage(page);
+		pagination.setPage(Integer.valueOf(page));
 		pagination.setTotalItem(total);
 		List<CustomEmployeeAll> cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
 				limit, offset);
