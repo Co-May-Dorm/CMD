@@ -20,10 +20,9 @@ import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
-@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN_LOCAL, CrossOriginConstant.REACT_ORIGIN})
+@CrossOrigin
 @RestController
 @RequestMapping("/employees")
-
 public class EmployeesController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
