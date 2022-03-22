@@ -90,6 +90,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee code existed
 			String code = jsonObjectEmployee.get("code").asText();
+			String avatar = jsonObjectEmployee.get("avatar") != null ? jsonObjectEmployee.get("avatar").asText() : "";
+			String gender = jsonObjectEmployee.get("gender") != null ? jsonObjectEmployee.get("gender").asText() : "";
 			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
 			
 			if (isExisted) {
@@ -98,8 +100,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 			emp.setCode(jsonObjectEmployee.get("code").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
-			emp.setAvatar(jsonObjectEmployee.get("avatar").asText());
-			emp.setGender(jsonObjectEmployee.get("gender").asText());
+			emp.setAvatar(avatar);
+			emp.setGender(gender);
 			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());

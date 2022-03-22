@@ -42,12 +42,7 @@ public class EmployeesController {
 			@RequestParam(value = "order", required = false) String order) {
 		return employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
 	}
-//	@PostMapping(value = "/add")
-//	@ResponseBody
-//	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
-//		return employeeService.addEmployee(json);
-//	}
-	@RequestMapping(method = RequestMethod.POST ,value = "/add")
+	@PostMapping(value = "/add")
 	@ResponseBody
 	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
 		return employeeService.addEmployee(json);
