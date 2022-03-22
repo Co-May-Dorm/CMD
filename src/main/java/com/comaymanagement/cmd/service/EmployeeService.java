@@ -123,7 +123,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setDepartment(dep);
 			Integer idAdded = employeeRepository.add(emp);
 			if (idAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + emp));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", emp));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("Error", idAdded + "", emp));
