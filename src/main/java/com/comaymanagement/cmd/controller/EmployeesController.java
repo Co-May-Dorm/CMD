@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,10 +55,10 @@ public class EmployeesController {
 		return employeeService.edit(json);
 	}
 
-	@PutMapping(value = "/delete")
+	@PutMapping(value = "/delete/{id}")
 	@ResponseBody
-	public ResponseEntity<Object> deleteEmployee(@RequestBody String json) {
-		return employeeService.delete(json);
+	public ResponseEntity<Object> deleteEmployee(@PathVariable String id) {
+		return employeeService.delete(id);
 	}
 
 	// Example return ResponseEntity

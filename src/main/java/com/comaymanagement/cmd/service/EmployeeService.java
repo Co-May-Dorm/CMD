@@ -201,12 +201,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 
 	}
 	// Delete employee by id
-	public ResponseEntity<Object> delete(String json) {
-		JsonMapper jsonMapper = new JsonMapper();
+	public ResponseEntity<Object> delete(String id) {
 		try {
-			JsonNode jsonObjectEmployee = jsonMapper.readTree(json);
-			Integer id = jsonObjectEmployee.get("id").asInt();
-			String updateStatus = employeeRepository.delete(id);
+			String updateStatus = employeeRepository.delete(Integer.valueOf(id));
 
 			if (updateStatus.equals("1")) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
