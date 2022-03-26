@@ -179,10 +179,10 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
-				pos.setId(p.get("id").asInt());
+				pos.setId(Integer.valueOf(p.toString()));
 				positionList.add(pos);
 			}
-			dep.setId(jsonObjectDepartment.get("id").asInt());
+			dep.setId(jsonObjectEmployee.get("department").asInt());
 			emp.setPositions(positionList);
 			emp.setDepartment(dep);
 			Integer message = employeeRepository.edit(emp);
