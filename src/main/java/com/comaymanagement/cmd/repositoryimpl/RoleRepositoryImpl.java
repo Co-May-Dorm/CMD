@@ -38,7 +38,6 @@ public class RoleRepositoryImpl implements IRoleRepository {
 		List<CustomRoleAll> customRoleList = new ArrayList<CustomRoleAll>();
 		StringBuilder hql = new StringBuilder();
 		hql.append("FROM roles r ");
-		hql.append("INNER JOIN r.positions ");
 		hql.append("WHERE r.name like CONCAT('%',:name,'%') ");
 		hql.append("ORDER BY " + sort + " " + order);
 		
@@ -52,22 +51,15 @@ public class RoleRepositoryImpl implements IRoleRepository {
 			LOGGER.info(hql.toString());
 			
 			for(Iterator it = query.getResultList().iterator();it.hasNext();) {
-				Object[] obj  = (Object[]) it.next();
-				Role role = (Role) obj[0];
+				Object obj  = (Object) it.next();
+				Role role = (Role) obj;
 				roles.add(role);
 			}
 			for(Role role : roles) {
 				CustomRoleAll customRoleAll = new CustomRoleAll();
 				customRoleAll.setId(role.getId());
 				customRoleAll.setName(role.getName());
-				List<CustomPositionAll> customPositionAlls = new ArrayList<>();
-				
-				for(Position p : role.getPositions()) {
-					CustomPositionAll cusPos = new CustomPositionAll();
-					cusPos.setId(p.getId());
-					cusPos.setName(p.getName());
-					customPositionAlls.add(cusPos);
-				}
+				List<CustomPositionAll> customPositionAlls = positionRepositoryImpl.findAllByRoleId(role.getId());
 				customRoleAll.setPositions(customPositionAlls);	
 				customRoleList.add(customRoleAll);
 			}

@@ -47,7 +47,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 				customPositionAll.setId(po.getId());
 				customPositionAll.setName(po.getName());
 				customPositionAll.setIsManager(po.getIsManager());
-				customPositionAll.setRole(po.getRole());
+//				customPositionAll.setRole(po.getRole());
 				customPositionAlls.add(customPositionAll);
 			}
 			
