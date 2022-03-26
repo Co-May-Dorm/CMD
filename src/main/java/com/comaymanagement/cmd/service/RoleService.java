@@ -25,19 +25,28 @@ public class RoleService implements IGeneralService<Role> {
 	
 	private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	
-	public ResponseEntity<Object> findAllRole(String sort, String order, String page) {
-		order = order == null ? "r.unique_number" : order.trim();
-		int limit = 15;
-		sort = sort == null ? "DESC" : sort.trim();
+	public ResponseEntity<Object> findAll(String name, String sort, String order, String page) {
 		page = page == null ? "1" : page.trim();
+		name = name == null ? "" : name.trim();
+		int limit = 15;
+		// Caculator offset
+		int offset = (Integer.parseInt(page) - 1) * limit;
+
+		// Order by defaut
+		if (sort == null || sort == "") {
+			sort = "r.id";
+		}
+		if (order == null || order == "") {
+			order = "desc";
+		}
 		try {
-			List<CustomRoleAll> customRoleAlls = roleRepository.findAllRole(sort, order, page,limit);
+			List<CustomRoleAll> customRoleAlls = roleRepository.findAll(name, sort, order , limit, offset);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
 			pagination.setTotalItem(roleRepository.CountTotalItem());
 			Map<String, Object> results = new TreeMap<String, Object>();
-			results.put("taskList", customRoleAlls);
+			results.put("roles", customRoleAlls);
 			results.put("pagination", pagination);
 			if(customRoleAlls == null) {
 				LOGGER.info("NOT FOUND");

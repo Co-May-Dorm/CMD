@@ -20,10 +20,11 @@ public class RoleController {
 
 	@GetMapping("")
 	public ResponseEntity<Object> findAll(
+			@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "sort", required = false) String sort,
 			@RequestParam(value = "order", required = false) String order,
-			@RequestParam(value = "limit", required = false) Integer limit,
 			@RequestParam(value = "page", required = false) String page) {
-		return roleService.findAllRole(sort, order, page);
+		
+		return roleService.findAll(name, sort, order, page);
 	}
 }

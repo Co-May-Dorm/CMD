@@ -45,16 +45,16 @@ public class EmployeeService implements IGeneralService<Employee> {
 		pos = pos == null ? "" : pos.trim();
 		page = page == null ? "1" : page.trim();
 		int limit = 15;
-			// Caculator offset
-			int offset = (Integer.parseInt(page) - 1) * limit;
+		// Caculator offset
+		int offset = (Integer.parseInt(page) - 1) * limit;
 
-			// Order by defaut
-			if (sort == null || sort == "") {
-				sort = "emp.id";
-			}
-			if (order == null || order == "") {
-				order = "desc";
-			}
+		// Order by defaut
+		if (sort == null || sort == "") {
+			sort = "emp.id";
+		}
+		if (order == null || order == "") {
+			order = "desc";
+		}
 		Pagination pagination = new Pagination();
 		Map<String, Object> result = new TreeMap<>();
 		Integer total = employeeRepository.getTotal(name, dob, email, phone, dep, pos);

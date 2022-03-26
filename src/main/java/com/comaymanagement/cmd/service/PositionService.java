@@ -55,7 +55,30 @@ public class PositionService implements IGeneralService<Position> {
 					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
 		}
 	}
+	public ResponseEntity<Object> findAllByDepartmentId(Integer depId) {
+		List<CustomPositionAll> customPositionAlls = new ArrayList<CustomPositionAll>();;
 
+		try {
+			if (depId == null) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("ERROR", "Have error: ", "Department ID is null"));
+			} else {
+				customPositionAlls = positionRepository.findAllByDepartmentId(depId);
+				if (customPositionAlls.size() < 1) {
+					LOGGER.info("Have no task by status_id: " + depId);
+					return ResponseEntity.status(HttpStatus.NOT_FOUND)
+							.body(new ResponseObject("", "Have no task by status_id: " + depId, ""));
+				} else {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("OK", "Query produce successfully:", customPositionAlls));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
+		}
+	}
 	@Override
 	public Optional<Position> findById(String id) {
 		// TODO Auto-generated method stub

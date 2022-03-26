@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -32,14 +33,14 @@ public class Role {
 	@OneToMany
 	@JoinColumn(name = "role_id")
 	@JsonBackReference
-	private Set<Auth> authList;
+	private Set<Auth> auths;
 
 	@OneToMany
 	@JoinColumn(name = "role_id")
 	@JsonBackReference
-	private Set<RoleDetail> roleDetailList;
+	private Set<RoleDetail> roleDetails;
 
-	@OneToOne()
-	@JoinColumn(name = "position_id")
-	private Position position;
+	@OneToMany()
+	@JoinColumn(name = "role_id")
+	private List<Position> positions;
 }
