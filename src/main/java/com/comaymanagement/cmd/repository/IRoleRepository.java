@@ -7,10 +7,11 @@ import org.springframework.data.repository.query.Param;
 import com.comaymanagement.cmd.customentity.CustomRoleAll;
 
 public interface IRoleRepository {
-	List<CustomRoleAll> findAllRole(
-			@Param("sort") String sort,
-			@Param("order") String order,
-			@Param("page") String page,
-			@Param("limit") Integer limit);
+	List<CustomRoleAll> findAll(
+			String name,
+			String sort,
+			String order,
+			Integer limit,
+			Integer offset);
 	Integer CountTotalItem();
 }

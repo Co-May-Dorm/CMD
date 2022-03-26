@@ -8,7 +8,7 @@ import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.entity.Position;
 
 public interface IPositionRepository{
-
+	List<CustomPositionAll> findAllByDepartmentId(Integer depId);
 	List<CustomPositionAll> findAllByRoleId(
 			@Param("roleID") Integer roleId);
 	Integer CountTotalItem();

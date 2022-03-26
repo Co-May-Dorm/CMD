@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.customentity.CustomRoleAll;
 import com.comaymanagement.cmd.entity.Pagination;
+import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.repository.IRoleRepository;
 @Repository
@@ -32,30 +33,41 @@ public class RoleRepositoryImpl implements IRoleRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoleRepositoryImpl.class);
 	
 	@Override
-	public List<CustomRoleAll> findAllRole(String sort, String order, String page,Integer limit) {
+	public List<CustomRoleAll> findAll(String name, String sort, String order, Integer limit, Integer offset) {
 		List<Role> roles = new ArrayList<Role>();
 		List<CustomRoleAll> customRoleList = new ArrayList<CustomRoleAll>();
-		StringBuilder hql = new StringBuilder("FROM roles AS r ");
+		StringBuilder hql = new StringBuilder();
+		hql.append("FROM roles r ");
+		hql.append("INNER JOIN r.positions ");
+		hql.append("WHERE r.name like CONCAT('%',:name,'%') ");
+		hql.append("ORDER BY " + sort + " " + order);
 		
 		try {
 			
-			int offset = (Integer.valueOf(page) - 1) * limit;
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
+			query.setParameter("name", name);
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			LOGGER.info(hql.toString());
 			
 			for(Iterator it = query.getResultList().iterator();it.hasNext();) {
-				Object obj  = (Object) it.next();
-				Role role = (Role) obj;
+				Object[] obj  = (Object[]) it.next();
+				Role role = (Role) obj[0];
 				roles.add(role);
 			}
 			for(Role role : roles) {
 				CustomRoleAll customRoleAll = new CustomRoleAll();
 				customRoleAll.setId(role.getId());
 				customRoleAll.setName(role.getName());
-				List<CustomPositionAll> customPositionAlls = positionRepositoryImpl.findAllByRoleId(role.getId());
+				List<CustomPositionAll> customPositionAlls = new ArrayList<>();
+				
+				for(Position p : role.getPositions()) {
+					CustomPositionAll cusPos = new CustomPositionAll();
+					cusPos.setId(p.getId());
+					cusPos.setName(p.getName());
+					customPositionAlls.add(cusPos);
+				}
 				customRoleAll.setPositions(customPositionAlls);	
 				customRoleList.add(customRoleAll);
 			}
@@ -75,7 +87,6 @@ public class RoleRepositoryImpl implements IRoleRepository {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
-			@SuppressWarnings("rawtypes")
 			List list = query.getResultList();
 			count = Integer.valueOf(list.get(0).toString());
 		}catch (Exception e) {
