@@ -30,7 +30,6 @@ public class Position {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	private String name;
 	@Column(name="is_manager")
 	private Boolean isManager;

@@ -93,18 +93,15 @@ public class DepartmentService implements IGeneralService<Department> {
 			dep.setDescription(jsonObjectDepartment.get("description").asText());
 			// save department..............
 			Integer idDepAdded = departmentRepository.save(dep);
-			int i = 1;
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
 				role.setId(p.get("role").get("id").asInt());
-				pos.setCode(dep.getCode() + i);
 				pos.setName(p.get("name").asText());
 				pos.setIsManager(p.get("isManager").asBoolean());
 				pos.setRole(role);
 				pos.setDepartment(dep);
 				positionList.add(pos);
-				i++;
 			}
 
 			for (Position p : positionList) {

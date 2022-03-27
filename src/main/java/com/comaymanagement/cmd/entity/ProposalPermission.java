@@ -21,7 +21,6 @@ public class ProposalPermission {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	
 	@OneToOne()
 	@JoinColumn(name = "position_id")

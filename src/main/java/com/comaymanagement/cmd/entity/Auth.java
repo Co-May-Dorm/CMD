@@ -23,7 +23,6 @@ public class Auth {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	private Boolean permission;
 	@Column(name="active_flag")
 	private Boolean activeFlag;

@@ -22,7 +22,6 @@ public class Task {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	private String title;
 	private String description;
 	@Column(name= "create_date")

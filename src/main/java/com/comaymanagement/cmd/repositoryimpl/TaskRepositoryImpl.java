@@ -264,7 +264,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
 				customTask.setId(task.getId());
-				customTask.setCode(task.getCode());
 				customTask.setTitle(task.getTitle());
 				customTask.setCreatorId(task.getCreator().getId());
 				customTask.setCreatorName(task.getCreator().getName());

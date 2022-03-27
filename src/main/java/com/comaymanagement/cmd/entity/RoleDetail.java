@@ -24,7 +24,6 @@ public class RoleDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	@Column(name="create_by")
 	private String createBy;
 	@Column(name="modify_by")

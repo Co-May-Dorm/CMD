@@ -25,7 +25,6 @@ public class DataType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	private String name;
 	private String description;
 
