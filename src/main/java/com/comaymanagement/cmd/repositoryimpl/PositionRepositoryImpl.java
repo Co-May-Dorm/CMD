@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.repository.IPositionRepository;
 @Repository
@@ -126,6 +127,20 @@ public class PositionRepositoryImpl implements IPositionRepository {
 			LOGGER.error("Error has occured in findAllByDepartmentId() ", e);
 		}
 		return customPositionAlls;
+	}
+	@Transactional
+	public String delete(Integer id) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			Position pos = new Position();
+			pos = session.find(Position.class, id);
+			session.remove(pos);
+			return "1";
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in delete() ", e);
+			return "0";
+		}
+
 	}
 	
 }

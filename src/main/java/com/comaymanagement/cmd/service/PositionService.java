@@ -117,7 +117,23 @@ public class PositionService implements IGeneralService<Position> {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 	}
-	
+	public ResponseEntity<Object> delete(String id) {
+		try {
+			String updateStatus = positionRepository.delete(Integer.valueOf(id));
+
+			if (updateStatus.equals("1")) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", updateStatus + "", ""));
+
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
+
+		}
+
+	}
 	@Override
 	public ResponseEntity<Object> save(Position p) {
 		Integer idAdded = positionRepository.save(p);
