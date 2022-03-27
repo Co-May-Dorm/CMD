@@ -90,7 +90,6 @@ public class DepartmentService implements IGeneralService<Department> {
 			dep.setCode(code);
 			dep.setName(jsonObjectDepartment.get("name").asText());
 			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asInt());
-			dep.setManagerId(jsonObjectDepartment.get("managerId").asInt());
 			dep.setDescription(jsonObjectDepartment.get("description").asText());
 			// save department..............
 			Integer idDepAdded = departmentRepository.save(dep);
@@ -129,7 +128,8 @@ public class DepartmentService implements IGeneralService<Department> {
 	}
 	
 	public ResponseEntity<Object> edit(String json) {
-		List<Position> positionList = new ArrayList<>();
+		List<Position> positionEdits = new ArrayList<>();
+		List<Position> positionAdds = new ArrayList<>();
 		Department dep = new Department();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectDepartment;
@@ -155,22 +155,44 @@ public class DepartmentService implements IGeneralService<Department> {
 			dep.setDescription(jsonObjectDepartment.get("description").asText());
 			// save department..............
 			Integer idDepAdded = departmentRepository.edit(dep);
-			int i = 1;
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
-				role.setId(p.get("role").get("id").asInt());
-				pos.setCode(dep.getCode() + i);
-				pos.setName(p.get("name").asText());
-				pos.setIsManager(p.get("isManager").asBoolean());
-				pos.setRole(role);
-				pos.setDepartment(dep);
-				positionList.add(pos);
-				i++;
+				// If don't have id => go to save, else => go to edit
+				Integer posId = p.get("id") != null ? p.get("id").asInt() : -1;
+				if(posId != -1) {
+					role.setId(p.get("role").get("id").asInt());
+					pos.setId(posId);
+					pos.setCode("");
+					pos.setName(p.get("name").asText());
+					pos.setIsManager(p.get("isManager").asBoolean());
+					pos.setRole(role);
+					pos.setDepartment(dep);
+					positionEdits.add(pos);
+				}else {
+					role.setId(p.get("role").get("id").asInt());
+					pos.setCode("");
+					pos.setName(p.get("name").asText());
+					pos.setIsManager(p.get("isManager").asBoolean());
+					pos.setRole(role);
+					pos.setDepartment(dep);
+					positionAdds.add(pos);
+				}
+				
+				
 			}
-
-			for (Position p : positionList) {
+			// Edit position
+			for (Position p : positionEdits) {
 				Integer idAdded = positionRepository.edit(p);
+				if (idAdded == -1) {
+					LOGGER.error("Error has occured in DepartmentService at edit():");
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+				}
+			}
+			// Add position
+			for (Position p : positionAdds) {
+				Integer idAdded = positionRepository.save(p);
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
