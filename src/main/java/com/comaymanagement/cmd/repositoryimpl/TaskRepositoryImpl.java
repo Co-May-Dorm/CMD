@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +20,7 @@ import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.repository.ITaskRepository;
+import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -164,19 +167,18 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		return count;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<CustomTaskAll> findByStatusIds(List<String> statusIds, String sort, String order, String page,
 			Integer limit) {
 		List<Task> tasks = new ArrayList<Task>();
 		List<CustomTaskAll> customTasks = new ArrayList<CustomTaskAll>();
-		StringBuilder hql = new StringBuilder("SELECT * FROM tasks AS t ");
-		hql.append("WHERE status_id IN (?1)");
+		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
+		hql.append("WHERE status_id IN (:ids)");
 		try {
+			LOGGER.info(hql.toString());
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
-			LOGGER.info(hql.toString());
-			query.setParameter(1, statusIds);
+			query.setParameter("ids", statusIds);
 			tasks = query.getResultList();
 			for(Task item : tasks) {
 				CustomTaskAll task = new CustomTaskAll();
@@ -198,13 +200,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		return customTasks;
 	}
 	@Override
-	public Integer countFindByIds() {
+	public Integer countFindByIds(List<Integer> ids) {
 		Integer count = null;
 		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS t ");
-		hql.append("WHERE status_id IN (?1)");
+		hql.append("WHERE status_id IN (:ids)");
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
+			query.setParameter("ids", ids);
 			LOGGER.info(hql.toString());
 			@SuppressWarnings("rawtypes")
 			List list = query.getResultList();
@@ -264,6 +267,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
 				customTask.setId(task.getId());
+				customTask.setCode(task.getCode());
 				customTask.setTitle(task.getTitle());
 				customTask.setCreatorId(task.getCreator().getId());
 				customTask.setCreatorName(task.getCreator().getName());
