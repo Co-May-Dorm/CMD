@@ -30,7 +30,7 @@ public interface ITaskRepository {
 			@Param("offset") String page,
 			@Param("limit") Integer limit);
 	Integer countAll(String dep, String title, String status, String creator, String receiver);
-	Integer countFindByIds();
+	Integer countFindByIds(List<Integer> ids);
 	List<CustomTaskAll> findByStatusIds(
 			@Param("status_id") List<String> statusIds,
 			@Param("sort") String sort,

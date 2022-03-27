@@ -111,13 +111,19 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			JsonMapper jsonMapper = new JsonMapper();
 			JsonNode jsonObject;
 			jsonObject = jsonMapper.readTree(json);
-			List<String> ids = jsonObject.get("statusIds").findValuesAsText("Id");
+			JsonNode jsonNodes = jsonObject.get("statusIds");
+			List<String> ids = new ArrayList<String>();
+			for(JsonNode j : jsonNodes) {
+				System.out.println(j.toString());
+				ids.add(j.toString());
+			}
+			
 			tasks = taskRepository.findByStatusIds(ids, sort, order, page, limit);
 
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
-			pagination.setTotalItem(taskRepository.countFindByIds());
+			pagination.setTotalItem(tasks.size());
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("tasks", tasks);
@@ -134,7 +140,6 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			LOGGER.error("ERROR:" + e.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
-
 	}
 
 	@Override
@@ -179,6 +184,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			Status status = new Status();
 			status.setId(Integer.parseInt(statusId));
 			
+			task.setCode(code + taskRepository.getMaxId());
 			task.setCreator(creator);
 			task.setReceiver(receiver);
 			task.setStatus(status);
