@@ -22,7 +22,6 @@ public class ApprovalStepDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	@OneToOne()
 	@JoinColumn(name = "approval_step_id")
 	private ApprovalStep approvalStep;

@@ -28,7 +28,6 @@ public class ApprovalStep {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	@Column(name="approval_step_name")
 	private String approvalStepName;
 	@Column(name="approval_step_index")

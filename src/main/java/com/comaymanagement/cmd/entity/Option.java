@@ -27,7 +27,6 @@ public class Option {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	private String name;
 	@OneToMany
 	@JoinColumn(name = "option_id")

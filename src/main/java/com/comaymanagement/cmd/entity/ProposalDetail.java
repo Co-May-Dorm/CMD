@@ -22,7 +22,6 @@ public class ProposalDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	@Column(name="field_id")
 	private String fieldId;
 	private String content;

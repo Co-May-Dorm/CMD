@@ -27,7 +27,6 @@ public class Menu {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	@Column(name="parent_id")
 	private String parentId;
 	private String url;

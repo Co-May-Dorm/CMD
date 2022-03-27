@@ -96,7 +96,6 @@ public class PositionService implements IGeneralService<Position> {
 		Integer id = -1;
 		try {
 			jsonObjectPosition = jsonMapper.readTree(json);
-			p.setCode(jsonObjectPosition.get("code").asText());
 			p.setName(jsonObjectPosition.get("name").asText());
 			p.setIsManager(jsonObjectPosition.get("isManager").asBoolean());
 			team.setId(jsonObjectPosition.get("teamId").asInt());

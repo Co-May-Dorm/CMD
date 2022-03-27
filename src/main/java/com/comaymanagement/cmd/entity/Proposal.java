@@ -26,7 +26,6 @@ public class Proposal {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String code;
 	
 	@OneToMany
 	@JoinColumn(name = "proposal_id")

@@ -179,7 +179,6 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			Status status = new Status();
 			status.setId(Integer.parseInt(statusId));
 			
-			task.setCode(code + taskRepository.getMaxId());
 			task.setCreator(creator);
 			task.setReceiver(receiver);
 			task.setStatus(status);
