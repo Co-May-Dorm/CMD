@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -28,7 +29,6 @@ public class Option {
 	private Integer id;
 	private String code;
 	private String name;
-
 	@OneToMany
 	@JoinColumn(name = "option_id")
 	@JsonBackReference

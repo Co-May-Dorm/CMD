@@ -30,4 +30,9 @@ public class PositionController {
 	public ResponseEntity<Object> findAll(@PathVariable(value = "roleId", required = true) Integer roleId) {
 		return positionService.findAllByRoleId(roleId);
 	}
+
+	@GetMapping("dep/{depId}")
+	public ResponseEntity<Object> findAllByDepartmentId(@PathVariable(value = "depId", required = true) Integer depId) {
+		return positionService.findAllByDepartmentId(depId);
+	}
 }

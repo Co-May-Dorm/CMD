@@ -4,11 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
+import com.comaymanagement.cmd.service.RoleDetailService;
 import com.comaymanagement.cmd.service.RoleService;
 
 @RestController
@@ -17,7 +20,8 @@ import com.comaymanagement.cmd.service.RoleService;
 public class RoleController {
 	@Autowired
 	RoleService roleService;
-
+	@Autowired
+	RoleDetailService roleDetailService;
 	@GetMapping("")
 	public ResponseEntity<Object> findAll(
 			@RequestParam(value = "name", required = false) String name,
@@ -26,5 +30,11 @@ public class RoleController {
 			@RequestParam(value = "page", required = false) String page) {
 		
 		return roleService.findAll(name, sort, order, page);
+	}
+	
+	@GetMapping("/{roleId}")
+	public ResponseEntity<Object> findAllByRoleId(@PathVariable Integer roleId) {
+		
+		return roleDetailService.findAllByRoleId(roleId);
 	}
 }

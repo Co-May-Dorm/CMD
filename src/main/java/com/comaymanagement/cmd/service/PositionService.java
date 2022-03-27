@@ -67,7 +67,7 @@ public class PositionService implements IGeneralService<Position> {
 				if (customPositionAlls.size() < 1) {
 					LOGGER.info("Have no task by status_id: " + depId);
 					return ResponseEntity.status(HttpStatus.NOT_FOUND)
-							.body(new ResponseObject("", "Have no task by status_id: " + depId, ""));
+							.body(new ResponseObject("", "Have no position by departmentId: " + depId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("OK", "Query produce successfully:", customPositionAlls));
