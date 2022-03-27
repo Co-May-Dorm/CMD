@@ -80,6 +80,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			Integer id = (Integer) session.save(p);
+//			session.flush();
 			return id;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in PositionRepositoryImpl at save() ", e);
@@ -91,6 +92,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			session.update(p);
+//			session.flush();
 			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentRepositoryImpl at edit() ", e);

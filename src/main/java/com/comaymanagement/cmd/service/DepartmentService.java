@@ -151,7 +151,6 @@ public class DepartmentService implements IGeneralService<Department> {
 			dep.setCode(code);
 			dep.setName(jsonObjectDepartment.get("name").asText());
 			dep.setFatherDepartmentId(jsonObjectDepartment.get("fatherDepartmentId").asInt());
-			dep.setManagerId(jsonObjectDepartment.get("managerId").asInt());
 			dep.setDescription(jsonObjectDepartment.get("description").asText());
 			// save department..............
 			Integer idDepAdded = departmentRepository.edit(dep);
@@ -163,15 +162,14 @@ public class DepartmentService implements IGeneralService<Department> {
 				if(posId != -1) {
 					role.setId(p.get("role").get("id").asInt());
 					pos.setId(posId);
-					pos.setCode("");
 					pos.setName(p.get("name").asText());
 					pos.setIsManager(p.get("isManager").asBoolean());
 					pos.setRole(role);
 					pos.setDepartment(dep);
 					positionEdits.add(pos);
 				}else {
+					
 					role.setId(p.get("role").get("id").asInt());
-					pos.setCode("");
 					pos.setName(p.get("name").asText());
 					pos.setIsManager(p.get("isManager").asBoolean());
 					pos.setRole(role);
@@ -180,15 +178,6 @@ public class DepartmentService implements IGeneralService<Department> {
 				}
 				
 				
-			}
-			// Edit position
-			for (Position p : positionEdits) {
-				Integer idAdded = positionRepository.edit(p);
-				if (idAdded == -1) {
-					LOGGER.error("Error has occured in DepartmentService at edit():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
-				}
 			}
 			// Add position
 			for (Position p : positionAdds) {
@@ -199,6 +188,16 @@ public class DepartmentService implements IGeneralService<Department> {
 							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
 				}
 			}
+			// Edit position
+			for (Position p : positionEdits) {
+				Integer idAdded = positionRepository.edit(p);
+				if (idAdded == -1) {
+					LOGGER.error("Error has occured in DepartmentService at edit():");
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+				}
+			}
+			
 			if (idDepAdded != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
 			} else {
