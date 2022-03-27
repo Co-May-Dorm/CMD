@@ -42,5 +42,6 @@ public class Role {
 
 	@OneToMany()
 	@JoinColumn(name = "role_id")
+	@JsonBackReference
 	private List<Position> positions;
 }

@@ -70,7 +70,7 @@ public class RoleRepositoryImpl implements IRoleRepository {
 
 		return customRoleList;
 	}
-
+	
 	@Override
 	public Integer CountTotalItem() {
 		Integer count = null;

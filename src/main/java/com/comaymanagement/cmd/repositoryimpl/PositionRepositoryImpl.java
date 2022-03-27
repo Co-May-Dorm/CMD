@@ -123,7 +123,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 			}
 			
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
+			LOGGER.error("Error has occured in findAllByDepartmentId() ", e);
 		}
 		return customPositionAlls;
 	}

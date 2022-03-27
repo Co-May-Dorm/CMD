@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,14 +33,22 @@ public class RoleDetail {
 	private String createDate;
 	@Column(name="modify_date")
 	private String modifyDate;
-
-	@OneToOne()
-	@JoinColumn(name = "option_id")
-	private Option option;
-
-	@OneToOne()
-	@JoinColumn(name = "permission_id")
-	private Permission permission;
+//
+//	@OneToOne()
+//	@JoinColumn(name = "option_id")
+//	private Option option;
+//
+//	@OneToOne()
+//	@JoinColumn(name = "permission_id")
+//	private Permission permission;
+//
+//	@OneToOne()
+//	@JoinColumn(name = "role_id")
+//	private Role role;
+	@Column(name = "option_id")
+	private Integer optionId;
+	@Column(name = "permission_id")
+	private Integer permissionId;
 
 	@OneToOne()
 	@JoinColumn(name = "role_id")
