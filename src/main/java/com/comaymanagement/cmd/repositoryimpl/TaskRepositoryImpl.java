@@ -173,12 +173,16 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		List<Task> tasks = new ArrayList<Task>();
 		List<CustomTaskAll> customTasks = new ArrayList<CustomTaskAll>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
-		hql.append("WHERE status_id IN (:ids)");
+		hql.append("WHERE status_id IN (:ids) ");
+		hql.append("ORDER BY " + sort + " " + order);
 		try {
+			int offset = (Integer.valueOf(page) - 1) * limit;
 			LOGGER.info(hql.toString());
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("ids", statusIds);
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
 			tasks = query.getResultList();
 			for(Task item : tasks) {
 				CustomTaskAll task = new CustomTaskAll();
@@ -267,7 +271,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
 				customTask.setId(task.getId());
-				customTask.setCode(task.getCode());
 				customTask.setTitle(task.getTitle());
 				customTask.setCreatorId(task.getCreator().getId());
 				customTask.setCreatorName(task.getCreator().getName());
