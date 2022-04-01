@@ -25,14 +25,6 @@ public class ProposalDetail {
 	@Column(name="field_id")
 	private String fieldId;
 	private String content;
-	@Column(name="create_by")
-	private String createBy;
-	@Column(name="modify_by")
-	private String modifyBy;
-	@Column(name="create_date")
-	private String createDate;
-	@Column(name="modify_date")
-	private String modifyDate;
 
 	@OneToOne()
 	@JoinColumn(name = "proposal_id")
