@@ -33,7 +33,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeRepositoryImpl employeeRepository;
-
+	List<CustomEmployeeAll> cusEmpList = new ArrayList<>();
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order) {
@@ -61,14 +61,15 @@ public class EmployeeService implements IGeneralService<Employee> {
 		pagination.setLimit(limit);
 		pagination.setPage(Integer.valueOf(page));
 		pagination.setTotalItem(total);
-		List<CustomEmployeeAll> cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
-				limit, offset);
+		cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
+			limit, offset);
 		result.put("pagination", pagination);
 		result.put("employees", cusEmpList);
 		if (cusEmpList.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", cusEmpList));
+			pagination.setPage(1);
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", result));
 		}
 	}
 
