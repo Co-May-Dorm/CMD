@@ -52,19 +52,19 @@ public class RoleDetailRepositoryImpl implements IRoleDetailRepository {
 				
 			}
 			for(Integer i : tmpOptionId) {
+				List<CustomPermissionAll> customPermissions = new ArrayList<>();
+				CustomOptionAll customOption = new CustomOptionAll();
 				for(RoleDetail rd : roleDetails) {
-					CustomOptionAll customOption = new CustomOptionAll();
-					customOption.setId(i);
-					List<CustomPermissionAll> customPermissions = new ArrayList<>();
 					if(rd.getOptionId().equals(i)) {
 						CustomPermissionAll customPermission = new CustomPermissionAll();
 						customPermission.setId(rd.getPermissionId());
 						customPermissions.add(customPermission);
 					}
-					customOption.setCustomPermissions(customPermissions);
-					customOptions.add(customOption);
+					
 				}
-			
+				customOption.setId(i);
+				customOption.setCustomPermissions(customPermissions);
+				customOptions.add(customOption);
 			}
 			System.out.println(tmpOptionId);
 		} catch (Exception e) {

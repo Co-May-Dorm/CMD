@@ -56,6 +56,8 @@ public class Employee {
 	private String password;
 	@Column(name="enable_login")
 	private boolean enableLogin;
+	@Column(name="is_active")
+	private boolean isActive;
 	
 	@OneToOne()
 	@JoinColumn(name = "department_id")
