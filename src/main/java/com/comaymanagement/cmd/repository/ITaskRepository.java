@@ -42,4 +42,6 @@ public interface ITaskRepository {
 	CustomTaskAll findById(Integer id);
 
 	List<CustomTaskAll> sortByStatusIds(Integer statusId,String page);
+	String deleteTaskById(Integer id);
+	Integer edit(Task task);
 }

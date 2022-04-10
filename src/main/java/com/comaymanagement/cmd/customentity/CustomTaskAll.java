@@ -16,7 +16,6 @@ import lombok.Setter;
 public class CustomTaskAll {
 	
 	private Integer id;
-	private String code;
 	private Integer creatorId;
 	private String creatorName;
 	private Integer recieverId;
