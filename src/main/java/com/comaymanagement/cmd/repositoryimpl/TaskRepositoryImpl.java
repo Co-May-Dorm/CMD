@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Task;
+import com.comaymanagement.cmd.entity.TaskHis;
 import com.comaymanagement.cmd.repository.ITaskRepository;
 import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 
@@ -331,5 +332,34 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 		return customTaskList;
 	}
-
+	// delete	
+		@Transactional
+		public String deleteTaskById(Integer id) {
+			Session session = sessionFactory.getCurrentSession();
+			try {
+				Task task = new Task();
+				task = session.find(Task.class, id);
+				TaskHis th = new TaskHis();
+				th = session.find(TaskHis.class, id);
+				session.remove(th);
+				session.remove(task);
+				return "1";
+			} catch (Exception e) {
+				LOGGER.error("Error has occured in delete() ", e);
+				return "0";
+			}
+		}
+	//edit
+		@Override
+		@Transactional
+		public Integer edit(Task task) {
+			Session session = sessionFactory.getCurrentSession();
+			try {
+				session.update(task);
+				return 1;
+			} catch (Exception e) {
+				LOGGER.error("Error has occured in edit task ", e);
+				return 0;
+			}
+		}
 }

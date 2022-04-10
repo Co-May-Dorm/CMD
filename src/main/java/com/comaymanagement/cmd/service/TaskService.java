@@ -259,4 +259,56 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		}
 
 	}
+	// delete task by id
+		public ResponseEntity<Object> deleteTaskById(Integer id){
+			String updateStatus = taskRepository.deleteTaskById(id);
+			try {
+				if (updateStatus.equals("1")) {
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
+			} else {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", updateStatus + "", ""));
+
+				}
+			} catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
+				}
+			}
+		// edit 
+		public ResponseEntity<Object> edit(String json) {
+			Task task = new Task();
+			JsonMapper jsonMapper = new JsonMapper();
+			JsonNode jsonObjectTask;
+			try {
+				jsonObjectTask = jsonMapper.readTree(json);
+				task.setId(jsonObjectTask.get("id").asInt());
+				task.setTitle(jsonObjectTask.get("title").asText());
+				task.setDescription(jsonObjectTask.get("description").asText());
+				task.setCreateDate(jsonObjectTask.get("createDate").asText());
+				task.setFinishDate(jsonObjectTask.get("finishDate").asText());
+				Employee emp = new Employee();
+				Employee emp2 = new Employee();
+				Status status = new Status();
+				emp.setId(jsonObjectTask.get("creatorId").asInt());
+				emp2.setId(jsonObjectTask.get("recieverId").asInt());
+				status.setId(jsonObjectTask.get("statusId").asInt());
+				task.setCreator(emp);
+				task.setReceiver(emp2);
+				task.setStatus(status);
+				Integer message = taskRepository.edit(task);
+				if (message != 0) {
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", task));
+				} else {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(new ResponseObject("Error", message + "", task));
+
+				}
+			} catch (Exception e) {
+				LOGGER.error("Error has occured in edit()", e );
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			}
+			
+
+		}
 }

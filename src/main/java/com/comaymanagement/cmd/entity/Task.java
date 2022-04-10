@@ -41,4 +41,5 @@ public class Task {
 	@JoinColumn(name = "status_id")
 	private Status status;
 
+
 }
