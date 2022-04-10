@@ -61,7 +61,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		pagination.setLimit(limit);
 		pagination.setPage(Integer.valueOf(page));
 		pagination.setTotalItem(total);
-		cusEmpList = employeeRepository.employeePaging(name, dob, email, phone, dep, pos, sort, order,
+		cusEmpList = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order,
 			limit, offset);
 		result.put("pagination", pagination);
 		result.put("employees", cusEmpList);
@@ -137,6 +137,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		
 
 	}
+	// API edit and clock account (isActive true || false) 
 	public ResponseEntity<Object> edit(String json) {
 		Employee emp = new Employee();
 		User user = new User();
@@ -169,6 +170,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
 			emp.setEmail(jsonObjectEmployee.get("email").asText());
 			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
+			emp.setActive(jsonObjectEmployee.get("isActive").asBoolean());
 			Boolean isEnableLogin = jsonLoginAccount.get("enableLogin").asBoolean();
 			emp.setEnableLogin(isEnableLogin);
 			// Cannot edit password

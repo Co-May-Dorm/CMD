@@ -39,7 +39,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	// find all employee with position in department
 	@Override
 	@Transactional
-	public List<CustomEmployeeAll> employeePaging(String name, String dob, String email, String phone, String dep,
+	public List<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order, Integer limit, Integer offset) {
 		List<Employee> employeeList = new ArrayList();
 		StringBuilder hql = new StringBuilder();
@@ -50,7 +50,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		hql.append("and emp.email like CONCAT('%',:email,'%') ");
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
-		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team.id is null and pos.department.id is not null ");
+		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team.id is null and pos.department.id is not null and emp.activeFlag = true ");
 		hql.append("order by " + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
 		List<CustomEmployeeAll> cusEmpList = new ArrayList();
@@ -173,7 +173,9 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		try {
 			Employee emp = new Employee();
 			emp = session.find(Employee.class, id);
-			session.remove(emp);
+			emp.setActiveFlag(false);
+			emp.setDepartment(null);
+			session.update(emp);
 			return "1";
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in delete() ", e);
