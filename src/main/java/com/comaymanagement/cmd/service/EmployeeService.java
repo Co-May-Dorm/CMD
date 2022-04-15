@@ -143,6 +143,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 			if (isEnableLogin) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
+			}else {
+				emp.setUsername("");
+				emp.setPassword("");
 			}
 			if(jsonObjectPosition.isArray()) {
 				for(JsonNode p : jsonObjectPosition) {
