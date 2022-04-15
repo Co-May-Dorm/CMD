@@ -1,6 +1,8 @@
 package com.comaymanagement.cmd.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +26,11 @@ import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.entity.Team;
+import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
+import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
+import com.comaymanagement.cmd.repositoryimpl.TeamRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -33,6 +39,16 @@ public class EmployeeService implements IGeneralService<Employee> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeRepositoryImpl employeeRepository;
+	
+	@Autowired
+	DepartmentRepositoryImpl departmentRepository;
+	
+	@Autowired
+	PositionRepositoryImpl positionRepository;
+	
+	@Autowired
+	TeamRepositoryImpl teamRepository;
+	
 	List<CustomEmployeeAll> cusEmpList = new ArrayList<>();
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone, String dep,
@@ -77,22 +93,38 @@ public class EmployeeService implements IGeneralService<Employee> {
 	public ResponseEntity<Object> addEmployee(String json) {
 		Employee emp = new Employee();
 		User user = new User();
+		String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+		String modifyDate = createDate;
 		List<Position> positionList = new ArrayList<>();
+		List<Team> teamList = new ArrayList<>();
 		Department dep = new Department();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectEmployee;
 		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectDepartment;
+		JsonNode jsonObjectTeam;
 		JsonNode jsonLoginAccount;
+		
 		Integer id = -1;
+		
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
+			jsonObjectTeam = jsonObjectEmployee.get("teams");
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee code existed
 			String code = jsonObjectEmployee.get("code").asText();
 			String avatar = jsonObjectEmployee.get("avatar") != null ? jsonObjectEmployee.get("avatar").asText() : "";
 			String gender = jsonObjectEmployee.get("gender") != null ? jsonObjectEmployee.get("gender").asText() : "";
+			String dateOfBirth = jsonObjectEmployee.get("dateOfBirth") == null ? "" : 
+							     jsonObjectEmployee.get("dateOfBirth").asText() == "null" ? "" : 
+								 jsonObjectEmployee.get("dateOfBirth").asText();
+			String email = jsonObjectEmployee.get("email") == null ? "" : 
+							jsonObjectEmployee.get("email").asText() == "null" ? "" : 
+							jsonObjectEmployee.get("email").asText();
+			String phoneNumber = jsonObjectEmployee.get("phoneNumber") == null ? "" : 
+								jsonObjectEmployee.get("phoneNumber").asText()== "null" ? "" : 
+								jsonObjectEmployee.get("phoneNumber").asText();
 			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
 			
 			if (isExisted) {
@@ -103,9 +135,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setName(jsonObjectEmployee.get("name").asText());
 			emp.setAvatar(avatar);
 			emp.setGender(gender);
-			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
-			emp.setEmail(jsonObjectEmployee.get("email").asText());
-			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
+			emp.setDateOfBirth(dateOfBirth);
+			emp.setEmail(email);
+			emp.setPhoneNumber(phoneNumber);
 			Boolean isEnableLogin = jsonLoginAccount.get("enableLogin").asBoolean();
 			emp.setEnableLogin(isEnableLogin);
 			if (isEnableLogin) {
@@ -119,16 +151,57 @@ public class EmployeeService implements IGeneralService<Employee> {
 					positionList.add(pos);
 				}
 			}
+			if(jsonObjectTeam.isArray()) {
+				for(JsonNode t : jsonObjectTeam) {
+					Team team = new Team();
+					team.setId(Integer.valueOf(t.toString()));
+					teamList.add(team);
+				}
+			}
+			
 			dep.setId(jsonObjectEmployee.get("department").asInt());
 			emp.setPositions(positionList);
+			emp.setTeams(teamList);
 			emp.setDepartment(dep);
+			emp.setActiveFlag(true);
+			emp.setActive(true);
+			emp.setCreateDate(createDate);
+			emp.setModifyDate(modifyDate);
+			emp.setCreateBy("Admin");
+			emp.setModifyBy("Admin");
+			Department department = departmentRepository.findById(emp.getDepartment().getId());
+//			List teams = emp.getTeams();
+			if(department != null) {
+				if(department.getManagerId()!=-1) {
+					emp.setManagerId(department.getManagerId());
+				}else {
+					emp.setManagerId(-1);
+				}
+			}
 			Integer idAdded = employeeRepository.add(emp);
 			if (idAdded != -1) {
+				for(JsonNode p : jsonObjectPosition) {
+					Position pos = new Position();
+					pos.setId(Integer.valueOf(p.toString()));
+					Position positionObjectById = positionRepository.findById(pos.getId());
+					if(positionObjectById.getIsManager()) {
+						Department department2 = positionObjectById.getDepartment();
+						Team team = positionObjectById.getTeam();
+						if(department2 != null) {
+							department2.setManagerId(idAdded);
+							departmentRepository.edit(department2);
+						}
+						if(team != null) {
+							team.setManagerId(idAdded);
+							teamRepository.edit(team);
+						}
+					}
+				}
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", emp));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("Error", idAdded + "", emp));
-
+				
 			}
 		} catch (Exception e) {
 			logger.error("Error has occured in addEmployee()", e);
@@ -148,7 +221,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonLoginAccount;
-		
+		String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
@@ -188,6 +261,19 @@ public class EmployeeService implements IGeneralService<Employee> {
 			dep.setId(jsonObjectEmployee.get("department").asInt());
 			emp.setPositions(positionList);
 			emp.setDepartment(dep);
+			Department department = departmentRepository.findById(emp.getDepartment().getId());
+			if(department != null) {
+				if(department.getManagerId()!=-1) {
+					emp.setManagerId(department.getManagerId());
+				}else {
+					emp.setManagerId(-1);
+				}
+			}
+			emp.setActiveFlag(true);
+			emp.setCreateDate(jsonObjectEmployee.get("createDate").asText());
+			emp.setModifyDate(modifyDate);
+			emp.setCreateBy("Admin");
+			emp.setModifyBy("Admin");
 			Integer message = employeeRepository.edit(emp);
 			if (message != 0) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));

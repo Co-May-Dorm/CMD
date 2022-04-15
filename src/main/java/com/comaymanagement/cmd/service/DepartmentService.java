@@ -34,10 +34,6 @@ public class DepartmentService implements IGeneralService<Department> {
 	PositionRepositoryImpl positionRepository;
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
 
-	public List<Department> findAllDepartmentByEmployeeId(String id) {
-		return departmentRepository.findAllDepartmentByEmployeeId(id);
-	}
-
 	public ResponseEntity<Object> findAll(String name) {
 		name = name == null ? "" : name.trim();
 		List<CustomDepartmentAll> cusDepList = departmentRepository.findAll(name);

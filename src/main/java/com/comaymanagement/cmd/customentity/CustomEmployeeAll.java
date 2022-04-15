@@ -19,12 +19,15 @@ public class CustomEmployeeAll {
 	private Integer id;
 	private String code;
 	private String name;
-	private String avatar;
-	private String gender;
 	private String dateOfBirth;
 	private String email;
 	private String phoneNumber;
+	private Integer managerId;
+	private String avatar;
+	private String gender;
 	private List<CustomPositionAll> positions;
 	private CustomDepartmentAll department;
 	private User user;
+	private boolean isActive;
+	private String createDate;
 }

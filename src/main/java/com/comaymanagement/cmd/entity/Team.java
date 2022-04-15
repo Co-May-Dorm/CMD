@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.entity;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,7 +29,19 @@ public class Team {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String name;
-
+	@Column(name="manager_id")
+	private Integer managerId;
+	@Column(name="create_by")
+	private String createBy;
+	@Column(name="create_date")
+	private String createDate;
+	@Column(name="modify_by")
+	private String modifyBy;
+	@Column(name="modify_date")
+	private String modifyDate;
+	@Column(name="description")
+	private String description;
+	
 	@ManyToMany
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "team_id", referencedColumnName = "id") }, inverseJoinColumns = {

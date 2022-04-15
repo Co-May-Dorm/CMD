@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -62,16 +63,16 @@ public class Position {
 			@JoinColumn(name = "position_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
 	@JsonBackReference
-	private Set<Employee> employeeList;
+	private List<Employee> employeeList;
 
 	@OneToMany
 	@JoinColumn(name = "position_id")
 	@JsonBackReference
-	private Set<ApprovalStepDetail> approvalStepDetailList;
+	private List<ApprovalStepDetail> approvalStepDetailList;
 
 	@OneToMany
 	@JoinColumn(name = "position_id")
 	@JsonBackReference
-	private Set<ProposalPermission> proposalPermissionList;
+	private List<ProposalPermission> proposalPermissionList;
 
 }

@@ -14,4 +14,5 @@ public interface IPositionRepository{
 	Integer CountTotalItem();
 	Integer save(Position p);
 	Integer edit(Position p);
+	Position findById(Integer id);
 }
