@@ -99,7 +99,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 			return 0;
 		}
 	}
-
+	
 	@Override
 	public List<CustomPositionAll> findAllByDepartmentId(Integer depId) {
 		StringBuilder hql = new StringBuilder("FROM positions pos WHERE pos.department.id = :depId");
@@ -143,6 +143,19 @@ public class PositionRepositoryImpl implements IPositionRepository {
 			return "0";
 		}
 
+	}
+	public Position findById(Integer id) {
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "FROM positions pos WHERE pos.id = :id";
+		Position pos = null;
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("id", id);
+			pos = (Position) query.getSingleResult();
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in checkEmployeeIdExisted() ", e);
+		}
+		return pos;
 	}
 	
 }

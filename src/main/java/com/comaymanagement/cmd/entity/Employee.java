@@ -41,7 +41,7 @@ public class Employee {
 	@Column(name="active_flag")
 	private boolean activeFlag;
 	@Column(name="manager_id")
-	private String managerId;
+	private Integer managerId;
 	@Column(name="create_by")
 	private String createBy;
 	@Column(name="modify_by")

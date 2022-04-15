@@ -105,10 +105,11 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusEmp.setDateOfBirth(e.getDateOfBirth());
 				cusEmp.setEmail(e.getEmail());
 				cusEmp.setPhoneNumber(e.getPhoneNumber());
+				cusEmp.setActive(e.isActive());
+				cusEmp.setCreateDate(e.getCreateDate());
 				cusEmp.setDepartment(cusDep);
 				cusEmp.setPositions(cusPositionList);
 				cusEmp.setUser(user);
-
 				cusEmpList.add(cusEmp);
 			}
 		} catch (Exception e) {
@@ -183,7 +184,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		}
 
 	}
-
+	
 	@Transactional
 	@Override
 	public Integer getTotal(String name, String dob, String email, String phone, String dep,

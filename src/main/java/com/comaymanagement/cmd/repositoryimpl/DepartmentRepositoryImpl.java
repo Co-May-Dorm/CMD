@@ -29,12 +29,8 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
-	public List<Department> findAllDepartmentByEmployeeId(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
+	
 	@Override
 	@Transactional
 	public List<CustomDepartmentAll> findAll(String name) {
@@ -147,6 +143,23 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 			return 0;
 		}
 
+	}
+
+	@Override
+	public Department findById(Integer id) {
+
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		Department department = null;
+		hql.append("from departments dep where dep.id = " + id);
+		try {
+			Query query = session.createQuery(hql.toString());
+			department = (Department) query.getSingleResult();
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in delete() ", e);
+		}
+		
+		return department;
 	}
 
 }
