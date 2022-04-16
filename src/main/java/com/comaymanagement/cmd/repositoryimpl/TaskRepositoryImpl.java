@@ -288,50 +288,50 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		return customTask;
 	}
 	
-	//
-	@Override
-	@Transactional
-	public List<CustomTaskAll> sortByStatusIds(Integer statusId,String page) {
-		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
-		List<Task> taskList = new ArrayList<Task>();
-		//Integer id = ParseInt(statusId);
-		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
-		hql.append(" inner join ta.receiver as em");
-		hql.append(" inner join ta.status as st");
-		hql.append(" inner join ta.creator as cr");
-		//hql.append(" WHERE ta.status = "+statusId);
-		hql.append(" WHERE ta.status = :statusId");
-
-		try {
-			Session session = sessionFactory.getCurrentSession();
-			Query query = session.createQuery(hql.toString());
-			LOGGER.info(hql.toString());
-			LOGGER.info(statusId.toString());
-			query.setParameter("statusId",statusId);
-			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-				Object[] obj = (Object[]) it.next();
-				Task task = (Task) obj[0];
-				taskList.add(task);
-			}
-			for (Task task : taskList) {
-				CustomTaskAll customTask = new CustomTaskAll();
-				customTask.setId(task.getId());
-				customTask.setTitle(task.getTitle());
-				customTask.setCreatorId(task.getCreator().getId());
-				customTask.setCreatorName(task.getCreator().getName());
-				customTask.setRecieverId(task.getReceiver().getId());
-				customTask.setRecieverName(task.getReceiver().getName());
-				customTask.setCreateDate(task.getCreateDate());
-				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
-				customTask.setStatusName(task.getStatus().getName());
-				customTaskList.add(customTask);
-			}
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage()+"Loi");
-		}
-		return customTaskList;
-	}
+//	//
+//	@Override
+//	@Transactional
+//	public List<CustomTaskAll> sortByStatusIds(Integer statusId,String page) {
+//		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
+//		List<Task> taskList = new ArrayList<Task>();
+//		//Integer id = ParseInt(statusId);
+//		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
+//		hql.append(" inner join ta.receiver as em");
+//		hql.append(" inner join ta.status as st");
+//		hql.append(" inner join ta.creator as cr");
+//		//hql.append(" WHERE ta.status = "+statusId);
+//		hql.append(" WHERE ta.status = :statusId");
+//
+//		try {
+//			Session session = sessionFactory.getCurrentSession();
+//			Query query = session.createQuery(hql.toString());
+//			LOGGER.info(hql.toString());
+//			LOGGER.info(statusId.toString());
+//			query.setParameter("statusId",statusId);
+//			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+//				Object[] obj = (Object[]) it.next();
+//				Task task = (Task) obj[0];
+//				taskList.add(task);
+//			}
+//			for (Task task : taskList) {
+//				CustomTaskAll customTask = new CustomTaskAll();
+//				customTask.setId(task.getId());
+//				customTask.setTitle(task.getTitle());
+//				customTask.setCreatorId(task.getCreator().getId());
+//				customTask.setCreatorName(task.getCreator().getName());
+//				customTask.setRecieverId(task.getReceiver().getId());
+//				customTask.setRecieverName(task.getReceiver().getName());
+//				customTask.setCreateDate(task.getCreateDate());
+//				customTask.setFinishDate(task.getFinishDate());
+//				customTask.setDepartmentName(task.getCreator().getDepartment().getName());
+//				customTask.setStatusName(task.getStatus().getName());
+//				customTaskList.add(customTask);
+//			}
+//		} catch (Exception e) {
+//			LOGGER.error(e.getMessage()+"Loi");
+//		}
+//		return customTaskList;
+//	}
 	// delete	
 		@Transactional
 		public String deleteTaskById(Integer id) {
@@ -362,4 +362,130 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				return 0;
 			}
 		}
+		// filter
+		@Override
+		public List<CustomTaskAll> filter(String createFrom, String createTo, String finishFrom, String finishTo, String title,
+				String creator, String receiver, String department, Integer limit, String order, String page,String sort) {
+			List<Task> tasks = new ArrayList<Task>();
+			List<CustomTaskAll> customTasks = new ArrayList<CustomTaskAll>();
+			StringBuilder hql = new StringBuilder("FROM tasks AS ta");
+			hql.append(" inner join ta.creator as em");
+			hql.append(" inner join em.department as de");
+			hql.append(" inner join ta.receiver as em1");
+			hql.append(" where em.name LIKE CONCAT('%',:creator,'%')");
+			hql.append(" AND de.name LIKE CONCAT('%',:department,'%')");//department of creator
+			hql.append(" AND em1.name LIKE CONCAT('%',:receiver,'%')");
+			hql.append(" AND ta.title LIKE CONCAT('%',:title,'%')");
+			if(createFrom.toString().length()>5) {
+				hql.append(" and ta.createDate>=:createFrom");
+			}
+			if(createTo.toString().length()>5) {
+				hql.append(" and ta.createDate<=:createTo");
+			}
+			if(finishFrom.toString().length()>5) {
+				hql.append(" and ta.finishDate>=:finishFrom");
+			}
+			if(finishTo.toString().length()>5) {
+				hql.append(" and ta.finishDate<=:finishTo");
+			}
+			hql.append(" ORDER BY ta."+sort+" "+order);
+			try {
+				Session session = sessionFactory.getCurrentSession();
+				Query query = session.createQuery(hql.toString());
+				query.setParameter("creator",creator);
+				query.setParameter("receiver",receiver);
+				query.setParameter("department",department);
+				query.setParameter("title",title);
+				if(createFrom.toString().length()>5) {
+					query.setParameter("createFrom",createFrom);
+				}
+				if(createTo.toString().length()>5) {
+					query.setParameter("createTo",createTo);
+				}
+				if(finishFrom.toString().length()>5) {
+					query.setParameter("finishFrom",finishFrom);
+				}
+				if(finishTo.toString().length()>5) {
+					query.setParameter("finishTo",finishTo);
+				}
+				LOGGER.info(hql.toString());
+				int offset = (Integer.valueOf(page) - 1) * limit;
+				query.setFirstResult(offset);
+				query.setMaxResults(limit);
+				for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+					Object[] obj = (Object[]) it.next();
+					Task task = (Task) obj[0];
+					tasks.add(task);
+				}
+				for(Task item : tasks) {
+					CustomTaskAll task = new CustomTaskAll();
+					task.setId(item.getId());
+					task.setTitle(item.getTitle());
+					task.setCreatorId(item.getCreator().getId());
+					task.setCreatorName(item.getCreator().getName());
+					task.setRecieverId(item.getReceiver().getId());
+					task.setRecieverName(item.getReceiver().getName());
+					task.setCreateDate(item.getCreateDate());
+					task.setFinishDate(item.getFinishDate());
+					task.setDepartmentName(item.getCreator().getDepartment().getName());
+					task.setStatusName(item.getStatus().getName());
+					customTasks.add(task);
+				}
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+			}
+			return customTasks;
+		}
+		@Override
+		public Integer countFilter(String createFrom, String createTo, String finishFrom, String finishTo, String title,String creator, String receiver, String department) {
+			StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS ta");
+			hql.append(" inner join ta.creator as em");
+			hql.append(" inner join em.department as de");
+			hql.append(" inner join ta.receiver as em1");
+			hql.append(" where em.name LIKE CONCAT('%',:creator,'%')");
+			hql.append(" AND de.name LIKE CONCAT('%',:department,'%')");//department of creator
+			hql.append(" AND em1.name LIKE CONCAT('%',:receiver,'%')");
+			hql.append(" AND ta.title LIKE CONCAT('%',:title,'%')");
+			if(createFrom.toString().length()>5) {
+				hql.append(" and ta.createDate>=:createFrom");
+			}
+			if(createTo.toString().length()>5) {
+				hql.append(" and ta.createDate<=:createTo");
+			}
+			if(finishFrom.toString().length()>5) {
+				hql.append(" and ta.finishDate>=:finishFrom");
+			}
+			if(finishTo.toString().length()>5) {
+				hql.append(" and ta.finishDate<=:finishTo");
+			}
+			int count =0;
+			try {
+				Session session = sessionFactory.getCurrentSession();
+				Query query = session.createQuery(hql.toString());
+				query.setParameter("creator",creator);
+				query.setParameter("receiver",receiver);
+				query.setParameter("department",department);
+				query.setParameter("title",title);
+				if(createFrom.toString().length()>5) {
+					query.setParameter("createFrom",createFrom);
+				}
+				if(createTo.toString().length()>5) {
+					query.setParameter("createTo",createTo);
+				}
+				if(finishFrom.toString().length()>5) {
+					query.setParameter("finishFrom",finishFrom);
+				}
+				if(finishTo.toString().length()>5) {
+					query.setParameter("finishTo",finishTo);
+				}
+				LOGGER.info(hql.toString());
+				@SuppressWarnings("rawtypes")
+				List list = query.getResultList();
+				count = Integer.parseInt(list.get(0).toString());
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+			}
+			return count;
+		}
+	
 }

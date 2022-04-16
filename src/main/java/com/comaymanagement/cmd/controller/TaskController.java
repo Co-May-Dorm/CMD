@@ -65,8 +65,7 @@ public class TaskController {
 			@RequestParam(value="dateCreated", required = false) String createDate,
 			@RequestParam(value="dateFinish", required = false) String finishDate,
 			@RequestParam(value="sort", required = false) String sort,
-			@RequestParam(value="order", required = false) String order,
-			@RequestParam(value="limit", required = false) Integer limit
+			@RequestParam(value="order", required = false) String order
 			) {
 		LOGGER.info("Get task list");
 		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,page);
@@ -116,4 +115,22 @@ public class TaskController {
 	public ResponseEntity<Object> editTask(@RequestBody String json) {
 		return taskService.edit(json);
 	}
+	@GetMapping(value="/filter")
+	public ResponseEntity<Object> filter(
+			@RequestParam(value="createFrom", required=false) String createFrom,
+			@RequestParam(value="createTo", required=false) String createTo,
+			@RequestParam(value="finishFrom", required=false) String finishFrom,
+			@RequestParam(value="finishTo", required=false) String finishTo,
+			@RequestParam(value="creator", required=false) String creator,
+			@RequestParam(value="title", required=false) String title,
+			@RequestParam(value="receiver", required=false) String receiver,
+			@RequestParam(value="department", required=false) String department,
+			@RequestParam(value="page",required = false) String page,
+			@RequestParam(value="sort",required = false) String sort, 
+			@RequestParam(value="order", required = false) String order){
+		LOGGER.info("Filter tasks!");
+		return taskService.filter(createFrom, createTo, finishFrom, finishTo, title, creator, receiver, department, order, page, sort);
+	}
+	
 }
+
