@@ -234,31 +234,31 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		}
 	}
 	//
-	public ResponseEntity<Object> sortByStatusIds(Integer statusId,String page) {
-		page = page == null ? "1" : page.trim();
-		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
-		try {
-			tasks = taskRepository.sortByStatusIds(statusId, page);
-			int limit = 15;
-			Pagination pagination = new Pagination();
-			pagination.setLimit(limit);
-			pagination.setPage(Integer.valueOf(page));
-			Map<String, Object> results = new TreeMap<String, Object>();
-			results.put("pagination", pagination);
-			results.put("tasks", tasks);
-			if (results.size() > 0) {
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("OK", "Query successfully: ", results));
-			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND)
-						.body(new ResponseObject("Not found", "Can not find task list", tasks));
-			}
-		} catch (Exception e) {
-			LOGGER.error("ERROR:" + e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
-		}
-
-	}
+//	public ResponseEntity<Object> sortByStatusIds(Integer statusId,String page) {
+//		page = page == null ? "1" : page.trim();
+//		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
+//		try {
+//			tasks = taskRepository.sortByStatusIds(statusId, page);
+//			int limit = 15;
+//			Pagination pagination = new Pagination();
+//			pagination.setLimit(limit);
+//			pagination.setPage(Integer.valueOf(page));
+//			Map<String, Object> results = new TreeMap<String, Object>();
+//			results.put("pagination", pagination);
+//			results.put("tasks", tasks);
+//			if (results.size() > 0) {
+//				return ResponseEntity.status(HttpStatus.OK)
+//						.body(new ResponseObject("OK", "Query successfully: ", results));
+//			} else {
+//				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//						.body(new ResponseObject("Not found", "Can not find task list", tasks));
+//			}
+//		} catch (Exception e) {
+//			LOGGER.error("ERROR:" + e.getMessage());
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+//		}
+//
+//	}
 	// delete task by id
 		public ResponseEntity<Object> deleteTaskById(Integer id){
 			String updateStatus = taskRepository.deleteTaskById(id);
@@ -308,7 +308,44 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 				LOGGER.error("Error has occured in edit()", e );
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 			}
-			
+		}
+		//filter
+		public ResponseEntity<Object> filter(String createFrom, String createTo, String finishFrom, 
+				String finishTo, String title, String creator, String receiver, String dep, String order, String page, String sort) {
+			createFrom = createFrom == null ? " " : createFrom.trim();
+			createTo = createTo == null ? " " : createTo.trim();
+			finishFrom = finishFrom == null ? " " : finishFrom.trim();
+			finishTo = finishTo == null ? " " : finishTo.trim();
+			dep = dep == null ? " " : dep.trim();
+			title = title == null ? " " : title.trim();
+			creator = creator == null ? " " : creator.trim();
+			receiver = receiver == null ? " " : receiver.trim();
+			order = order == null ? "DESC" : order;
+			sort = sort == null ? "id" : sort;
+			page = page == null ? "1" : page.trim();
+			List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
+			try {
+				int limit = 15;
+				tasks = taskRepository.filter(createFrom, createTo, finishFrom, finishTo, title, creator, receiver, dep, limit, order, page, sort);
+				Map<String, Object> results = new TreeMap<String, Object>();
+				Pagination pagination = new Pagination();
+				pagination.setLimit(limit);
+				pagination.setPage(Integer.valueOf(page));
+				pagination.setTotalItem(taskRepository.countFilter(createFrom, createTo, finishFrom, finishTo, title, creator, receiver, dep));
+				results.put("pagination", pagination);
+				results.put("tasks", tasks);
+				if (results.size() > 0) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("OK", "Query produce successfully ", results));
+				} else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND)
+							.body(new ResponseObject("Not found ", "Can not find task list ", tasks));
+				}
+			} catch (Exception e) {
+				LOGGER.error("ERROR: " + e.getMessage());
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR ", e.getMessage(), ""));
+			}
 
 		}
 }
+

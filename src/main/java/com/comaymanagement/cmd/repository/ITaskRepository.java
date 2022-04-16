@@ -40,8 +40,31 @@ public interface ITaskRepository {
 	Integer save(Task task);
 	Integer getMaxId();
 	CustomTaskAll findById(Integer id);
-
-	List<CustomTaskAll> sortByStatusIds(Integer statusId,String page);
+//	List<CustomTaskAll> sortByStatusIds(Integer statusId,String page);
 	String deleteTaskById(Integer id);
 	Integer edit(Task task);
+	List<CustomTaskAll> filter(
+			@Param("createFrom") String createFrom,
+			@Param("createTo") String createTo,
+			@Param("finishFrom") String finishFrom,
+			@Param("finishTo") String finishTo,
+			@Param("title") String title,
+			@Param("creator") String creator,
+			@Param("receicer") String receiver,
+			@Param("department") String department,
+			@Param("limit") Integer limit,
+			@Param("order") String order,
+			@Param("page") String page,
+			@Param("sort") String sort
+	);
+	Integer countFilter(
+			@Param("createFrom") String createFrom,
+			@Param("createTo") String createTo,
+			@Param("finishFrom") String finishFrom,
+			@Param("finishTo") String finishTo,
+			@Param("title") String title,
+			@Param("creator") String creator,
+			@Param("receicer") String receiver,
+			@Param("department") String department
+	);
 }
