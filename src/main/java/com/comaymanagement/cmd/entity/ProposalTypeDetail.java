@@ -27,9 +27,9 @@ public class ProposalTypeDetail {
 	@Column(name="field_name")
 	private String fieldName;
 	@Column(name="create_by")
-	private String createBy;
+	private Integer createBy;
 	@Column(name="modify_by")
-	private String modifyBy;
+	private Integer modifyBy;
 	@Column(name="create_date")
 	private String createDate;
 	@Column(name="modify_date")

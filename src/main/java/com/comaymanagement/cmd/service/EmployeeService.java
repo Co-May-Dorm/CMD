@@ -39,20 +39,21 @@ public class EmployeeService implements IGeneralService<Employee> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeRepositoryImpl employeeRepository;
-	
+
 	@Autowired
 	DepartmentRepositoryImpl departmentRepository;
-	
+
 	@Autowired
 	PositionRepositoryImpl positionRepository;
-	
+
 	@Autowired
 	TeamRepositoryImpl teamRepository;
-	
+
 	List<CustomEmployeeAll> cusEmpList = new ArrayList<>();
+
 	// Find all employee and search
-	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone, String dep,
-			String pos, String sort, String order) {
+	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
+			String dep, String pos, String sort, String order) {
 		name = name == null ? "" : name.trim();
 		dob = dob == null ? "" : dob.trim();
 		email = email == null ? "" : email.trim();
@@ -77,8 +78,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 		pagination.setLimit(limit);
 		pagination.setPage(Integer.valueOf(page));
 		pagination.setTotalItem(total);
-		cusEmpList = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order,
-			limit, offset);
+		cusEmpList = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit, offset);
 		result.put("pagination", pagination);
 		result.put("employees", cusEmpList);
 		if (cusEmpList.size() > 0) {
@@ -101,12 +101,11 @@ public class EmployeeService implements IGeneralService<Employee> {
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectEmployee;
 		JsonNode jsonObjectPosition;
-		JsonNode jsonObjectDepartment;
 		JsonNode jsonObjectTeam;
 		JsonNode jsonLoginAccount;
-		
+
 		Integer id = -1;
-		
+
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
@@ -116,17 +115,17 @@ public class EmployeeService implements IGeneralService<Employee> {
 			String code = jsonObjectEmployee.get("code").asText();
 			String avatar = jsonObjectEmployee.get("avatar") != null ? jsonObjectEmployee.get("avatar").asText() : "";
 			String gender = jsonObjectEmployee.get("gender") != null ? jsonObjectEmployee.get("gender").asText() : "";
-			String dateOfBirth = jsonObjectEmployee.get("dateOfBirth") == null ? "" : 
-							     jsonObjectEmployee.get("dateOfBirth").asText() == "null" ? "" : 
-								 jsonObjectEmployee.get("dateOfBirth").asText();
-			String email = jsonObjectEmployee.get("email") == null ? "" : 
-							jsonObjectEmployee.get("email").asText() == "null" ? "" : 
-							jsonObjectEmployee.get("email").asText();
-			String phoneNumber = jsonObjectEmployee.get("phoneNumber") == null ? "" : 
-								jsonObjectEmployee.get("phoneNumber").asText()== "null" ? "" : 
-								jsonObjectEmployee.get("phoneNumber").asText();
+			String dateOfBirth = jsonObjectEmployee.get("dateOfBirth") == null ? ""
+					: jsonObjectEmployee.get("dateOfBirth").asText() == "null" ? ""
+							: jsonObjectEmployee.get("dateOfBirth").asText();
+			String email = jsonObjectEmployee.get("email") == null ? ""
+					: jsonObjectEmployee.get("email").asText() == "null" ? ""
+							: jsonObjectEmployee.get("email").asText();
+			String phoneNumber = jsonObjectEmployee.get("phoneNumber") == null ? ""
+					: jsonObjectEmployee.get("phoneNumber").asText() == "null" ? ""
+							: jsonObjectEmployee.get("phoneNumber").asText();
 			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
-			
+
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
@@ -143,25 +142,25 @@ public class EmployeeService implements IGeneralService<Employee> {
 			if (isEnableLogin) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
-			}else {
+			} else {
 				emp.setUsername("");
 				emp.setPassword("");
 			}
-			if(jsonObjectPosition.isArray()) {
-				for(JsonNode p : jsonObjectPosition) {
+			if (jsonObjectPosition.isArray()) {
+				for (JsonNode p : jsonObjectPosition) {
 					Position pos = new Position();
 					pos.setId(Integer.valueOf(p.toString()));
 					positionList.add(pos);
 				}
 			}
-			if(jsonObjectTeam.isArray()) {
-				for(JsonNode t : jsonObjectTeam) {
+			if (jsonObjectTeam.isArray()) {
+				for (JsonNode t : jsonObjectTeam) {
 					Team team = new Team();
 					team.setId(Integer.valueOf(t.toString()));
 					teamList.add(team);
 				}
 			}
-			
+
 			dep.setId(jsonObjectEmployee.get("department").asInt());
 			emp.setPositions(positionList);
 			emp.setTeams(teamList);
@@ -170,31 +169,30 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setActive(true);
 			emp.setCreateDate(createDate);
 			emp.setModifyDate(modifyDate);
-			emp.setCreateBy("Admin");
-			emp.setModifyBy("Admin");
+			emp.setCreateBy(jsonObjectEmployee.get("createBy").asInt());
+			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
 			Department department = departmentRepository.findById(emp.getDepartment().getId());
-//			List teams = emp.getTeams();
-			if(department != null) {
-				if(department.getManagerId()!=-1) {
+			if (department != null) {
+				if (department.getManagerId() != -1) {
 					emp.setManagerId(department.getManagerId());
-				}else {
+				} else {
 					emp.setManagerId(-1);
 				}
 			}
 			Integer idAdded = employeeRepository.add(emp);
 			if (idAdded != -1) {
-				for(JsonNode p : jsonObjectPosition) {
+				for (JsonNode p : jsonObjectPosition) {
 					Position pos = new Position();
 					pos.setId(Integer.valueOf(p.toString()));
 					Position positionObjectById = positionRepository.findById(pos.getId());
-					if(positionObjectById.getIsManager()) {
+					if (positionObjectById.getIsManager()) {
 						Department department2 = positionObjectById.getDepartment();
 						Team team = positionObjectById.getTeam();
-						if(department2 != null) {
+						if (department2 != null) {
 							department2.setManagerId(idAdded);
 							departmentRepository.edit(department2);
 						}
-						if(team != null) {
+						if (team != null) {
 							team.setManagerId(idAdded);
 							teamRepository.edit(team);
 						}
@@ -204,31 +202,32 @@ public class EmployeeService implements IGeneralService<Employee> {
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("Error", idAdded + "", emp));
-				
+
 			}
 		} catch (Exception e) {
 			logger.error("Error has occured in addEmployee()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		
 
 	}
-	// API edit and clock account (isActive true || false) 
+
+	// API edit and clock account (isActive true || false)
 	public ResponseEntity<Object> edit(String json) {
 		Employee emp = new Employee();
 		User user = new User();
 		List<Position> positionList = new ArrayList<>();
+		List<Team> teamList = new ArrayList<>();
 		Department dep = new Department();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectEmployee;
 		JsonNode jsonObjectPosition;
-		JsonNode jsonObjectDepartment;
+		JsonNode jsonObjectTeam;
 		JsonNode jsonLoginAccount;
 		String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
-			jsonObjectDepartment = jsonObjectEmployee.get("department");
+			jsonObjectTeam = jsonObjectEmployee.get("teams");
 			Integer id = jsonObjectEmployee.get("id") != null ? jsonObjectEmployee.get("id").asInt() : -1;
 //			Check employee id existed
 			String code = jsonObjectEmployee.get("code").asText();
@@ -238,47 +237,85 @@ public class EmployeeService implements IGeneralService<Employee> {
 						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
 			}
 			jsonLoginAccount = jsonObjectEmployee.get("user");
+			String avatar = jsonObjectEmployee.get("avatar") != null ? jsonObjectEmployee.get("avatar").asText() : "";
+			String gender = jsonObjectEmployee.get("gender") != null ? jsonObjectEmployee.get("gender").asText() : "";
+			String dateOfBirth = jsonObjectEmployee.get("dateOfBirth") == null ? ""
+					: jsonObjectEmployee.get("dateOfBirth").asText() == "null" ? ""
+							: jsonObjectEmployee.get("dateOfBirth").asText();
+			String email = jsonObjectEmployee.get("email") == null ? ""
+					: jsonObjectEmployee.get("email").asText() == "null" ? ""
+							: jsonObjectEmployee.get("email").asText();
+			String phoneNumber = jsonObjectEmployee.get("phoneNumber") == null ? ""
+					: jsonObjectEmployee.get("phoneNumber").asText() == "null" ? ""
+							: jsonObjectEmployee.get("phoneNumber").asText();
 			emp.setId(jsonObjectEmployee.get("id").asInt());
 			emp.setCode(jsonObjectEmployee.get("code").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
-			emp.setAvatar(jsonObjectEmployee.get("avatar").asText());
-			emp.setGender(jsonObjectEmployee.get("gender").asText());
-			emp.setDateOfBirth(jsonObjectEmployee.get("dateOfBirth").asText());
-			emp.setEmail(jsonObjectEmployee.get("email").asText());
-			emp.setPhoneNumber(jsonObjectEmployee.get("phoneNumber").asText());
-			emp.setActive(jsonObjectEmployee.get("isActive").asBoolean());
+			emp.setAvatar(avatar);
+			emp.setGender(gender);
+			emp.setDateOfBirth(dateOfBirth);
+			emp.setEmail(email);
+			emp.setPhoneNumber(phoneNumber);
+			emp.setActive(jsonObjectEmployee.get("active").asBoolean());
 			Boolean isEnableLogin = jsonLoginAccount.get("enableLogin").asBoolean();
 			emp.setEnableLogin(isEnableLogin);
 			// Cannot edit password
-			if(isEnableLogin) {
+			if (isEnableLogin) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
 				emp.setPassword(DefaultPassword.PASSWORD);
-			}else {
-				emp.setUsername(jsonLoginAccount.get("username").asText());
+			} else {
+				emp.setUsername("");
+				emp.setPassword("");
 			}
 			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
 				pos.setId(Integer.valueOf(p.toString()));
 				positionList.add(pos);
 			}
+			if (jsonObjectTeam.isArray()) {
+				for (JsonNode t : jsonObjectTeam) {
+					Team team = new Team();
+					team.setId(Integer.valueOf(t.toString()));
+					teamList.add(team);
+				}
+			}
 			dep.setId(jsonObjectEmployee.get("department").asInt());
 			emp.setPositions(positionList);
+			emp.setTeams(teamList);
 			emp.setDepartment(dep);
+			emp.setActiveFlag(true);
+			emp.setActive(jsonObjectEmployee.get("active").asBoolean());
+			emp.setCreateDate(jsonObjectEmployee.get("createDate").asText());
+			emp.setModifyDate(modifyDate);
+			emp.setCreateBy(jsonObjectEmployee.get("createBy").asInt());
+			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
 			Department department = departmentRepository.findById(emp.getDepartment().getId());
-			if(department != null) {
-				if(department.getManagerId()!=-1) {
+			if (department != null) {
+				if (department.getManagerId() != -1) {
 					emp.setManagerId(department.getManagerId());
-				}else {
+				} else {
 					emp.setManagerId(-1);
 				}
 			}
-			emp.setActiveFlag(true);
-			emp.setCreateDate(jsonObjectEmployee.get("createDate").asText());
-			emp.setModifyDate(modifyDate);
-			emp.setCreateBy("Admin");
-			emp.setModifyBy("Admin");
 			Integer message = employeeRepository.edit(emp);
 			if (message != 0) {
+				for (JsonNode p : jsonObjectPosition) {
+					Position pos = new Position();
+					pos.setId(Integer.valueOf(p.toString()));
+					Position positionObjectById = positionRepository.findById(pos.getId());
+					if (positionObjectById.getIsManager()) {
+						Department department2 = positionObjectById.getDepartment();
+						Team team = positionObjectById.getTeam();
+						if (department2 != null) {
+							department2.setManagerId(id);
+							departmentRepository.edit(department2);
+						}
+						if (team != null) {
+							team.setManagerId(id);
+							teamRepository.edit(team);
+						}
+					}
+				}
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -289,9 +326,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 			logger.error("Error has occured in edit()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
-		
 
 	}
+
 	// Delete employee by id
 	public ResponseEntity<Object> delete(String id) {
 		try {

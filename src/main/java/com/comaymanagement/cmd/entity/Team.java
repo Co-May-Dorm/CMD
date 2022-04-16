@@ -32,11 +32,11 @@ public class Team {
 	@Column(name="manager_id")
 	private Integer managerId;
 	@Column(name="create_by")
-	private String createBy;
+	private Integer createBy;
 	@Column(name="create_date")
 	private String createDate;
 	@Column(name="modify_by")
-	private String modifyBy;
+	private Integer modifyBy;
 	@Column(name="modify_date")
 	private String modifyDate;
 	@Column(name="description")

@@ -30,4 +30,7 @@ public class CustomEmployeeAll {
 	private User user;
 	private boolean isActive;
 	private String createDate;
+	private String modifyDate;
+	private Integer createBy;
+	private Integer modifyBy;
 }
