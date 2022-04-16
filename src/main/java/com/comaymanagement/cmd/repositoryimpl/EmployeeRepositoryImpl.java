@@ -110,6 +110,9 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusEmp.setDepartment(cusDep);
 				cusEmp.setPositions(cusPositionList);
 				cusEmp.setUser(user);
+				cusEmp.setCreateDate(e.getCreateDate());
+				cusEmp.setModifyDate(e.getModifyDate());
+				cusEmp.setCreateBy(e.getCreateBy());
 				cusEmpList.add(cusEmp);
 			}
 		} catch (Exception e) {
