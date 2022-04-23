@@ -51,6 +51,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 				cusDep.setName(tmp.getName());
 				cusDep.setDescription(tmp.getDescription());
 				cusDep.setFatherDepartmentId(tmp.getFatherDepartmentId());
+				cusDep.setLevel(tmp.getLevel());
 				for (Position pos : tmp.getPositions()) {
 					CustomPositionAll cusPos = new CustomPositionAll();
 					Role role = new Role();

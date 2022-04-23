@@ -1,8 +1,12 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.Query;
 
@@ -18,6 +22,7 @@ import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.customentity.User;
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
@@ -41,16 +46,19 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	@Transactional
 	public List<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order, Integer limit, Integer offset) {
-		List<Employee> employeeList = new ArrayList();
+		Set<Employee> employeeSet = new TreeSet();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
-		hql.append("inner join emp.positions as pos inner join emp.department as dep ");
+		hql.append("inner join emp.positions as pos inner join emp.departments as dep ");
 		hql.append("where emp.name like CONCAT('%',:name,'%') ");
 		hql.append("and emp.dateOfBirth like CONCAT('%',:dob,'%') ");
 		hql.append("and emp.email like CONCAT('%',:email,'%') ");
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
-		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team.id is null and pos.department.id is not null and emp.activeFlag = true ");
+		hql.append("and pos.name like CONCAT('%',:pos,'%') ");
+		hql.append("and pos.team.id is null ");
+		hql.append("and pos.department.id is not null ");
+		hql.append("and emp.activeFlag = true ");
 		hql.append("order by " + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
 		List<CustomEmployeeAll> cusEmpList = new ArrayList();
@@ -67,16 +75,22 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[]) it.next();
-				employeeList.add((Employee) ob[0]);
+				employeeSet.add((Employee) ob[0]);
+				
 			}
-			for (Employee e : employeeList) {
+			for (Employee e : employeeSet) {
 				CustomEmployeeAll cusEmp = new CustomEmployeeAll();
-				CustomDepartmentAll cusDep = new CustomDepartmentAll();
 				List<CustomPositionAll> cusPositionList = new ArrayList<>();
-
-				cusDep.setId(e.getDepartment().getId());
-				cusDep.setName(e.getDepartment().getName());
-				cusDep.setManagerId(e.getDepartment().getManagerId());
+				List<CustomDepartmentAll> cusDepartmentList = new ArrayList<>();
+				// Add department list
+				List<Department> departList = e.getDepartments();
+				for(Department d : departList) {
+					CustomDepartmentAll cusDep = new CustomDepartmentAll();
+					cusDep.setId(d.getId());
+					cusDep.setName(d.getName());
+					cusDep.setHeadPosition(d.getHeadPosition());
+					cusDepartmentList.add(cusDep);
+				}
 
 				// Add position list
 				for (Position p : e.getPositions()) {
@@ -107,7 +121,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusEmp.setPhoneNumber(e.getPhoneNumber());
 				cusEmp.setActive(e.isActive());
 				cusEmp.setCreateDate(e.getCreateDate());
-				cusEmp.setDepartment(cusDep);
+				cusEmp.setCustomDepartments(cusDepartmentList);
 				cusEmp.setPositions(cusPositionList);
 				cusEmp.setUser(user);
 				cusEmp.setCreateDate(e.getCreateDate());
@@ -172,15 +186,9 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	}
 
 	@Transactional
-	public String delete(Integer id) {
-		Session session = sessionFactory.getCurrentSession();
+	public String delete(Employee emp) {
 		try {
-			Employee emp = new Employee();
-			emp = session.find(Employee.class, id);
-			emp.setActiveFlag(false);
-			emp.setDepartment(null);
-			session.update(emp);
-			return "1";
+			return String.valueOf(edit(emp));
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in delete() ", e);
 			return "0";
@@ -190,32 +198,53 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	
 	@Transactional
 	@Override
-	public Integer getTotal(String name, String dob, String email, String phone, String dep,
-			String pos) {
-		Session session = sessionFactory.getCurrentSession();
-		Integer count = 0;
+	public Integer countAllPaging(String name, String dob, String email, String phone, String dep,
+			String pos, String sort, String order) {
+		Set<Employee> employeeSet = new TreeSet();
 		StringBuilder hql = new StringBuilder();
-		hql.append("SELECT COUNT(*) FROM employees emp ");
-		hql.append("inner join emp.positions as pos inner join emp.department as dep ");
+		hql.append("from employees emp ");
+		hql.append("inner join emp.positions as pos inner join emp.departments as dep ");
 		hql.append("where emp.name like CONCAT('%',:name,'%') ");
 		hql.append("and emp.dateOfBirth like CONCAT('%',:dob,'%') ");
 		hql.append("and emp.email like CONCAT('%',:email,'%') ");
 		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
 		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
-		hql.append("and pos.name like CONCAT('%',:pos,'%') and pos.team is null and pos.department is not null ");
+		hql.append("and pos.name like CONCAT('%',:pos,'%') ");
+		hql.append("and pos.team.id is null ");
+		hql.append("and pos.department.id is not null ");
+		hql.append("and emp.activeFlag = true ");
+		hql.append("order by " + sort + " " + order);
+		Session session = this.sessionFactory.getCurrentSession();
+		List<CustomEmployeeAll> cusEmpList = new ArrayList();
 		try {
-		Query query = session.createQuery(hql.toString());
-		query.setParameter("name", name);
-		query.setParameter("dob", dob);
-		query.setParameter("email", email);
-		query.setParameter("phone", phone);
-		query.setParameter("dep", dep);
-		query.setParameter("pos", pos);
-		count = Integer.valueOf(query.getResultList().get(0).toString());
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("name", name);
+			query.setParameter("dob", dob);
+			query.setParameter("email", email);
+			query.setParameter("phone", phone);
+			query.setParameter("dep", dep);
+			query.setParameter("pos", pos);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] ob = (Object[]) it.next();
+				employeeSet.add((Employee) ob[0]);
+			}
+			
 		} catch (Exception e) {
-			LOGGER.error("Error has occured in getTotal() ", e);
+			LOGGER.error("Error has occured in employeePaging() ", e);
+			
 		}
-		return count;
+		
+		return employeeSet.size();
 	}
-
+	@Override
+	public Employee findById(Integer id) {
+		Session session = sessionFactory.getCurrentSession();
+		Employee employee = null;
+		try {
+			employee = session.find(Employee.class, id);
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in findById() ", e);
+		}
+		return employee;
+	}
 }

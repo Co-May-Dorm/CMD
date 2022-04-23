@@ -5,11 +5,17 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -32,8 +38,8 @@ public class Department {
 	private String name;
 	@Column(name="farther_department_id")
 	private Integer fatherDepartmentId;
-	@Column(name="manager_id")
-	private Integer managerId;
+	@Column(name="head_position")
+	private Integer headPosition;
 	@Column(name="create_by")
 	private Integer createBy;
 	@Column(name="create_date")
@@ -44,7 +50,7 @@ public class Department {
 	private String modifyDate;
 	@Column(name="description")
 	private String description;
-	
+	private Integer level;
 	@OneToMany
 	@JoinColumn(name = "department_id")
 	@JsonBackReference
@@ -57,10 +63,12 @@ public class Department {
 	@OneToMany
 	@JoinColumn(name = "department_id")
 	private List<ApprovalStepDetail> approvalStepDetails;
-
-	@OneToMany
-	@JoinColumn(name = "department_id")
-	@JsonBackReference
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany()
+	@JoinTable(name = "departments_employees", joinColumns = {
+			@JoinColumn(name = "department_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
 	private List<Employee> employees;
 
 }

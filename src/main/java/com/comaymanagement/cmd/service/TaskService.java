@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.comaymanagement.cmd.constant.CMDConstrant;
+import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Pagination;
@@ -30,14 +32,15 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 
 	@Autowired
 	TaskRepositoryImpl taskRepository;
-
+	Integer limit = CMDConstrant.LIMIT;
+	
 	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, String page) {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page;
+		int offset = (Integer.valueOf(page) - 1) * limit;
 		try {
-			int limit = 15;
-			List<CustomTaskAll> tasksByStatusId = taskRepository.findByStatusId(statusId, sort, order, page, limit);
+			List<CustomTaskAll> tasksByStatusId = taskRepository.findByStatusId(statusId, sort, order, offset, limit);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
@@ -60,7 +63,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		}
 
 	}
-
+	
 	public ResponseEntity<Object> findAllTask(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, String page) {
 		dep = dep == null ? "" : dep.trim();
@@ -73,24 +76,37 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page.trim();
-		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
+		// Caculator offset
+		int offset = (Integer.parseInt(page) - 1) * limit;
+		List<CustomTaskAll> cusTaskList = new ArrayList<CustomTaskAll>();
+		List<CustomTaskAll> cusTaskListTMP = new ArrayList<CustomTaskAll>();
 		try {
-			int limit = 15;
-			tasks = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, sort,
-					order, page, limit);
+			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, sort, order);
+			Integer numberOfItemNeeded = 0;
+			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
+			while (cusTaskList.size() < numberOfItemNeeded) {
+				offset = cusTaskList.size() == 0 ? offset : (offset + cusTaskList.size() + 1);
+				limit = numberOfItemNeeded - cusTaskList.size();
+				cusTaskListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, sort, order, totalItem, numberOfItemNeeded);
+				for(CustomTaskAll cusEmp : cusTaskListTMP) {
+					cusTaskList.add(cusEmp);
+				}
+				cusTaskListTMP.clear();
+			}
+			Integer totalItemEmployee = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, sort, order);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
-			pagination.setTotalItem(taskRepository.countAll(dep, title, status, creator, receiver));
+			pagination.setTotalItem(totalItemEmployee);
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
-			results.put("tasks", tasks);
+			results.put("tasks", cusTaskList);
 			if (results.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
 			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND)
-						.body(new ResponseObject("Not found", "Can not find task list", tasks));
+				pagination.setPage(1);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", results));
 			}
 		} catch (Exception e) {
 			LOGGER.error("ERROR:" + e.getMessage());
@@ -104,10 +120,10 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page.trim();
+		int offset = (Integer.valueOf(page) - 1) * limit;
 		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
 		try {
-			int limit = 15;
-
+			
 			JsonMapper jsonMapper = new JsonMapper();
 			JsonNode jsonObject;
 			jsonObject = jsonMapper.readTree(json);
@@ -118,7 +134,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 				ids.add(j.toString());
 			}
 			
-			tasks = taskRepository.findByStatusIds(ids, sort, order, page, limit);
+			tasks = taskRepository.findByStatusIds(ids, sort, order, offset, limit);
 
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
