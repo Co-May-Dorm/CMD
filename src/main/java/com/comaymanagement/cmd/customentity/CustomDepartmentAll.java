@@ -22,6 +22,6 @@ public class CustomDepartmentAll {
 	private Integer headPosition;
 	private List<CustomPositionAll> positions;
 	private String description;
-	private List<CustomEmployeeAll> customEmployees;
+	private List<CustomEmployeeAll> employees;
 	private Integer level;
 }

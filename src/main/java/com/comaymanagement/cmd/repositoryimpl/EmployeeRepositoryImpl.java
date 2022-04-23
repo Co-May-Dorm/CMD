@@ -121,7 +121,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusEmp.setPhoneNumber(e.getPhoneNumber());
 				cusEmp.setActive(e.isActive());
 				cusEmp.setCreateDate(e.getCreateDate());
-				cusEmp.setCustomDepartments(cusDepartmentList);
+				cusEmp.setDepartments(cusDepartmentList);;
 				cusEmp.setPositions(cusPositionList);
 				cusEmp.setUser(user);
 				cusEmp.setCreateDate(e.getCreateDate());
@@ -195,7 +195,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		}
 
 	}
-	
+	 	
 	@Transactional
 	@Override
 	public Integer countAllPaging(String name, String dob, String email, String phone, String dep,
