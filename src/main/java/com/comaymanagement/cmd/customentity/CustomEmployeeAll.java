@@ -26,7 +26,7 @@ public class CustomEmployeeAll {
 	private String avatar;
 	private String gender;
 	private List<CustomPositionAll> positions;
-	private List<CustomDepartmentAll> customDepartments;
+	private List<CustomDepartmentAll> departments;
 	private User user;
 	private boolean isActive;
 	private String createDate;
