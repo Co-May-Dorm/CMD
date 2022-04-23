@@ -25,4 +25,5 @@ public class CustomTaskAll {
 	private String departmentName;
 	private String createDate;
 	private String finishDate;
+
 }
