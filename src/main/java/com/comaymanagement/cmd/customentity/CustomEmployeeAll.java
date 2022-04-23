@@ -22,13 +22,13 @@ public class CustomEmployeeAll {
 	private String dateOfBirth;
 	private String email;
 	private String phoneNumber;
-	private Integer managerId;
 	private String avatar;
 	private String gender;
 	private List<CustomPositionAll> positions;
 	private List<CustomDepartmentAll> departments;
+	private List<CustomTeamAll> teams;
 	private User user;
-	private boolean isActive;
+	private boolean active;
 	private String createDate;
 	private String modifyDate;
 	private Integer createBy;

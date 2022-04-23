@@ -30,7 +30,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "employees")
-public class Employee implements Comparable<Employee>{
+public class Employee{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -58,7 +58,7 @@ public class Employee implements Comparable<Employee>{
 	@Column(name="enable_login")
 	private boolean enableLogin;
 	@Column(name="is_active")
-	private boolean isActive;
+	private boolean active;
 	
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@ManyToMany()
@@ -101,10 +101,5 @@ public class Employee implements Comparable<Employee>{
 					@JoinColumn(name = "team_id", referencedColumnName = "id") })
 	private List<Team> teams;
 
-	@Override
-	public int compareTo(Employee o) {
-		// we sort objects on the basis of Student Id
-		return (o.id - this.id);
-	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -21,11 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
+import com.comaymanagement.cmd.customentity.CustomTeamAll;
 import com.comaymanagement.cmd.customentity.User;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.entity.Team;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
 
 @Repository
@@ -46,7 +49,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	@Transactional
 	public List<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order, Integer limit, Integer offset) {
-		Set<Employee> employeeSet = new TreeSet();
+		Set<Employee> employeeSet = new LinkedHashSet<>();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
 		hql.append("inner join emp.positions as pos inner join emp.departments as dep ");
@@ -82,6 +85,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				CustomEmployeeAll cusEmp = new CustomEmployeeAll();
 				List<CustomPositionAll> cusPositionList = new ArrayList<>();
 				List<CustomDepartmentAll> cusDepartmentList = new ArrayList<>();
+				List<CustomTeamAll> cusTeamList= new ArrayList<>();
 				// Add department list
 				List<Department> departList = e.getDepartments();
 				for(Department d : departList) {
@@ -91,7 +95,15 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 					cusDep.setHeadPosition(d.getHeadPosition());
 					cusDepartmentList.add(cusDep);
 				}
-
+				// Add team list
+				List<Team> teams = e.getTeams();
+				for(Team t : teams) {
+					CustomTeamAll cusTeam = new CustomTeamAll();
+					cusTeam.setId(t.getId());
+					cusTeam.setName(t.getName());
+					cusTeam.setDescription(t.getDescription());
+					cusTeam.setPositionList(t.getPositionList());
+				}
 				// Add position list
 				for (Position p : e.getPositions()) {
 					if(p.getDepartment()!=null && p.getTeam()==null) {
@@ -110,7 +122,6 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				User user = new User();
 				user.setUsername(e.getUsername());
 				user.setEnableLogin(e.isEnableLogin());
-
 				cusEmp.setId(e.getId());
 				cusEmp.setCode(e.getCode());
 				cusEmp.setName(e.getName());
@@ -127,6 +138,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusEmp.setCreateDate(e.getCreateDate());
 				cusEmp.setModifyDate(e.getModifyDate());
 				cusEmp.setCreateBy(e.getCreateBy());
+				cusEmp.setTeams(cusTeamList);
 				cusEmpList.add(cusEmp);
 			}
 		} catch (Exception e) {
@@ -200,7 +212,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	@Override
 	public Integer countAllPaging(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order) {
-		Set<Employee> employeeSet = new TreeSet();
+		Set<Employee> employeeSet = new LinkedHashSet<>();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
 		hql.append("inner join emp.positions as pos inner join emp.departments as dep ");
