@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "tasks")
-public class Task implements Comparable<Task>{
+public class Task{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -41,11 +41,6 @@ public class Task implements Comparable<Task>{
 	@JoinColumn(name = "status_id")
 	private Status status;
 
-	@Override
-	public int compareTo(Task o) {
-		// TODO Auto-generated method stub
-		return o.id - this.id;
-	}
 
 
 }

@@ -1,10 +1,13 @@
 package com.comaymanagement.cmd.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +35,13 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 
 	@Autowired
 	TaskRepositoryImpl taskRepository;
-	Integer limit = CMDConstrant.LIMIT;
+
 	
 	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, String page) {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page;
+		Integer limit = CMDConstrant.LIMIT;
 		int offset = (Integer.valueOf(page) - 1) * limit;
 		try {
 			List<CustomTaskAll> tasksByStatusId = taskRepository.findByStatusId(statusId, sort, order, offset, limit);
@@ -76,18 +80,21 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page.trim();
+		Integer limit = CMDConstrant.LIMIT;
 		// Caculator offset
 		int offset = (Integer.parseInt(page) - 1) * limit;
-		List<CustomTaskAll> cusTaskList = new ArrayList<CustomTaskAll>();
+		Set<CustomTaskAll> cusTaskList = new LinkedHashSet<CustomTaskAll>();
 		List<CustomTaskAll> cusTaskListTMP = new ArrayList<CustomTaskAll>();
 		try {
 			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, sort, order);
 			Integer numberOfItemNeeded = 0;
 			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
+			Integer numberDuplicate = numberOfItemNeeded;
 			while (cusTaskList.size() < numberOfItemNeeded) {
-				offset = cusTaskList.size() == 0 ? offset : (offset + cusTaskList.size() + 1);
+				numberDuplicate -= cusTaskList.size();  
+				offset = cusTaskList.size() == 0 ? offset : (offset + cusTaskList.size() + numberDuplicate);
 				limit = numberOfItemNeeded - cusTaskList.size();
-				cusTaskListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, sort, order, totalItem, numberOfItemNeeded);
+				cusTaskListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, sort, order, offset, limit);
 				for(CustomTaskAll cusEmp : cusTaskListTMP) {
 					cusTaskList.add(cusEmp);
 				}
@@ -120,6 +127,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
 		page = page == null ? "1" : page.trim();
+		Integer limit = CMDConstrant.LIMIT;
 		int offset = (Integer.valueOf(page) - 1) * limit;
 		List<CustomTaskAll> tasks = new ArrayList<CustomTaskAll>();
 		try {

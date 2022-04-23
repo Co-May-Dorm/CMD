@@ -3,6 +3,7 @@ package com.comaymanagement.cmd.repositoryimpl;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -84,7 +85,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	@Transactional
 	public List<CustomTaskAll> findAll(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit) {
-		Set<Task> taskSet = new TreeSet<Task>();
+		Set<Task> taskSet = new LinkedHashSet<Task>();
 		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
@@ -147,7 +148,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	public Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order) {
 		Integer count = 0;
-		Set<Task> taskSet = new TreeSet<Task>();
+		Set<Task> taskSet = new LinkedHashSet<Task>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
 		hql.append("INNER JOIN t.status as s ");
