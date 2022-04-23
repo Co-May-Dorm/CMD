@@ -15,6 +15,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +30,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "employees")
-public class Employee {
+public class Employee implements Comparable<Employee>{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -40,8 +43,6 @@ public class Employee {
 	private String phoneNumber;
 	@Column(name="active_flag")
 	private boolean activeFlag;
-	@Column(name="manager_id")
-	private Integer managerId;
 	@Column(name="create_by")
 	private Integer createBy;
 	@Column(name="modify_by")
@@ -59,11 +60,15 @@ public class Employee {
 	@Column(name="is_active")
 	private boolean isActive;
 	
-	@OneToOne()
-	@JoinColumn(name = "department_id")
-	private Department department;
-
-	@ManyToMany(fetch = FetchType.EAGER)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany()
+	@JoinTable(name = "departments_employees", joinColumns = {
+			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "department_id", referencedColumnName = "id") })
+	private List<Department> departments;
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@ManyToMany()
 	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "position_id", referencedColumnName = "id") })
@@ -88,11 +93,18 @@ public class Employee {
 	@OneToMany
 	@JoinColumn(name = "employee_id")
 	private List<ApprovalStepDetail> approvalStepDetails;
-
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@ManyToMany
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "team_id", referencedColumnName = "id") })
 	private List<Team> teams;
+
+	@Override
+	public int compareTo(Employee o) {
+		// we sort objects on the basis of Student Id
+		return (o.id - this.id);
+	}
 
 }

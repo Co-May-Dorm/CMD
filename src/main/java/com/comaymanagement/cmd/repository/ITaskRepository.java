@@ -14,7 +14,7 @@ public interface ITaskRepository {
 			@Param("status_id") String statusId,
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("offset") String page,
+			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
 	
 	List<CustomTaskAll> findAll( 
@@ -27,20 +27,20 @@ public interface ITaskRepository {
 			@Param("finishDate") String finishDate,
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("offset") String page,
+			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
-	Integer countAll(String dep, String title, String status, String creator, String receiver);
+	Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
+			String createDate, String finishDate, String sort, String order);
 	Integer countFindByIds(List<Integer> ids);
 	List<CustomTaskAll> findByStatusIds(
 			@Param("status_id") List<String> statusIds,
 			@Param("sort") String sort,
 			@Param("order") String order,
-			@Param("offset") String page,
+			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
 	Integer save(Task task);
 	Integer getMaxId();
 	CustomTaskAll findById(Integer id);
-//	List<CustomTaskAll> sortByStatusIds(Integer statusId,String page);
 	String deleteTaskById(Integer id);
 	Integer edit(Task task);
 	List<CustomTaskAll> filter(

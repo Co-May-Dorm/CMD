@@ -19,7 +19,9 @@ public class CustomDepartmentAll {
 	private String code;
 	private String name;
 	private Integer fatherDepartmentId;
-	private Integer managerId;
+	private Integer headPosition;
 	private List<CustomPositionAll> positions;
 	private String description;
+	private List<CustomEmployeeAll> customEmployees;
+	private Integer level;
 }

@@ -40,11 +40,11 @@ public interface IEmployeeRepository {
 
 	public Integer edit(Employee emp);
 
-	public String delete(Integer id);
+	public String delete(Employee emp);
 
 	public boolean checkEmployeeCodeExisted(Integer id, String code);
+	public Integer countAllPaging(String name, String dob, String email, String phone, String dep,
+			String pos, String sort, String order);
+	public Employee findById(Integer id);
 	
-	public Integer getTotal(String name, String dob, String email, String phone, String dep,
-			String pos);
-		
 }

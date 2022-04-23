@@ -1,5 +1,5 @@
 package com.comaymanagement.cmd.repository;
 
 public interface MessageRepository {
-	String getMessage();
+	String getMessage(Integer id);
 }

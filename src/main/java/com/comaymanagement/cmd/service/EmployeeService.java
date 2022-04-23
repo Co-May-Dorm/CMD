@@ -15,7 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.comaymanagement.cmd.constant.DefaultPassword;
+import com.comaymanagement.cmd.constant.CMDConstrant;
+import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
@@ -37,6 +38,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 @Service
 public class EmployeeService implements IGeneralService<Employee> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
+
 	@Autowired
 	EmployeeRepositoryImpl employeeRepository;
 
@@ -49,11 +52,13 @@ public class EmployeeService implements IGeneralService<Employee> {
 	@Autowired
 	TeamRepositoryImpl teamRepository;
 
-	List<CustomEmployeeAll> cusEmpList = new ArrayList<>();
-
+	
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
 			String dep, String pos, String sort, String order) {
+		Integer limit = new Integer(CMDConstrant.LIMIT);
+		List<CustomEmployeeAll> cusEmpListTmp = new ArrayList<>();
+		List<CustomEmployeeAll> cusEmpList = new ArrayList<>();
 		name = name == null ? "" : name.trim();
 		dob = dob == null ? "" : dob.trim();
 		email = email == null ? "" : email.trim();
@@ -61,7 +66,6 @@ public class EmployeeService implements IGeneralService<Employee> {
 		dep = dep == null ? "" : dep.trim();
 		pos = pos == null ? "" : pos.trim();
 		page = page == null ? "1" : page.trim();
-		int limit = 15;
 		// Caculator offset
 		int offset = (Integer.parseInt(page) - 1) * limit;
 
@@ -72,21 +76,40 @@ public class EmployeeService implements IGeneralService<Employee> {
 		if (order == null || order == "") {
 			order = "desc";
 		}
-		Pagination pagination = new Pagination();
-		Map<String, Object> result = new TreeMap<>();
-		Integer total = employeeRepository.getTotal(name, dob, email, phone, dep, pos);
-		pagination.setLimit(limit);
-		pagination.setPage(Integer.valueOf(page));
-		pagination.setTotalItem(total);
-		cusEmpList = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit, offset);
-		result.put("pagination", pagination);
-		result.put("employees", cusEmpList);
-		if (cusEmpList.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
-		} else {
-			pagination.setPage(1);
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", result));
+		try {
+			Integer totalItem = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order);
+			Integer numberOfItemNeeded = 0;
+			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
+			while (cusEmpList.size() < numberOfItemNeeded) {
+				offset = cusEmpList.size() == 0 ? offset : (offset + cusEmpList.size() + 1);
+				limit = numberOfItemNeeded - cusEmpList.size();
+				cusEmpListTmp = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit, offset);
+				for(CustomEmployeeAll cusEmp : cusEmpListTmp) {
+					cusEmpList.add(cusEmp);
+				}
+				cusEmpListTmp.clear();
+			}
+			Integer totalItemEmployee = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order);
+			Pagination pagination = new Pagination();
+			Map<String, Object> result = new TreeMap<>();
+			pagination.setLimit(CMDConstrant.LIMIT);
+			pagination.setPage(Integer.valueOf(page));
+			pagination.setTotalItem(totalItemEmployee);
+			
+			result.put("pagination", pagination);
+			result.put("employees", cusEmpList);
+			if (cusEmpList.size() > 0) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
+			} else {
+				pagination.setPage(1);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", result));
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in employeePaging() ", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
+		
+		
 	}
 
 	// Add and edit employee
@@ -97,10 +120,12 @@ public class EmployeeService implements IGeneralService<Employee> {
 		String modifyDate = createDate;
 		List<Position> positionList = new ArrayList<>();
 		List<Team> teamList = new ArrayList<>();
+		List<Department> departmentList = new ArrayList<>();
 		Department dep = new Department();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectEmployee;
 		JsonNode jsonObjectPosition;
+		JsonNode jsonObjectDepartment;
 		JsonNode jsonObjectTeam;
 		JsonNode jsonLoginAccount;
 
@@ -110,6 +135,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
 			jsonObjectTeam = jsonObjectEmployee.get("teams");
+			jsonObjectDepartment = jsonObjectEmployee.get("departments");
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee code existed
 			String code = jsonObjectEmployee.get("code").asText();
@@ -141,7 +167,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.setEnableLogin(isEnableLogin);
 			if (isEnableLogin) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
-				emp.setPassword(DefaultPassword.PASSWORD);
+				emp.setPassword(CMDConstrant.PASSWORD);
 			} else {
 				emp.setUsername("");
 				emp.setPassword("");
@@ -160,44 +186,26 @@ public class EmployeeService implements IGeneralService<Employee> {
 					teamList.add(team);
 				}
 			}
-
-			dep.setId(jsonObjectEmployee.get("department").asInt());
+			
+			if (jsonObjectDepartment.isArray()) {
+				for (JsonNode d : jsonObjectDepartment) {
+					Department department = new Department();
+					department.setId(Integer.valueOf(d.toString()));
+					departmentList.add(department);
+				}
+			}
+			
 			emp.setPositions(positionList);
 			emp.setTeams(teamList);
-			emp.setDepartment(dep);
+			emp.setDepartments(departmentList);
 			emp.setActiveFlag(true);
 			emp.setActive(true);
 			emp.setCreateDate(createDate);
 			emp.setModifyDate(modifyDate);
 			emp.setCreateBy(jsonObjectEmployee.get("createBy").asInt());
 			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
-			Department department = departmentRepository.findById(emp.getDepartment().getId());
-			if (department != null) {
-				if (department.getManagerId() != -1) {
-					emp.setManagerId(department.getManagerId());
-				} else {
-					emp.setManagerId(-1);
-				}
-			}
 			Integer idAdded = employeeRepository.add(emp);
 			if (idAdded != -1) {
-				for (JsonNode p : jsonObjectPosition) {
-					Position pos = new Position();
-					pos.setId(Integer.valueOf(p.toString()));
-					Position positionObjectById = positionRepository.findById(pos.getId());
-					if (positionObjectById.getIsManager()) {
-						Department department2 = positionObjectById.getDepartment();
-						Team team = positionObjectById.getTeam();
-						if (department2 != null) {
-							department2.setManagerId(idAdded);
-							departmentRepository.edit(department2);
-						}
-						if (team != null) {
-							team.setManagerId(idAdded);
-							teamRepository.edit(team);
-						}
-					}
-				}
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", emp));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -217,17 +225,20 @@ public class EmployeeService implements IGeneralService<Employee> {
 		User user = new User();
 		List<Position> positionList = new ArrayList<>();
 		List<Team> teamList = new ArrayList<>();
+		List<Department> departmentList = new ArrayList<>();
 		Department dep = new Department();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectEmployee;
 		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectTeam;
+		JsonNode jsonObjectDepartment;
 		JsonNode jsonLoginAccount;
 		String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
 			jsonObjectTeam = jsonObjectEmployee.get("teams");
+			jsonObjectDepartment = jsonObjectEmployee.get("departments");
 			Integer id = jsonObjectEmployee.get("id") != null ? jsonObjectEmployee.get("id").asInt() : -1;
 //			Check employee id existed
 			String code = jsonObjectEmployee.get("code").asText();
@@ -237,6 +248,19 @@ public class EmployeeService implements IGeneralService<Employee> {
 						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
 			}
 			jsonLoginAccount = jsonObjectEmployee.get("user");
+			boolean active = jsonObjectEmployee.get("active").asBoolean();
+			/* Check if active == false 
+			Check if the employee is the head of the department, do not allow the lock */
+			if(!active) {
+				Employee empCheck = employeeRepository.findById(id);
+				for(Position p : empCheck.getPositions()) {
+					if(p.getIsManager()) {
+						String message = Message.getMessage(2);
+						return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+								.body(new ResponseObject("Error", message, ""));
+					}
+				}
+			}
 			String avatar = jsonObjectEmployee.get("avatar") != null ? jsonObjectEmployee.get("avatar").asText() : "";
 			String gender = jsonObjectEmployee.get("gender") != null ? jsonObjectEmployee.get("gender").asText() : "";
 			String dateOfBirth = jsonObjectEmployee.get("dateOfBirth") == null ? ""
@@ -262,7 +286,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			// Cannot edit password
 			if (isEnableLogin) {
 				emp.setUsername(jsonLoginAccount.get("username").asText());
-				emp.setPassword(DefaultPassword.PASSWORD);
+				emp.setPassword(CMDConstrant.PASSWORD);
 			} else {
 				emp.setUsername("");
 				emp.setPassword("");
@@ -279,43 +303,24 @@ public class EmployeeService implements IGeneralService<Employee> {
 					teamList.add(team);
 				}
 			}
-			dep.setId(jsonObjectEmployee.get("department").asInt());
+			if (jsonObjectDepartment.isArray()) {
+				for (JsonNode t : jsonObjectDepartment) {
+					Department department = new Department();
+					department.setId(Integer.valueOf(t.toString()));
+					departmentList.add(department);
+				}
+			}
 			emp.setPositions(positionList);
 			emp.setTeams(teamList);
-			emp.setDepartment(dep);
+			emp.setDepartments(departmentList);
 			emp.setActiveFlag(true);
 			emp.setActive(jsonObjectEmployee.get("active").asBoolean());
 			emp.setCreateDate(jsonObjectEmployee.get("createDate").asText());
 			emp.setModifyDate(modifyDate);
 			emp.setCreateBy(jsonObjectEmployee.get("createBy").asInt());
 			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
-			Department department = departmentRepository.findById(emp.getDepartment().getId());
-			if (department != null) {
-				if (department.getManagerId() != -1) {
-					emp.setManagerId(department.getManagerId());
-				} else {
-					emp.setManagerId(-1);
-				}
-			}
 			Integer message = employeeRepository.edit(emp);
 			if (message != 0) {
-				for (JsonNode p : jsonObjectPosition) {
-					Position pos = new Position();
-					pos.setId(Integer.valueOf(p.toString()));
-					Position positionObjectById = positionRepository.findById(pos.getId());
-					if (positionObjectById.getIsManager()) {
-						Department department2 = positionObjectById.getDepartment();
-						Team team = positionObjectById.getTeam();
-						if (department2 != null) {
-							department2.setManagerId(id);
-							departmentRepository.edit(department2);
-						}
-						if (team != null) {
-							team.setManagerId(id);
-							teamRepository.edit(team);
-						}
-					}
-				}
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -330,9 +335,15 @@ public class EmployeeService implements IGeneralService<Employee> {
 	}
 
 	// Delete employee by id
-	public ResponseEntity<Object> delete(String id) {
+	public ResponseEntity<Object> delete(Integer id) {
 		try {
-			String updateStatus = employeeRepository.delete(Integer.valueOf(id));
+			Employee emp = employeeRepository.findById(id);
+			emp.setActive(false);
+			emp.setActiveFlag(false);
+			emp.getDepartments().clear();
+			emp.getTeams().clear();
+			emp.getPositions().clear();
+			String updateStatus = employeeRepository.delete(emp);
 
 			if (updateStatus.equals("1")) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
