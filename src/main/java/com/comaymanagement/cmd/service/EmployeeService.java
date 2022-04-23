@@ -3,9 +3,11 @@ package com.comaymanagement.cmd.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -58,7 +60,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			String dep, String pos, String sort, String order) {
 		Integer limit = new Integer(CMDConstrant.LIMIT);
 		List<CustomEmployeeAll> cusEmpListTmp = new ArrayList<>();
-		List<CustomEmployeeAll> cusEmpList = new ArrayList<>();
+		Set<CustomEmployeeAll> cusEmpSet = new LinkedHashSet<>();
 		name = name == null ? "" : name.trim();
 		dob = dob == null ? "" : dob.trim();
 		email = email == null ? "" : email.trim();
@@ -80,12 +82,13 @@ public class EmployeeService implements IGeneralService<Employee> {
 			Integer totalItem = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order);
 			Integer numberOfItemNeeded = 0;
 			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
-			while (cusEmpList.size() < numberOfItemNeeded) {
-				offset = cusEmpList.size() == 0 ? offset : (offset + cusEmpList.size() + 1);
-				limit = numberOfItemNeeded - cusEmpList.size();
+			Integer numberDuplicate = numberOfItemNeeded;
+			while (cusEmpSet.size() < numberOfItemNeeded) {
+				offset = cusEmpSet.size() == 0 ? offset : (offset + cusEmpSet.size() + numberDuplicate);
+				limit = numberOfItemNeeded - cusEmpSet.size();
 				cusEmpListTmp = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit, offset);
 				for(CustomEmployeeAll cusEmp : cusEmpListTmp) {
-					cusEmpList.add(cusEmp);
+					cusEmpSet.add(cusEmp);
 				}
 				cusEmpListTmp.clear();
 			}
@@ -97,8 +100,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 			pagination.setTotalItem(totalItemEmployee);
 			
 			result.put("pagination", pagination);
-			result.put("employees", cusEmpList);
-			if (cusEmpList.size() > 0) {
+			result.put("employees", cusEmpSet);
+			if (cusEmpSet.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 			} else {
 				pagination.setPage(1);

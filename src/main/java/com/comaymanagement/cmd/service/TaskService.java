@@ -83,20 +83,20 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 		Integer limit = CMDConstrant.LIMIT;
 		// Caculator offset
 		int offset = (Integer.parseInt(page) - 1) * limit;
-		Set<CustomTaskAll> cusTaskList = new LinkedHashSet<CustomTaskAll>();
+		Set<CustomTaskAll> cusTaskSet = new LinkedHashSet<CustomTaskAll>();
 		List<CustomTaskAll> cusTaskListTMP = new ArrayList<CustomTaskAll>();
 		try {
 			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, sort, order);
 			Integer numberOfItemNeeded = 0;
 			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
 			Integer numberDuplicate = numberOfItemNeeded;
-			while (cusTaskList.size() < numberOfItemNeeded) {
-				numberDuplicate -= cusTaskList.size();  
-				offset = cusTaskList.size() == 0 ? offset : (offset + cusTaskList.size() + numberDuplicate);
-				limit = numberOfItemNeeded - cusTaskList.size();
+			while (cusTaskSet.size() < numberOfItemNeeded) {
+				numberDuplicate -= cusTaskSet.size();  
+				offset = cusTaskSet.size() == 0 ? offset : (offset + cusTaskSet.size() + numberDuplicate);
+				limit = numberOfItemNeeded - cusTaskSet.size();
 				cusTaskListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, sort, order, offset, limit);
 				for(CustomTaskAll cusEmp : cusTaskListTMP) {
-					cusTaskList.add(cusEmp);
+					cusTaskSet.add(cusEmp);
 				}
 				cusTaskListTMP.clear();
 			}
@@ -107,7 +107,7 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			pagination.setTotalItem(totalItemEmployee);
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
-			results.put("tasks", cusTaskList);
+			results.put("tasks", cusTaskSet);
 			if (results.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
