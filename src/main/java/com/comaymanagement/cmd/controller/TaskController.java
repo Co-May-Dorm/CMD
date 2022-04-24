@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.customentity.CustomTaskAll;
@@ -24,7 +25,7 @@ import com.comaymanagement.cmd.service.TaskService;
 
 @RestController
 @RequestMapping("/tasks")
-@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TaskController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
