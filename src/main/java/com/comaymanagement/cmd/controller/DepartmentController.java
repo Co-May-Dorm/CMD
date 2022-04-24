@@ -36,7 +36,7 @@ public class DepartmentController {
 	
 	@PostMapping("/add")
 	public ResponseEntity<Object> add(@RequestBody String json){
-		return departmentService.save(json);
+		return departmentService.add(json);
 	}
 	@PutMapping("/edit")
 	public ResponseEntity<Object> edit(@RequestBody String json){

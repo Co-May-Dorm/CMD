@@ -39,22 +39,26 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "from departments dep inner join dep.positions as pos where dep.name like CONCAT('%',:name,'%')";
 		Set<CustomDepartmentAll> cusDepSet = new LinkedHashSet<CustomDepartmentAll>();
+		Set<Department> depSetTMP = new LinkedHashSet<Department>();
 		
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-				List<CustomPositionAll> cusPosList = new ArrayList<>();
 				Object[] ob = (Object[]) it.next();
-				CustomDepartmentAll cusDep = new CustomDepartmentAll();
 				Department tmp = (Department) ob[0];
-				cusDep.setId(tmp.getId());
-				cusDep.setCode(tmp.getCode());
-				cusDep.setName(tmp.getName());
-				cusDep.setDescription(tmp.getDescription());
-				cusDep.setFatherDepartmentId(tmp.getFatherDepartmentId());
-				cusDep.setLevel(tmp.getLevel());
-				for (Position pos : tmp.getPositions()) {
+				depSetTMP.add(tmp);
+			}
+			for(Department d : depSetTMP) {
+				CustomDepartmentAll cusDep = new CustomDepartmentAll();
+				List<CustomPositionAll> cusPosList = new ArrayList<>();
+				cusDep.setId(d.getId());
+				cusDep.setCode(d.getCode());
+				cusDep.setName(d.getName());
+				cusDep.setDescription(d.getDescription());
+				cusDep.setFatherDepartmentId(d.getFatherDepartmentId());
+				cusDep.setLevel(d.getLevel());
+				for (Position pos : d.getPositions()) {
 					CustomPositionAll cusPos = new CustomPositionAll();
 					Role role = new Role();
 					role.setId(pos.getRole().getId());

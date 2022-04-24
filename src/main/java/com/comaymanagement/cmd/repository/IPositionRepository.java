@@ -12,7 +12,7 @@ public interface IPositionRepository{
 	List<CustomPositionAll> findAllByRoleId(
 			@Param("roleID") Integer roleId);
 	Integer CountTotalItem();
-	Integer save(Position p);
+	Integer add(Position p);
 	Integer edit(Position p);
 	Position findById(Integer id);
 }
