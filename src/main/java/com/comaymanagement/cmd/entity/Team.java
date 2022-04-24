@@ -51,10 +51,10 @@ public class Team {
 			@JoinColumn(name = "team_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
 	@JsonBackReference
-	private Set<Employee> employeeList;
+	private Set<Employee> employees;
 
 	@OneToMany
 	@JoinColumn(name = "team_id")
 	@JsonBackReference
-	private Set<Position> positionList;
+	private Set<Position> positions;
 }

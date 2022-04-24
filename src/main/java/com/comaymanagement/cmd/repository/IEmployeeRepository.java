@@ -1,6 +1,7 @@
 package com.comaymanagement.cmd.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
 import com.comaymanagement.cmd.entity.Employee;
@@ -33,7 +34,7 @@ public interface IEmployeeRepository {
 //										@Param("limit") Integer limit,
 //										@Param("offset") Integer offset
 //										);
-	public List<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep, String pos,
+	public Set<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep, String pos,
 			String sort, String order, Integer limit, Integer offset);
 
 	public Integer add(Employee emp);
