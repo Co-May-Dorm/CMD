@@ -179,8 +179,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 
-			Integer id = (Integer) session.save(emp);
-			return id;
+			return Integer.parseInt(session.save(emp).toString());
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee() ", e);
 			return -1;

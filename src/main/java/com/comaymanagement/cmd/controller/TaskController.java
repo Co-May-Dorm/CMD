@@ -72,8 +72,8 @@ public class TaskController {
 	
 	@PostMapping("/add")
 	@ResponseBody
-	public ResponseEntity<Object> save(@RequestBody String json) {
-		return taskService.save(json);
+	public ResponseEntity<Object> add(@RequestBody String json) {
+		return taskService.add(json);
 	}
 
 	//Get task list by status id 
@@ -87,7 +87,7 @@ public class TaskController {
 	}
 	
 	//Get task list by status ids 
-	@PostMapping(value="/status",produces = "application/json")
+	@GetMapping(value="/statuses",produces = "application/json")
 	public ResponseEntity<Object> findByStatusIds(
 			@RequestBody String json,
 			@RequestParam(value="page",required = false) String page, 

@@ -187,7 +187,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		return count;
 	}
 	@Override
-	public List<CustomTaskAll> findByStatusIds(List<String> statusIds, String sort, String order, Integer offset,
+	public List<CustomTaskAll> findByStatusIds(List<Integer> statusIds, String sort, String order, Integer offset,
 			Integer limit) {
 		List<Task> tasks = new ArrayList<Task>();
 		List<CustomTaskAll> customTasks = new ArrayList<CustomTaskAll>();
@@ -203,9 +203,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setMaxResults(limit);
 			tasks = query.getResultList();
 			for(Task task : tasks) {
-				PriorityQueue<Department> departmentList = new PriorityQueue<>(new TaskComparator());
+				PriorityQueue<Department> departmentQueue = new PriorityQueue<>(new TaskComparator());
 				for(Department d : task.getCreator().getDepartments()) {
-					departmentList.add(d);
+					departmentQueue.add(d);
 				}
 				CustomTaskAll customTask = new CustomTaskAll();
 				customTask.setId(task.getId());
@@ -216,12 +216,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setRecieverName(task.getReceiver().getName());
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(departmentList.remove().getName());
+				customTask.setDepartmentName(departmentQueue.remove().getName());
 				customTask.setStatusName(task.getStatus().getName());
 				customTasks.add(customTask);
 			}
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
+			LOGGER.error("Error has occured in findByStatusIds() ", e);
 		}
 		return customTasks;
 	}
@@ -245,14 +245,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public Integer save(Task task) {
+	public Integer add(Task task) {
 		try {
 			LOGGER.info("SAVE TASK....");
 			Session session = sessionFactory.getCurrentSession();
 			return Integer.parseInt(session.save(task).toString());
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-			return null;
+			LOGGER.error("Error has occured in addEmployee() ", e);
+			return -1;
 		}
 	}
 

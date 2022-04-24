@@ -1,6 +1,8 @@
 package com.comaymanagement.cmd.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -135,11 +137,11 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			JsonMapper jsonMapper = new JsonMapper();
 			JsonNode jsonObject;
 			jsonObject = jsonMapper.readTree(json);
-			JsonNode jsonNodes = jsonObject.get("statusIds");
-			List<String> ids = new ArrayList<String>();
-			for(JsonNode j : jsonNodes) {
-				System.out.println(j.toString());
-				ids.add(j.toString());
+			JsonNode jsonStatusObject = jsonObject.get("statusIds");
+			List<Integer> ids = new ArrayList<Integer>();
+			for(JsonNode statusId : jsonStatusObject) {
+				System.out.println(statusId.toString());
+				ids.add(Integer.valueOf(statusId.toString()));
 			}
 			
 			tasks = taskRepository.findByStatusIds(ids, sort, order, offset, limit);
@@ -149,20 +151,19 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			pagination.setPage(Integer.valueOf(page));
 			pagination.setTotalItem(tasks.size());
 			Map<String, Object> results = new TreeMap<String, Object>();
-			results.put("pagination", pagination);
 			results.put("tasks", tasks);
+			results.put("pagination", pagination);
 
 			if (tasks.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
 			} else {
-
 				return ResponseEntity.status(HttpStatus.NOT_FOUND)
-						.body(new ResponseObject("Not found", "Can not find task list", ""));
+						.body(new ResponseObject("Not found", "Can not find task list", results));
 			}
 		} catch (Exception e) {
 			LOGGER.error("ERROR:" + e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
 
@@ -185,37 +186,40 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 
 	}
 
-	@Override
-	public ResponseEntity<Object> save(String json) {
+	public ResponseEntity<Object> add(String json) {
 		JsonMapper jsonMapper = new JsonMapper();
-		JsonNode jsonObjectSanPham;
+		JsonNode jsonObjectTask;
 		try {
-			jsonObjectSanPham = jsonMapper.readTree(json);
+			jsonObjectTask = jsonMapper.readTree(json);
 
 			Task task = new Task();
 			
-			String creatorId = jsonObjectSanPham.get("creator_id").asText();
-			String receiverId = jsonObjectSanPham.get("receiver_id").asText();
-			String statusId = jsonObjectSanPham.get("status_id").asText();
-			String code = jsonObjectSanPham.get("code").asText();
+			
+			Integer statusId = jsonObjectTask.get("statusId") != null ? jsonObjectTask.get("statusId").asInt() : -1;
+			Integer receiverId = jsonObjectTask.get("receiverId") != null ? jsonObjectTask.get("receiverId").asInt() : -1;
+			Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
+			String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
+			String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
+			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+			String finishDate = "";
 			
 			Employee creator = new Employee();
-			creator.setId(Integer.parseInt(creatorId));
+			creator.setId(creatorId);
 			
 			Employee receiver = new Employee();
-			receiver.setId(Integer.parseInt(receiverId));
+			receiver.setId(receiverId);
 
 			Status status = new Status();
-			status.setId(Integer.parseInt(statusId));
+			status.setId(statusId);
 			task.setCreator(creator);
 			task.setReceiver(receiver);
 			task.setStatus(status);
-			task.setTitle(jsonObjectSanPham.get("title").asText());
-			task.setDescription(jsonObjectSanPham.get("description").asText());
-			task.setCreateDate(jsonObjectSanPham.get("createDate").asText());
-			task.setFinishDate(jsonObjectSanPham.get("finishDate").asText());
-			Integer id = taskRepository.save(task); 
-			if ( id != null) {
+			task.setTitle(title);
+			task.setDescription(description);
+			task.setCreateDate(createDate);
+			task.setFinishDate(finishDate);
+			Integer id = taskRepository.add(task); 
+			if ( id != -1) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", id));
 			} else {
@@ -224,7 +228,6 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			LOGGER.debug("ERROR",e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
@@ -306,20 +309,32 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 			JsonNode jsonObjectTask;
 			try {
 				jsonObjectTask = jsonMapper.readTree(json);
-				task.setId(jsonObjectTask.get("id").asInt());
-				task.setTitle(jsonObjectTask.get("title").asText());
-				task.setDescription(jsonObjectTask.get("description").asText());
-				task.setCreateDate(jsonObjectTask.get("createDate").asText());
-				task.setFinishDate(jsonObjectTask.get("finishDate").asText());
-				Employee emp = new Employee();
-				Employee emp2 = new Employee();
+				Integer id = jsonObjectTask.get("id").asInt();
+				Integer statusId = jsonObjectTask.get("statusId") != null ? jsonObjectTask.get("statusId").asInt() : -1;
+				Integer receiverId = jsonObjectTask.get("receiverId") != null ? jsonObjectTask.get("receiverId").asInt() : -1;
+				Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
+				String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
+				String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
+				String createDate = jsonObjectTask.get("createDate") != null ? jsonObjectTask.get("createDate").asText() : "";;
+				String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+				String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : "";
+				
+				Employee creator = new Employee();
+				creator.setId(creatorId);
+				
+				Employee receiver = new Employee();
+				receiver.setId(receiverId);
+
 				Status status = new Status();
-				emp.setId(jsonObjectTask.get("creatorId").asInt());
-				emp2.setId(jsonObjectTask.get("recieverId").asInt());
-				status.setId(jsonObjectTask.get("statusId").asInt());
-				task.setCreator(emp);
-				task.setReceiver(emp2);
+				status.setId(statusId);
+				task.setId(id);
+				task.setCreator(creator);
+				task.setReceiver(receiver);
 				task.setStatus(status);
+				task.setTitle(title);
+				task.setDescription(description);
+				task.setCreateDate(createDate);
+				task.setFinishDate(finishDate);
 				Integer message = taskRepository.edit(task);
 				if (message != 0) {
 					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", task));
@@ -370,6 +385,12 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR ", e.getMessage(), ""));
 			}
 
+		}
+
+		@Override
+		public ResponseEntity<Object> save(String json) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 }
 
