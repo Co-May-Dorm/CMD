@@ -307,6 +307,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStatusName(task.getStatus().getName());
 				customTask.setDepartmentName(departmentList.remove().getName());
+				customTask.setDescription(task.getDescription());
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
