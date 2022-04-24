@@ -2,7 +2,9 @@ package com.comaymanagement.cmd.repositoryimpl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Query;
 
@@ -33,11 +35,11 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	
 	@Override
 	@Transactional
-	public List<CustomDepartmentAll> findAll(String name) {
+	public Set<CustomDepartmentAll> findAll(String name) {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "from departments dep inner join dep.positions as pos where dep.name like CONCAT('%',:name,'%')";
-		List<CustomDepartmentAll> cusDepList = new ArrayList<CustomDepartmentAll>();
-
+		Set<CustomDepartmentAll> cusDepSet = new LinkedHashSet<CustomDepartmentAll>();
+		
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
@@ -64,28 +66,12 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 					cusPosList.add(cusPos);
 				}
 				cusDep.setPositions(cusPosList);
-				if (cusDepList.size() <= 0) {
-					cusDepList.add(cusDep);
-				} else {
-					boolean duplicateValue = false;
-					// check duplicate
-					for (CustomDepartmentAll c : cusDepList) {
-						if (cusDep.getId().equals(c.getId())) {
-							duplicateValue = true;
-							break;
-						}
-
-					}
-					if (duplicateValue == false) {
-						cusDepList.add(cusDep);
-					}
-				}
-
+				cusDepSet.add(cusDep);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentRepositoryImpl at findAll() ", e);
 		}
-		return cusDepList;
+		return cusDepSet;
 	}
 
 	@Transactional
