@@ -2,25 +2,20 @@ package com.comaymanagement.cmd.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
-import com.comaymanagement.cmd.entity.Team;
 import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
@@ -28,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
-public class DepartmentService implements IGeneralService<Department> {
+public class DepartmentService {
 	@Autowired
 	DepartmentRepositoryImpl departmentRepository;
 	@Autowired
@@ -38,7 +33,7 @@ public class DepartmentService implements IGeneralService<Department> {
 	public ResponseEntity<Object> findAll(String name) {
 		name = name == null ? "" : name.trim();
 		Set<CustomDepartmentAll> cusDepSet = departmentRepository.findAll(name);
-
+		
 		if (cusDepSet.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", cusDepSet));
 		} else {
@@ -47,26 +42,7 @@ public class DepartmentService implements IGeneralService<Department> {
 
 	}
 
-	@Override
-	public Iterable<Department> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Optional<Department> findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void remove(Department model) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public ResponseEntity<Object> save(String json) {
+	public ResponseEntity<Object> add(String json) {
 		List<Position> positionList = new ArrayList<>();
 		Department dep = new Department();
 		JsonMapper jsonMapper = new JsonMapper();
@@ -102,7 +78,7 @@ public class DepartmentService implements IGeneralService<Department> {
 			}
 
 			for (Position p : positionList) {
-				Integer idAdded = positionRepository.save(p);
+				Integer idAdded = positionRepository.add(p);
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at save():");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -175,7 +151,7 @@ public class DepartmentService implements IGeneralService<Department> {
 			}
 			// Add position
 			for (Position p : positionAdds) {
-				Integer idAdded = positionRepository.save(p);
+				Integer idAdded = positionRepository.add(p);
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -202,11 +178,6 @@ public class DepartmentService implements IGeneralService<Department> {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 
 		}
-	}
-	@Override
-	public ResponseEntity<Object> save(Department t) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

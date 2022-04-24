@@ -104,7 +104,7 @@ public class PositionService implements IGeneralService<Position> {
 			p.setTeam(team);
 			p.setDepartment(dep);
 			p.setRole(role);
-			Integer idAdded = positionRepository.save(p);
+			Integer idAdded = positionRepository.add(p);
 			if (idAdded != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
 			} else {
@@ -135,7 +135,7 @@ public class PositionService implements IGeneralService<Position> {
 	}
 	@Override
 	public ResponseEntity<Object> save(Position p) {
-		Integer idAdded = positionRepository.save(p);
+		Integer idAdded = positionRepository.add(p);
 		if (idAdded != -1) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
 		} else {
