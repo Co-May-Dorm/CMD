@@ -33,12 +33,12 @@ public interface ITaskRepository {
 			String createDate, String finishDate, String sort, String order);
 	Integer countFindByIds(List<Integer> ids);
 	List<CustomTaskAll> findByStatusIds(
-			@Param("status_id") List<String> statusIds,
+			@Param("status_id") List<Integer> statusIds,
 			@Param("sort") String sort,
 			@Param("order") String order,
 			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
-	Integer save(Task task);
+	Integer add(Task task);
 	Integer getMaxId();
 	CustomTaskAll findById(Integer id);
 	String deleteTaskById(Integer id);

@@ -234,7 +234,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 		} catch (Exception e) {
 			logger.error("Error has occured in addEmployee()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 
 	}
