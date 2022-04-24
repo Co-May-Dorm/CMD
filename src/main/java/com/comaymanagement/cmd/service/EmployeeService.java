@@ -59,7 +59,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
 			String dep, String pos, String sort, String order) {
 		Integer limit = new Integer(CMDConstrant.LIMIT);
-		List<CustomEmployeeAll> cusEmpListTmp = new ArrayList<>();
+		Set<CustomEmployeeAll> cusEmpSetTmp = new LinkedHashSet<>();
 		Set<CustomEmployeeAll> cusEmpSet = new LinkedHashSet<>();
 		name = name == null ? "" : name.trim();
 		dob = dob == null ? "" : dob.trim();
@@ -86,11 +86,11 @@ public class EmployeeService implements IGeneralService<Employee> {
 			while (cusEmpSet.size() < numberOfItemNeeded) {
 				offset = cusEmpSet.size() == 0 ? offset : (offset + cusEmpSet.size() + numberDuplicate);
 				limit = numberOfItemNeeded - cusEmpSet.size();
-				cusEmpListTmp = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit, offset);
-				for(CustomEmployeeAll cusEmp : cusEmpListTmp) {
+				cusEmpSetTmp = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit, offset);
+				for(CustomEmployeeAll cusEmp : cusEmpSetTmp) {
 					cusEmpSet.add(cusEmp);
 				}
-				cusEmpListTmp.clear();
+				cusEmpSetTmp.clear();
 			}
 			Integer totalItemEmployee = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order);
 			Pagination pagination = new Pagination();
@@ -175,27 +175,44 @@ public class EmployeeService implements IGeneralService<Employee> {
 				emp.setUsername("");
 				emp.setPassword("");
 			}
-			if (jsonObjectPosition.isArray()) {
-				for (JsonNode p : jsonObjectPosition) {
-					Position pos = new Position();
-					pos.setId(Integer.valueOf(p.toString()));
-					positionList.add(pos);
-				}
+//			if (jsonObjectPosition.isArray()) {
+//				for (JsonNode p : jsonObjectPosition) {
+//					Position pos = new Position();
+//					pos.setId(Integer.valueOf(p.toString()));
+//					positionList.add(pos);
+//				}
+//			}
+//			if (jsonObjectTeam.isArray()) {
+//				for (JsonNode t : jsonObjectTeam) {
+//					Team team = new Team();
+//					team.setId(Integer.valueOf(t.toString()));
+//					teamList.add(team);
+//				}
+//			}
+//			
+//			if (jsonObjectDepartment.isArray()) {
+//				for (JsonNode d : jsonObjectDepartment) {
+//					Department department = new Department();
+//					department.setId(Integer.valueOf(d.toString()));
+//					departmentList.add(department);
+//				}
+//			}
+//			
+			for (JsonNode p : jsonObjectPosition) {
+				Position pos = new Position();
+				pos.setId(p.get("id").asInt());
+				positionList.add(pos);
 			}
-			if (jsonObjectTeam.isArray()) {
-				for (JsonNode t : jsonObjectTeam) {
-					Team team = new Team();
-					team.setId(Integer.valueOf(t.toString()));
-					teamList.add(team);
-				}
+			for (JsonNode t : jsonObjectTeam) {
+				Team team = new Team();
+				team.setId(t.get("id").asInt());
+				teamList.add(team);
 			}
-			
-			if (jsonObjectDepartment.isArray()) {
-				for (JsonNode d : jsonObjectDepartment) {
-					Department department = new Department();
-					department.setId(Integer.valueOf(d.toString()));
-					departmentList.add(department);
-				}
+		
+			for (JsonNode d : jsonObjectDepartment) {
+				Department department = new Department();
+				department.setId(d.get("id").asInt());
+				departmentList.add(department);
 			}
 			
 			emp.setPositions(positionList);
@@ -294,24 +311,41 @@ public class EmployeeService implements IGeneralService<Employee> {
 				emp.setUsername("");
 				emp.setPassword("");
 			}
+//			if (jsonObjectPosition.isArray()) {
+//				for (JsonNode p : jsonObjectPosition) {
+//					Position pos = new Position();
+//					pos.setId(Integer.valueOf(p.toString()));
+//					positionList.add(pos);
+//				}
+//			}
+//			if (jsonObjectTeam.isArray()) {
+//				for (JsonNode t : jsonObjectTeam) {
+//					Team team = new Team();
+//					team.setId(Integer.valueOf(t.toString()));
+//					teamList.add(team);
+//				}
+//			}
+//			if (jsonObjectDepartment.isArray()) {
+//				for (JsonNode t : jsonObjectDepartment) {
+//					Department department = new Department();
+//					department.setId(Integer.valueOf(t.toString()));
+//					departmentList.add(department);
+//				}
+//			}
 			for (JsonNode p : jsonObjectPosition) {
 				Position pos = new Position();
-				pos.setId(Integer.valueOf(p.toString()));
+				pos.setId(p.get("id").asInt());
 				positionList.add(pos);
 			}
-			if (jsonObjectTeam.isArray()) {
-				for (JsonNode t : jsonObjectTeam) {
-					Team team = new Team();
-					team.setId(Integer.valueOf(t.toString()));
-					teamList.add(team);
-				}
+			for (JsonNode t : jsonObjectTeam) {
+				Team team = new Team();
+				team.setId(t.get("id").asInt());
+				teamList.add(team);
 			}
-			if (jsonObjectDepartment.isArray()) {
-				for (JsonNode t : jsonObjectDepartment) {
-					Department department = new Department();
-					department.setId(Integer.valueOf(t.toString()));
-					departmentList.add(department);
-				}
+			for (JsonNode d : jsonObjectDepartment) {
+				Department department = new Department();
+				department.setId(d.get("id").asInt());
+				departmentList.add(department);
 			}
 			emp.setPositions(positionList);
 			emp.setTeams(teamList);
