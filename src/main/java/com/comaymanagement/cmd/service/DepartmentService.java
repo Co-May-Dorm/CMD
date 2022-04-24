@@ -3,6 +3,7 @@ package com.comaymanagement.cmd.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -36,10 +37,10 @@ public class DepartmentService implements IGeneralService<Department> {
 
 	public ResponseEntity<Object> findAll(String name) {
 		name = name == null ? "" : name.trim();
-		List<CustomDepartmentAll> cusDepList = departmentRepository.findAll(name);
+		Set<CustomDepartmentAll> cusDepSet = departmentRepository.findAll(name);
 
-		if (cusDepList.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", cusDepList));
+		if (cusDepSet.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", cusDepSet));
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "Not found", ""));
 		}

@@ -47,7 +47,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	// find all employee with position in department
 	@Override
 	@Transactional
-	public List<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep,
+	public Set<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order, Integer limit, Integer offset) {
 		Set<Employee> employeeSet = new LinkedHashSet<>();
 		StringBuilder hql = new StringBuilder();
@@ -64,7 +64,8 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		hql.append("and emp.activeFlag = true ");
 		hql.append("order by " + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
-		List<CustomEmployeeAll> cusEmpList = new ArrayList();
+		Set<Employee> empSet = new LinkedHashSet<>();
+		Set<CustomEmployeeAll> cusEmpSet = new LinkedHashSet<>();
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
@@ -78,10 +79,10 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[]) it.next();
-				employeeSet.add((Employee) ob[0]);
-				
+				Employee e = (Employee)ob[0];
+				empSet.add(e);
 			}
-			for (Employee e : employeeSet) {
+			for(Employee e : empSet) {
 				CustomEmployeeAll cusEmp = new CustomEmployeeAll();
 				List<CustomPositionAll> cusPositionList = new ArrayList<>();
 				List<CustomDepartmentAll> cusDepartmentList = new ArrayList<>();
@@ -93,6 +94,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 					cusDep.setId(d.getId());
 					cusDep.setName(d.getName());
 					cusDep.setHeadPosition(d.getHeadPosition());
+					cusDep.setLevel(d.getLevel());
 					cusDepartmentList.add(cusDep);
 				}
 				// Add team list
@@ -102,7 +104,9 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 					cusTeam.setId(t.getId());
 					cusTeam.setName(t.getName());
 					cusTeam.setDescription(t.getDescription());
-					cusTeam.setPositionList(t.getPositionList());
+					cusTeam.setHeadPosition(t.getHeadPosition());
+//					cusTeam.setPositions(t.getPositions());
+					cusTeamList.add(cusTeam);
 				}
 				// Add position list
 				for (Position p : e.getPositions()) {
@@ -139,14 +143,14 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				cusEmp.setModifyDate(e.getModifyDate());
 				cusEmp.setCreateBy(e.getCreateBy());
 				cusEmp.setTeams(cusTeamList);
-				cusEmpList.add(cusEmp);
+				cusEmpSet.add(cusEmp);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
 
 		}
 
-		return cusEmpList;
+		return cusEmpSet;
 	}
 	
 	@Transactional
