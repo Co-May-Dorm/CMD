@@ -1,6 +1,7 @@
 package com.comaymanagement.cmd.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.websocket.server.PathParam;
 
@@ -14,7 +15,7 @@ public interface IDepartmentRepository{
 
 	@Query(value = "Select * FROM cmd.departments dp inner join cmd.departments_employees de "
 			+ "on dp.id = de.department_id " + "where de.employee_id = :id ", nativeQuery = true)
-	public List<CustomDepartmentAll> findAll(String name);
+	public Set<CustomDepartmentAll> findAll(String name);
 	public Integer save(Department dep);
 	public Integer edit(Department dep);
 	public Integer delete(Integer id);
