@@ -53,7 +53,9 @@ public class EmployeeService implements IGeneralService<Employee> {
 
 	@Autowired
 	TeamRepositoryImpl teamRepository;
-
+	
+	@Autowired
+	Message message;
 	
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
@@ -275,9 +277,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 				Employee empCheck = employeeRepository.findById(id);
 				for(Position p : empCheck.getPositions()) {
 					if(p.getIsManager()) {
-						String message = Message.getMessage(2);
 						return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-								.body(new ResponseObject("Error", message, ""));
+								.body(new ResponseObject("Error", message.getMessageByItemCode("EMPE1"), ""));
 					}
 				}
 			}
@@ -375,11 +376,17 @@ public class EmployeeService implements IGeneralService<Employee> {
 	public ResponseEntity<Object> delete(Integer id) {
 		try {
 			Employee emp = employeeRepository.findById(id);
+			for(Position p : emp.getPositions()) {
+				if(p.getIsManager()) {
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE2"), ""));
+				}
+			}
 			emp.setActive(false);
 			emp.setActiveFlag(false);
 			emp.getDepartments().clear();
 			emp.getTeams().clear();
 			emp.getPositions().clear();
+			
 			String updateStatus = employeeRepository.delete(emp);
 
 			if (updateStatus.equals("1")) {

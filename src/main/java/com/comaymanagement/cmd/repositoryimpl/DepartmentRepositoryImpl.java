@@ -122,16 +122,16 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	}
 
 	@Override
-	public Integer delete(Integer id) {
+	public String delete(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
-			Employee emp = new Employee();
-			emp = session.find(Employee.class, id);
-			session.remove(emp);
-			return 1;
+			Department dep = new Department();
+			dep = session.find(Department.class, id);
+			session.remove(dep);
+			return "1";
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in delete() ", e);
-			return 0;
+			return "0";
 		}
 
 	}

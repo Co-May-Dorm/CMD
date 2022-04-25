@@ -18,7 +18,7 @@ public interface IDepartmentRepository{
 	public Set<CustomDepartmentAll> findAll(String name);
 	public Integer save(Department dep);
 	public Integer edit(Department dep);
-	public Integer delete(Integer id);
+	public String delete(Integer id);
 	public boolean isExisted(Integer id, String code);
 	public Department findById(Integer id);
 }

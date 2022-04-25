@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
-public class PositionService implements IGeneralService<Position> {
+public class PositionService{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	PositionRepositoryImpl positionRepository;
@@ -79,14 +79,8 @@ public class PositionService implements IGeneralService<Position> {
 					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
 		}
 	}
-	@Override
-	public Optional<Position> findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public ResponseEntity<Object> save(String json) {
+	public ResponseEntity<Object> add(String json) {
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectPosition;
 		Position p = new Position();
@@ -95,7 +89,18 @@ public class PositionService implements IGeneralService<Position> {
 		Team team = new Team();
 		Integer id = -1;
 		try {
+			
 			jsonObjectPosition = jsonMapper.readTree(json);
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//			
+			
 			p.setName(jsonObjectPosition.get("name").asText());
 			p.setIsManager(jsonObjectPosition.get("isManager").asBoolean());
 			team.setId(jsonObjectPosition.get("teamId").asInt());
@@ -133,8 +138,7 @@ public class PositionService implements IGeneralService<Position> {
 		}
 
 	}
-	@Override
-	public ResponseEntity<Object> save(Position p) {
+	public ResponseEntity<Object> add(Position p) {
 		Integer idAdded = positionRepository.add(p);
 		if (idAdded != -1) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
@@ -142,17 +146,6 @@ public class PositionService implements IGeneralService<Position> {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseObject("Error", idAdded + "", p));
 		}
-	}
-	@Override
-	public void remove(Position model) {
-		// TODO Auto-generated method stub
-
-	}
-
-
-	public Iterable<Position> findAll() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
