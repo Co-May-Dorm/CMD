@@ -2,6 +2,7 @@ package com.comaymanagement.cmd.entity;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,6 +21,9 @@ public class Message {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	private String code;
+	@Column(name="mss_type")
+	private String mssType;
+	@Column(name="item_code")
+	private String itemCode;
 	private String description;
 }
