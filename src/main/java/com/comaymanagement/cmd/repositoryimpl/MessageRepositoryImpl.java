@@ -35,5 +35,19 @@ public class MessageRepositoryImpl implements MessageRepository{
 		}
 		return message;
 	}
+	@Override
+	public String getMessageByItemCode(String itemCode) {
+		String message = "";
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "SELECT description FROM messages where itemCode = :itemCode";
+		try {
+			Query query = session.createQuery(hql);
+			query.setParameter("itemCode",itemCode);
+			message = (String) query.getSingleResult();
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in MessageRepositoryImpl at getMessage() ", e);
+		}
+		return message;
+	}
 	
 }

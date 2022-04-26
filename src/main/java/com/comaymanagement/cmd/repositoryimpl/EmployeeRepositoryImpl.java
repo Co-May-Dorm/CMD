@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -10,6 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Query;
+import javax.sql.DataSource;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,6 +38,10 @@ import com.comaymanagement.cmd.repository.IEmployeeRepository;
 @Transactional(rollbackFor = Exception.class)
 public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
+	
+	@Autowired
+	private DataSource dataSource;
+	
 	@Autowired
 	private SessionFactory sessionFactory;
 
@@ -261,5 +268,38 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			LOGGER.error("Error has occured in findById() ", e);
 		}
 		return employee;
+	}
+
+	@Override
+	public boolean add(Set<Employee> emps) {
+		Connection connection = null;
+		try {
+			connection = dataSource.getConnection();
+			connection.setAutoCommit(false);
+			int count = 0;
+			for (Employee em : emps) {
+				Integer id = -1;
+				id = add(em);
+				count++;
+			}
+			if(count == emps.size()) {
+				connection.commit();
+				return true;
+			}else {
+				connection.rollback();
+				return false;
+			}
+			
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (Exception e2) {
+				LOGGER.error(e2.getMessage());
+			}
+			return false;
+		}
+
 	}
 }

@@ -48,4 +48,6 @@ public interface IEmployeeRepository {
 			String pos, String sort, String order);
 	public Employee findById(Integer id);
 	
+	public boolean add(Set<Employee> emps);
+	
 }
