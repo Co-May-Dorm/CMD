@@ -31,7 +31,7 @@ public class Proposal {
 	@OneToMany
 	@JoinColumn(name = "proposal_id")
 	@JsonBackReference
-	private Set<ProposalDetail> proposalDetailList;
+	private Set<ProposalDetail> proposalDetails;
 
 	@OneToOne()
 	@JoinColumn(name = "creator_id")

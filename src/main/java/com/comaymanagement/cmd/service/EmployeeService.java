@@ -1,5 +1,9 @@
 package com.comaymanagement.cmd.service;
 
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
@@ -36,9 +42,11 @@ import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.TeamRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 @Service
-public class EmployeeService implements IGeneralService<Employee> {
+public class EmployeeService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
 
@@ -395,35 +403,57 @@ public class EmployeeService implements IGeneralService<Employee> {
 		}
 
 	}
+	
+	public ResponseEntity<Object> importEmployees(MultipartFile multipartFile) {
+		try {
+			Path path = FileSystems.getDefault().getPath("").toAbsolutePath();
+			File file = new File(path + "/src/main/resources/CMD.csv");
+			multipartFile.transferTo(file);
 
-	@Override
-	public Iterable<Employee> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+			final File csvFile = new File(path + "/src/main/resources/CMD.csv");
+
+            CSVReader reader=
+                    new CSVReaderBuilder(new FileReader(path + "/src/main/resources/CMD.csv")).
+                            withSkipLines(1).
+                            build();
+            Set<Employee> employees=reader.readAll().stream().map(data-> {
+            	Employee employee= new Employee();
+            	
+            	List<Department> departments = new ArrayList<Department>();
+            	Department department = new Department();
+            	department = departmentRepository.findByName(data[4]);
+            	List<Position> positions = positionRepository.findAllByDepId(department.getId());
+            	List<Position> positionsEmp = new ArrayList<Position>();
+            	for(Position po : positions) {
+            		if(po.getName().equals(data[5])) {
+            			positionsEmp.add(po);
+            		}
+            	}
+            	
+            	if(department != null) {
+                	departments.add(department);
+            	}
+            	employee.setName(data[0]);
+            	employee.setDateOfBirth(data[1]);
+            	employee.setEmail(data[2]);
+            	employee.setPhoneNumber(data[3]);
+            	employee.setDepartments(departments);
+            	employee.setPositions(positionsEmp);
+                return employee;
+            }).collect(Collectors.toSet());
+			if (employees.size() > 0) {
+	            String message = Message.getMessage(3);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message, ""));
+			} else {
+				String message = Message.getMessage(4);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error",message, ""));
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
+
+		}
+
 	}
 
-	@Override
-	public Optional<Employee> findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<Object> save(Employee t) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void remove(Employee model) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public ResponseEntity<Object> save(String json) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

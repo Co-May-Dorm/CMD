@@ -15,4 +15,5 @@ public interface IPositionRepository{
 	Integer save(Position p);
 	Integer edit(Position p);
 	Position findById(Integer id);
+	List<Position> findAllByDepId(Integer depId);
 }
