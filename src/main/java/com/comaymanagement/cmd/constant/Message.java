@@ -1,14 +1,20 @@
 package com.comaymanagement.cmd.constant;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.repositoryimpl.MessageRepositoryImpl;
-
+@Service
 public class Message {
 	@Autowired
-	static MessageRepositoryImpl messageRepositoryImpl;
-	public static String getMessage(Integer id) {
+	MessageRepositoryImpl messageRepositoryImpl;
+	
+	public String getMessage(Integer id) {
 		return messageRepositoryImpl.getMessage(id);
 	}
+	public String getMessageByItemCode(String itemCode) {
+		return messageRepositoryImpl.getMessageByItemCode(itemCode);
+	}
+	
 	
 }

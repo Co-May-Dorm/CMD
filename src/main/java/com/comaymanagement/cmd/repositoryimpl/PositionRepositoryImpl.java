@@ -77,7 +77,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 	}
 
 	@Override
-	public Integer save(Position p) {
+	public Integer add(Position p) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			Integer id = (Integer) session.save(p);

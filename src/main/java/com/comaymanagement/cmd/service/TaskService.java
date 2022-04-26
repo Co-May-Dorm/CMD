@@ -302,12 +302,12 @@ public class TaskService implements IGeneralService<CustomTaskAll> {
 						.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
 				}
 			}
-		// edit 
+		//   
 		public ResponseEntity<Object> edit(String json) {
 			Task task = new Task();
 			JsonMapper jsonMapper = new JsonMapper();
 			JsonNode jsonObjectTask;
-			try {
+			try { 
 				jsonObjectTask = jsonMapper.readTree(json);
 				Integer id = jsonObjectTask.get("id").asInt();
 				Integer statusId = jsonObjectTask.get("statusId") != null ? jsonObjectTask.get("statusId").asInt() : -1;
