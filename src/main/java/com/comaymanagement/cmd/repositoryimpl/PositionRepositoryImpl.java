@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.customentity.CustomPositionAll;
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.repository.IPositionRepository;
@@ -157,5 +158,29 @@ public class PositionRepositoryImpl implements IPositionRepository {
 		}
 		return pos;
 	}
+	
+	@Override
+	public List<Position> findAllByDepId(Integer depId) {
+		StringBuilder hql = new StringBuilder("FROM positions pos WHERE pos.department.id = :depId");
+		List <Position> positions = new ArrayList<Position>();
+
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			query.setParameter("depId", depId);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object obj = (Object) it.next();
+				Position po = (Position) obj;
+				positions.add(po);
+			}
+			
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in findAllByDepartmentId() ", e);
+		}
+		return positions;
+	}
+	
+
 	
 }

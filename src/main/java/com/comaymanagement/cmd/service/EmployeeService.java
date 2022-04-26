@@ -1,14 +1,22 @@
 package com.comaymanagement.cmd.service;
 
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +24,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
-import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
-import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.customentity.User;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
-import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.Team;
 import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
@@ -36,9 +42,11 @@ import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.TeamRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 @Service
-public class EmployeeService implements IGeneralService<Employee> {
+public class EmployeeService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
 
@@ -53,10 +61,12 @@ public class EmployeeService implements IGeneralService<Employee> {
 
 	@Autowired
 	TeamRepositoryImpl teamRepository;
-	
+
 	@Autowired
 	Message message;
-	
+
+
+
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
 			String dep, String pos, String sort, String order) {
@@ -83,24 +93,26 @@ public class EmployeeService implements IGeneralService<Employee> {
 		try {
 			Integer totalItem = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order);
 			Integer numberOfItemNeeded = 0;
-			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
+			numberOfItemNeeded = totalItem < limit ? totalItem : limit;
 			Integer numberDuplicate = numberOfItemNeeded;
 			while (cusEmpSet.size() < numberOfItemNeeded) {
 				offset = cusEmpSet.size() == 0 ? offset : (offset + cusEmpSet.size() + numberDuplicate);
 				limit = numberOfItemNeeded - cusEmpSet.size();
-				cusEmpSetTmp = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit, offset);
-				for(CustomEmployeeAll cusEmp : cusEmpSetTmp) {
+				cusEmpSetTmp = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit,
+						offset);
+				for (CustomEmployeeAll cusEmp : cusEmpSetTmp) {
 					cusEmpSet.add(cusEmp);
 				}
 				cusEmpSetTmp.clear();
 			}
-			Integer totalItemEmployee = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order);
+			Integer totalItemEmployee = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort,
+					order);
 			Pagination pagination = new Pagination();
 			Map<String, Object> result = new TreeMap<>();
 			pagination.setLimit(CMDConstrant.LIMIT);
 			pagination.setPage(Integer.valueOf(page));
 			pagination.setTotalItem(totalItemEmployee);
-			
+
 			result.put("pagination", pagination);
 			result.put("employees", cusEmpSet);
 			if (cusEmpSet.size() > 0) {
@@ -113,8 +125,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			LOGGER.error("Error has occured in employeePaging() ", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
-		
-		
+
 	}
 
 	// Add and edit employee
@@ -210,13 +221,13 @@ public class EmployeeService implements IGeneralService<Employee> {
 				team.setId(t.get("id").asInt());
 				teamList.add(team);
 			}
-		
+
 			for (JsonNode d : jsonObjectDepartment) {
 				Department department = new Department();
 				department.setId(d.get("id").asInt());
 				departmentList.add(department);
 			}
-			
+
 			emp.setPositions(positionList);
 			emp.setTeams(teamList);
 			emp.setDepartments(departmentList);
@@ -236,7 +247,8 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 		} catch (Exception e) {
 			logger.error("Error has occured in addEmployee()", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 
 	}
@@ -271,12 +283,14 @@ public class EmployeeService implements IGeneralService<Employee> {
 			}
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 			boolean active = jsonObjectEmployee.get("active").asBoolean();
-			/* Check if active == false 
-			Check if the employee is the head of the department, do not allow the lock */
-			if(!active) {
+			/*
+			 * Check if active == false Check if the employee is the head of the department,
+			 * do not allow the lock
+			 */
+			if (!active) {
 				Employee empCheck = employeeRepository.findById(id);
-				for(Position p : empCheck.getPositions()) {
-					if(p.getIsManager()) {
+				for (Position p : empCheck.getPositions()) {
+					if (p.getIsManager()) {
 						return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 								.body(new ResponseObject("Error", message.getMessageByItemCode("EMPE1"), ""));
 					}
@@ -376,9 +390,10 @@ public class EmployeeService implements IGeneralService<Employee> {
 	public ResponseEntity<Object> delete(Integer id) {
 		try {
 			Employee emp = employeeRepository.findById(id);
-			for(Position p : emp.getPositions()) {
-				if(p.getIsManager()) {
-					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE2"), ""));
+			for (Position p : emp.getPositions()) {
+				if (p.getIsManager()) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE2"), ""));
 				}
 			}
 			emp.setActive(false);
@@ -386,7 +401,7 @@ public class EmployeeService implements IGeneralService<Employee> {
 			emp.getDepartments().clear();
 			emp.getTeams().clear();
 			emp.getPositions().clear();
-			
+
 			String updateStatus = employeeRepository.delete(emp);
 
 			if (updateStatus.equals("1")) {
@@ -403,34 +418,78 @@ public class EmployeeService implements IGeneralService<Employee> {
 
 	}
 
-	@Override
-	public Iterable<Employee> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public ResponseEntity<Object> importEmployees(MultipartFile multipartFile, Integer creatorId) {
 
-	@Override
-	public Optional<Employee> findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		try {
+			Path path = FileSystems.getDefault().getPath("").toAbsolutePath();
+			File file = new File(path + "/src/main/resources/CMD.csv");
+			multipartFile.transferTo(file);
+			final File csvFile = new File(path + "/src/main/resources/CMD.csv");
+			CSVReader reader = new CSVReaderBuilder(new FileReader(path + "/src/main/resources/CMD.csv"))
+					.withSkipLines(1).build();
+			Set<Employee> employees = reader.readAll().stream().map(data -> {
+				Employee employee = new Employee();
+				String name, email, dob, phone, dep, pos, gender, code;
+				name = data[0];
+				dob = data[1];
+				email = data[2];
+				phone = data[3];
+				dep = data[4];
+				pos = data[5];
+				gender = data[6];
+				code = data[7];
+				List<Department> departments = new ArrayList<Department>();
+				Department department = new Department();
+				department = departmentRepository.findByName(dep);
+				List<Position> positions = positionRepository.findAllByDepId(department.getId());
+				List<Position> positionsEmp = new ArrayList<Position>();
+				String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+				for (Position po : positions) {
+					if (po.getName().equals(pos)) {
+						positionsEmp.add(po);
+					}
+				}
+				if (department != null) {
+					departments.add(department);
+				}
+				employee.setName(name);
+				employee.setDateOfBirth(dob);
+				employee.setEmail(email);
+				employee.setPhoneNumber(phone);
+				employee.setDepartments(departments);
+				employee.setPositions(positionsEmp);
+				employee.setCreateDate(createDate);
+				employee.setModifyDate(createDate);
+				employee.setCode(code);
+				employee.setCreateBy(creatorId);
+				employee.setModifyBy(creatorId);
+				employee.setActiveFlag(true);
+				employee.setActive(true);
+				employee.setPassword("cmdcmdcmd");
+				employee.setEnableLogin(true);
+				employee.setAvatar("https://i.imgur.com/bFbOCtQ.jpg");
+				employee.setGender(gender);
+				employee.setUsername(email);
+				return employee;
+			}).collect(Collectors.toSet());
 
-	@Override
-	public ResponseEntity<Object> save(Employee t) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+			boolean success = employeeRepository.add(employees);
+			
 
-	@Override
-	public void remove(Employee model) {
-		// TODO Auto-generated method stub
+			
+			if (success) {
+				String messageSuccess = message.getMessageByItemCode("EMPS1");
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageSuccess, ""));
+			} else {
+				String messageError = message.getMessageByItemCode("EMPE3");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("Error", messageError, ""));
+			}
+		} catch (Exception e) {
+			String messageError = message.getMessageByItemCode("EMPE3");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", messageError, ""));
+		}
 
-	}
-
-	@Override
-	public ResponseEntity<Object> save(String json) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

@@ -1,11 +1,7 @@
 package com.comaymanagement.cmd.repository;
 
-import java.util.List;
 import java.util.Set;
 
-import javax.websocket.server.PathParam;
-
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
@@ -21,4 +17,5 @@ public interface IDepartmentRepository{
 	public String delete(Integer id);
 	public boolean isExisted(Integer id, String code);
 	public Department findById(Integer id);
+	public Department findByName(String name);
 }

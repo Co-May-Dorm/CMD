@@ -153,4 +153,22 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		return department;
 	}
 
+	@Override
+	public Department findByName(String name) {
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		Department department = null;
+		hql.append("FROM departments dep WHERE dep.name= :name");
+		
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("name", name);
+			LOGGER.info(hql.toString());
+			department =  (Department)query.getSingleResult();
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentRepositoryImpl findByName() ", e);
+		}
+		return department;
+	}
+
 }

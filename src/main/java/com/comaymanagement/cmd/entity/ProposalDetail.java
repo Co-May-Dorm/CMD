@@ -22,8 +22,9 @@ public class ProposalDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@Column(name="field_id")
-	private String fieldId;
+	@Column(name="proposal_detail_index")
+	private Integer proposalDetailIndex;
+	
 	private String content;
 
 	@OneToOne()
