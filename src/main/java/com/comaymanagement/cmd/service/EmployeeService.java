@@ -2,10 +2,8 @@ package com.comaymanagement.cmd.service;
 
 import java.io.File;
 import java.io.FileReader;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,8 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -421,7 +417,12 @@ public class EmployeeService {
 	public ResponseEntity<Object> importEmployees(MultipartFile multipartFile, Integer creatorId) {
 
 		try {
-			Path path = FileSystems.getDefault().getPath("").toAbsolutePath();
+			Path paths = CMDConstrant.path;
+			String path = System.getProperty("user.dir");
+			int length = path.length() - path.indexOf("CMD");
+			if(length > 3) {
+				path = CMDConstrant.path.toAbsolutePath().toString();
+			}
 			File file = new File(path + "/src/main/resources/CMD.csv");
 			multipartFile.transferTo(file);
 			final File csvFile = new File(path + "/src/main/resources/CMD.csv");
@@ -486,9 +487,8 @@ public class EmployeeService {
 						.body(new ResponseObject("Error", messageError, ""));
 			}
 		} catch (Exception e) {
-			String messageError = message.getMessageByItemCode("EMPE3");
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", messageError, ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
 		}
 
 	}
