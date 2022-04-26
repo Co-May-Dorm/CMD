@@ -487,6 +487,7 @@ public class EmployeeService {
 			}
 		} catch (Exception e) {
 			String messageError = message.getMessageByItemCode("EMPE3");
+			LOGGER.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", messageError, ""));
 		}
 
