@@ -104,7 +104,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
-			LOGGER.info(hql.toString());
+//			LOGGER.info(hql.toString());
 			query.setParameter("dep", dep);
 			query.setParameter("title", title);
 			query.setParameter("status", status);
