@@ -88,7 +88,8 @@ public class TaskController {
 	}
 	
 	//Get task list by status ids 
-	@GetMapping(value="/statuses",produces = "application/json")
+//	Axios not support on GET method with body param
+	@PostMapping(value="/statuses",produces = "application/json")
 	public ResponseEntity<Object> findByStatusIds(
 			@RequestBody String json,
 			@RequestParam(value="page",required = false) String page, 

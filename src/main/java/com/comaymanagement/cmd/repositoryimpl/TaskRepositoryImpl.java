@@ -104,7 +104,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
-			LOGGER.info(hql.toString());
+//			LOGGER.info(hql.toString());
 			query.setParameter("dep", dep);
 			query.setParameter("title", title);
 			query.setParameter("status", status);
@@ -324,8 +324,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				task = session.find(Task.class, id);
 				TaskHis th = new TaskHis();
 				th = session.find(TaskHis.class, id);
-				session.remove(th);
-				session.remove(task);
+				if(th != null) {
+					session.remove(th);
+				}
+				if(task!=null) {
+					session.remove(task);
+				}
 				return "1";
 			} catch (Exception e) {
 				LOGGER.error("Error has occured in delete() ", e);

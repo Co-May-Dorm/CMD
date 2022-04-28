@@ -1,13 +1,6 @@
 package com.comaymanagement.cmd.controller;
 
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.comaymanagement.cmd.customentity.EmployeesSheet;
-import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/employees")
@@ -118,7 +106,7 @@ public class EmployeesController {
 //		
 //	}
 	@PostMapping("/import")
-	public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile multipartFile) {
-		return employeeService.importEmployees(multipartFile);
+	public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile multipartFile,@RequestParam("creatorId") Integer creatorId) {
+		return employeeService.importEmployees(multipartFile,creatorId);
 	}
 }
