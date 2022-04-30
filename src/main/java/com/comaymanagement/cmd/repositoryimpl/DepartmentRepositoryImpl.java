@@ -70,6 +70,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 					cusPosList.add(cusPos);
 				}
 				cusDep.setPositions(cusPosList);
+				cusDep.setHeadPosition(d.getHeadPosition());
 				cusDepSet.add(cusDep);
 			}
 		} catch (Exception e) {
