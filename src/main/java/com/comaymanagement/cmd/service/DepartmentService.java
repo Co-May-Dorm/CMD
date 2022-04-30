@@ -146,7 +146,7 @@ public class DepartmentService {
 			// Get data
 			String code = jsonObjectDepartment.get("code").asText();
 			String name = jsonObjectDepartment.get("name") != null ? jsonObjectDepartment.get("name").asText() : "";
-			Integer fartherDepartmentId = jsonObjectDepartment.get("fartherDepartmentId") != null ? jsonObjectDepartment.get("fartherDepartmentId").asInt() : -1;
+			Integer fatherDepartmentId = jsonObjectDepartment.get("fatherDepartmentId") != null ? jsonObjectDepartment.get("fatherDepartmentId").asInt() : -1;
 			String description = jsonObjectDepartment.get("description") != null ? jsonObjectDepartment.get("description").asText() : "";
 			Integer createBy = jsonObjectDepartment.get("createBy") != null ? jsonObjectDepartment.get("createBy").asInt() : -1;
 			String createDate = jsonObjectDepartment.get("createDate") != null ? jsonObjectDepartment.get("createDate").asText() : "";
@@ -164,7 +164,7 @@ public class DepartmentService {
 			dep.setId(id);
 			dep.setCode(code);
 			dep.setName(name);
-			dep.setFatherDepartmentId(fartherDepartmentId);
+			dep.setFatherDepartmentId(fatherDepartmentId);
 			dep.setDescription(description);
 			dep.setCreateBy(createBy);
 			dep.setCreateDate(createDate);
