@@ -18,17 +18,17 @@ import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
-import com.comaymanagement.cmd.model.DepartmentModel;
-import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
+import com.comaymanagement.cmd.entity.Team;
+import com.comaymanagement.cmd.model.TeamModel;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
+import com.comaymanagement.cmd.repositoryimpl.TeamRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-
 @Service
-public class DepartmentService {
+public class TeamService {
 	@Autowired
-	DepartmentRepositoryImpl departmentRepository;
+	TeamRepositoryImpl teamRepository;
 	@Autowired
 	PositionRepositoryImpl positionRepository;
 	
@@ -38,10 +38,10 @@ public class DepartmentService {
 
 	public ResponseEntity<Object> findAll(String name) {
 		name = name == null ? "" : name.trim();
-		Set<DepartmentModel> departmentModelSet = departmentRepository.findAll(name);
+		Set<TeamModel> teamModelSet = teamRepository.findAll(name);
 		
-		if (departmentModelSet.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", departmentModelSet));
+		if (teamModelSet.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", teamModelSet));
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "Not found", ""));
 		}
@@ -50,7 +50,7 @@ public class DepartmentService {
 
 	public ResponseEntity<Object> add(String json) {
 		List<Position> positionList = new ArrayList<>();
-		Department dep = new Department();
+		Team team = new Team();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonObjectPosition;
@@ -60,35 +60,32 @@ public class DepartmentService {
 			// Get data
 			String code = jsonObjectDepartment.get("code").asText();
 			String name = jsonObjectDepartment.get("name") != null ? jsonObjectDepartment.get("name").asText() : "";
-			Integer fartherDepartmentId = jsonObjectDepartment.get("fartherDepartmentId") != null ? jsonObjectDepartment.get("fartherDepartmentId").asInt() : -1;
 			String description = jsonObjectDepartment.get("description") != null ? jsonObjectDepartment.get("description").asText() : "";
 			Integer createBy = jsonObjectDepartment.get("createBy") != null ? jsonObjectDepartment.get("createBy").asInt() : -1;
 			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
 			Integer modifyBy = -1;
 			String modifyDate = "";
-			Integer level = jsonObjectDepartment.get("level") != null ? jsonObjectDepartment.get("level").asInt() : -1;
 			Integer headPosition = -1;
 			
 //			Check department code existed
-			boolean isExisted = departmentRepository.isExisted(-1, code);
+			boolean isExisted = teamRepository.isExisted(-1, code);
 
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", message.getMessageByItemCode("DEPE2") , ""));
+						.body(new ResponseObject("Error", message.getMessageByItemCode("TEAME1") , ""));
 			}
 			
-			dep.setCode(code);
-			dep.setName(name);
-			dep.setFatherDepartmentId(fartherDepartmentId);
-			dep.setDescription(description);
-			dep.setCreateBy(createBy);
-			dep.setCreateDate(createDate);
-			dep.setModifyBy(modifyBy);
-			dep.setModifyDate(modifyDate);
-			dep.setLevel(level);
-			dep.setHeadPosition(headPosition);
-			// save department..............
-			Integer idDepAdded = departmentRepository.add(dep);
+			team.setCode(code);
+			team.setName(name);
+			team.setDescription(description);
+			team.setCreateBy(createBy);
+			team.setCreateDate(createDate);
+			team.setModifyBy(modifyBy);
+			team.setModifyDate(modifyDate);
+			team.setHeadPosition(headPosition);
+			// save team..............
+			Integer idTeamAdded = teamRepository.add(team);
+			Team teamUpdate = teamRepository.findById(idTeamAdded);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -100,32 +97,30 @@ public class DepartmentService {
 				pos.setCreateDate(createDate);
 				pos.setModifyDate(modifyDate);
 				pos.setRole(role);
-				pos.setDepartment(dep);
+				pos.setTeam(team);
 				positionList.add(pos);
 			}
 
 			for (Position p : positionList) {
 				Integer idAdded = positionRepository.add(p);
-				
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at save():");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 							.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1") , ""));
 				}
 				if(p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(idDepAdded);
-					depUpdate.setHeadPosition(idAdded);
-					departmentRepository.edit(depUpdate);
+					teamUpdate.setHeadPosition(idAdded);
+					teamRepository.edit(teamUpdate);
 				}
 			}
 			
-			if (idDepAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
+			if (idTeamAdded != -1) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idTeamAdded + "", teamUpdate));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", dep));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", teamUpdate));
 			}
 		} catch (Exception e) {
-			LOGGER.error("Error has occured in DepartmentService at add() ", e);
+			LOGGER.error("Error has occured at add() ", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 
 		}
@@ -134,7 +129,7 @@ public class DepartmentService {
 	public ResponseEntity<Object> edit(String json) {
 		List<Position> positionEdits = new ArrayList<>();
 		List<Position> positionAdds = new ArrayList<>();
-		Department dep = new Department();
+		Team team = new Team();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonObjectPosition;
@@ -145,35 +140,31 @@ public class DepartmentService {
 			// Get data
 			String code = jsonObjectDepartment.get("code").asText();
 			String name = jsonObjectDepartment.get("name") != null ? jsonObjectDepartment.get("name").asText() : "";
-			Integer fatherDepartmentId = jsonObjectDepartment.get("fatherDepartmentId") != null ? jsonObjectDepartment.get("fatherDepartmentId").asInt() : -1;
 			String description = jsonObjectDepartment.get("description") != null ? jsonObjectDepartment.get("description").asText() : "";
 			Integer createBy = jsonObjectDepartment.get("createBy") != null ? jsonObjectDepartment.get("createBy").asInt() : -1;
 			String createDate = jsonObjectDepartment.get("createDate") != null ? jsonObjectDepartment.get("createDate").asText() : "";
 			Integer modifyBy = jsonObjectDepartment.get("modifyBy") != null ? jsonObjectDepartment.get("modifyBy").asInt() : -1;
 			String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
-			Integer level = jsonObjectDepartment.get("level") != null ? jsonObjectDepartment.get("level").asInt() : -1;
 			Integer headPosition = -1;
 //			Check department code existed
 			Integer id = jsonObjectDepartment.get("id").asInt();
-			boolean isExisted = departmentRepository.isExisted(id, code);
+			boolean isExisted = teamRepository.isExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1"), ""));
+						.body(new ResponseObject("Error", message.getMessageByItemCode("TEAME1"), ""));
 			}
-			dep.setId(id);
-			dep.setCode(code);
-			dep.setName(name);
-			dep.setFatherDepartmentId(fatherDepartmentId);
-			dep.setDescription(description);
-			dep.setCreateBy(createBy);
-			dep.setCreateDate(createDate);
-			dep.setModifyBy(modifyBy);
-			dep.setModifyDate(modifyDate);
-			dep.setLevel(level);
-			dep.setHeadPosition(headPosition);
-			
+			team.setId(id);
+			team.setCode(code);
+			team.setName(name);
+			team.setDescription(description);
+			team.setCreateBy(createBy);
+			team.setCreateDate(createDate);
+			team.setModifyBy(modifyBy);
+			team.setModifyDate(modifyDate);
+			team.setHeadPosition(headPosition);
+			Team teamUpdate = teamRepository.findById(id);
 			// save department..............
-			Integer messageEdit = departmentRepository.edit(dep);
+			Integer messageEdit = teamRepository.edit(team);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -185,7 +176,7 @@ public class DepartmentService {
 					pos.setName(p.get("name").asText());
 					pos.setIsManager(p.get("isManager").asBoolean());
 					pos.setRole(role);
-					pos.setDepartment(dep);
+					pos.setTeam(team);
 					pos.setCreateBy(createBy);
 					pos.setModifyBy(modifyBy);
 					pos.setCreateDate(createDate);
@@ -197,7 +188,7 @@ public class DepartmentService {
 					pos.setName(p.get("name").asText());
 					pos.setIsManager(p.get("isManager").asBoolean());
 					pos.setRole(role);
-					pos.setDepartment(dep);
+					pos.setTeam(team);
 					pos.setCreateBy(createBy);
 					pos.setModifyBy(modifyBy);
 					pos.setCreateDate(createDate);
@@ -213,12 +204,12 @@ public class DepartmentService {
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+							.body(new ResponseObject("Error",message.getMessageByItemCode("POSE1"), ""));
 				}
 				else if(p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(id);
-					depUpdate.setHeadPosition(idAdded);
-					departmentRepository.edit(depUpdate);
+					teamUpdate = teamRepository.findById(id);
+					teamUpdate.setHeadPosition(idAdded);
+					teamRepository.edit(teamUpdate);
 				}
 			}
 			// Edit position
@@ -227,19 +218,18 @@ public class DepartmentService {
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+							.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1"), ""));
 				}
 				else if (p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(id);
-					depUpdate.setHeadPosition(idAdded);
-					departmentRepository.edit(depUpdate);
+					teamUpdate.setHeadPosition(p.getId());
+					teamRepository.edit(teamUpdate);
 				}
 			}
 			
 			if (messageEdit != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", dep));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", teamUpdate));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", dep));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", teamUpdate));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentService at add() ", e);
@@ -249,11 +239,11 @@ public class DepartmentService {
 	}
 	
 	public ResponseEntity<Object> delete(Integer id){
-		Department depDelete = departmentRepository.findById(id);
-		if(depDelete.getEmployees().size()>0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE1") , ""));
+		Team teamDelete = teamRepository.findById(id);
+		if(teamDelete.getEmployees().size()>0) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("TEAME2") , ""));
 		}
-		String deleteStatus = departmentRepository.delete(id);
+		String deleteStatus = teamRepository.delete(id);
 		try {
 			if (deleteStatus.equals("1")) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", deleteStatus + "", ""));
