@@ -2,8 +2,6 @@ package com.comaymanagement.cmd.model;
 
 import java.util.List;
 
-import com.comaymanagement.cmd.entity.Position;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 

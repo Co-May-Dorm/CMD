@@ -135,7 +135,6 @@ public class EmployeeService {
 		Department dep = new Department();
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectEmployee;
-		JsonNode jsonObjectPosition;
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonObjectTeam;
 		JsonNode jsonLoginAccount;
@@ -144,7 +143,6 @@ public class EmployeeService {
 
 		try {
 			jsonObjectEmployee = jsonMapper.readTree(json);
-			jsonObjectPosition = jsonObjectEmployee.get("positions");
 			jsonObjectTeam = jsonObjectEmployee.get("teams");
 			jsonObjectDepartment = jsonObjectEmployee.get("departments");
 			jsonLoginAccount = jsonObjectEmployee.get("user");
@@ -206,20 +204,27 @@ public class EmployeeService {
 //				}
 //			}
 //			
-			for (JsonNode p : jsonObjectPosition) {
-				Position pos = new Position();
-				pos.setId(p.get("id").asInt());
-				positionList.add(pos);
-			}
+//			for (JsonNode p : jsonObjectPosition) {
+//				Position pos = new Position();
+//				pos.setId(p.get("id").asInt());
+//				positionList.add(pos);
+//			}
 			for (JsonNode t : jsonObjectTeam) {
 				Team team = new Team();
 				team.setId(t.get("id").asInt());
+				
+				Position pos = new Position();
+				pos.setId(t.get("position").get("id").asInt());
+				positionList.add(pos);
 				teamList.add(team);
 			}
 
 			for (JsonNode d : jsonObjectDepartment) {
 				Department department = new Department();
 				department.setId(d.get("id").asInt());
+				Position pos = new Position();
+				pos.setId(d.get("position").get("id").asInt());
+				positionList.add(pos);
 				departmentList.add(department);
 			}
 
@@ -231,7 +236,7 @@ public class EmployeeService {
 			emp.setCreateDate(createDate);
 			emp.setModifyDate(modifyDate);
 			emp.setCreateBy(jsonObjectEmployee.get("createBy").asInt());
-			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
+			emp.setModifyBy(jsonObjectEmployee.get("createBy").asInt());
 			Integer idAdded = employeeRepository.add(emp);
 			if (idAdded != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", emp));
@@ -342,19 +347,25 @@ public class EmployeeService {
 //					departmentList.add(department);
 //				}
 //			}
-			for (JsonNode p : jsonObjectPosition) {
-				Position pos = new Position();
-				pos.setId(p.get("id").asInt());
-				positionList.add(pos);
-			}
+//			for (JsonNode p : jsonObjectPosition) {
+//				Position pos = new Position();
+//				pos.setId(p.get("id").asInt());
+//				positionList.add(pos);
+//			}
 			for (JsonNode t : jsonObjectTeam) {
 				Team team = new Team();
 				team.setId(t.get("id").asInt());
+				Position pos = new Position();
+				pos.setId(t.get("position").get("id").asInt());
+				positionList.add(pos);
 				teamList.add(team);
 			}
 			for (JsonNode d : jsonObjectDepartment) {
 				Department department = new Department();
 				department.setId(d.get("id").asInt());
+				Position pos = new Position();
+				pos.setId(d.get("position").get("id").asInt());
+				positionList.add(pos);
 				departmentList.add(department);
 			}
 			emp.setPositions(positionList);
