@@ -2,12 +2,10 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
-import org.springframework.data.repository.query.Param;
-
-import com.comaymanagement.cmd.customentity.CustomRoleAll;
+import com.comaymanagement.cmd.model.RoleModel;
 
 public interface IRoleRepository {
-	List<CustomRoleAll> findAll(
+	List<RoleModel> findAll(
 			String name,
 			String sort,
 			String order,

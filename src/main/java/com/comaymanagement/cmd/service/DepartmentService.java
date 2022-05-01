@@ -14,14 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.constant.Message;
-import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.model.DepartmentModel;
 import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
-import com.comaymanagement.cmd.repositoryimpl.MessageRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -39,10 +38,10 @@ public class DepartmentService {
 
 	public ResponseEntity<Object> findAll(String name) {
 		name = name == null ? "" : name.trim();
-		Set<CustomDepartmentAll> cusDepSet = departmentRepository.findAll(name);
+		Set<DepartmentModel> departmentModelSet = departmentRepository.findAll(name);
 		
-		if (cusDepSet.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", cusDepSet));
+		if (departmentModelSet.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", departmentModelSet));
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "Not found", ""));
 		}
@@ -89,7 +88,7 @@ public class DepartmentService {
 			dep.setLevel(level);
 			dep.setHeadPosition(headPosition);
 			// save department..............
-			Integer idDepAdded = departmentRepository.save(dep);
+			Integer idDepAdded = departmentRepository.add(dep);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -153,7 +152,7 @@ public class DepartmentService {
 			Integer modifyBy = jsonObjectDepartment.get("modifyBy") != null ? jsonObjectDepartment.get("modifyBy").asInt() : -1;
 			String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
 			Integer level = jsonObjectDepartment.get("level") != null ? jsonObjectDepartment.get("level").asInt() : -1;
-			Integer headPosition = jsonObjectDepartment.get("headPosition") != null ? jsonObjectDepartment.get("headPosition").asInt() : -1;
+			Integer headPosition = -1;
 //			Check department code existed
 			Integer id = jsonObjectDepartment.get("id").asInt();
 			boolean isExisted = departmentRepository.isExisted(id, code);
@@ -174,7 +173,7 @@ public class DepartmentService {
 			dep.setHeadPosition(headPosition);
 			
 			// save department..............
-			Integer idDepAdded = departmentRepository.edit(dep);
+			Integer messageEdit = departmentRepository.edit(dep);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -216,8 +215,8 @@ public class DepartmentService {
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
 				}
-				if(p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(idDepAdded);
+				else if(p.getIsManager()) {
+					Department depUpdate = departmentRepository.findById(id);
 					depUpdate.setHeadPosition(idAdded);
 					departmentRepository.edit(depUpdate);
 				}
@@ -230,15 +229,15 @@ public class DepartmentService {
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
 				}
-				if(p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(idDepAdded);
+				else if (p.getIsManager()) {
+					Department depUpdate = departmentRepository.findById(id);
 					depUpdate.setHeadPosition(idAdded);
 					departmentRepository.edit(depUpdate);
 				}
 			}
 			
-			if (idDepAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
+			if (messageEdit != -1) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", dep));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", dep));
 			}

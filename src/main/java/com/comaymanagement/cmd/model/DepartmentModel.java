@@ -1,24 +1,24 @@
-package com.comaymanagement.cmd.customentity;
+package com.comaymanagement.cmd.model;
 
 import java.util.List;
-
-import com.comaymanagement.cmd.entity.Team;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomTeamAll{
+public class DepartmentModel {
 	private Integer id;
 	private String code;
 	private String name;
+	private Integer fatherDepartmentId;
 	private Integer headPosition;
-	private List<CustomPositionAll> positions;
+	private List<PositionModel> positions;
 	private String description;
-	private List<CustomEmployeeAll> employees;
+	private List<EmployeeModel> employees;
 	private Integer level;
 }

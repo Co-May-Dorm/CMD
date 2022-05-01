@@ -3,7 +3,6 @@ package com.comaymanagement.cmd.service;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,14 +23,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
-import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
-import com.comaymanagement.cmd.customentity.User;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Team;
+import com.comaymanagement.cmd.model.EmployeeModel;
+import com.comaymanagement.cmd.model.User;
 import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
@@ -67,8 +66,8 @@ public class EmployeeService {
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
 			String dep, String pos, String sort, String order) {
 		Integer limit = new Integer(CMDConstrant.LIMIT);
-		Set<CustomEmployeeAll> cusEmpSetTmp = new LinkedHashSet<>();
-		Set<CustomEmployeeAll> cusEmpSet = new LinkedHashSet<>();
+		Set<EmployeeModel> employeeModelSetTMP = new LinkedHashSet<>();
+		Set<EmployeeModel> employeeModelSet = new LinkedHashSet<>();
 		name = name == null ? "" : name.trim();
 		dob = dob == null ? "" : dob.trim();
 		email = email == null ? "" : email.trim();
@@ -91,15 +90,15 @@ public class EmployeeService {
 			Integer numberOfItemNeeded = 0;
 			numberOfItemNeeded = totalItem < limit ? totalItem : limit;
 			Integer numberDuplicate = numberOfItemNeeded;
-			while (cusEmpSet.size() < numberOfItemNeeded) {
-				offset = cusEmpSet.size() == 0 ? offset : (offset + cusEmpSet.size() + numberDuplicate);
-				limit = numberOfItemNeeded - cusEmpSet.size();
-				cusEmpSetTmp = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit,
+			while (employeeModelSet.size() < numberOfItemNeeded) {
+				offset = employeeModelSet.size() == 0 ? offset : (offset + employeeModelSet.size() + numberDuplicate);
+				limit = numberOfItemNeeded - employeeModelSet.size();
+				employeeModelSetTMP = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit,
 						offset);
-				for (CustomEmployeeAll cusEmp : cusEmpSetTmp) {
-					cusEmpSet.add(cusEmp);
+				for (EmployeeModel employeeModel : employeeModelSetTMP) {
+					employeeModelSet.add(employeeModel);
 				}
-				cusEmpSetTmp.clear();
+				employeeModelSetTMP.clear();
 			}
 			Integer totalItemEmployee = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort,
 					order);
@@ -110,8 +109,8 @@ public class EmployeeService {
 			pagination.setTotalItem(totalItemEmployee);
 
 			result.put("pagination", pagination);
-			result.put("employees", cusEmpSet);
-			if (cusEmpSet.size() > 0) {
+			result.put("employees", employeeModelSet);
+			if (employeeModelSet.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 			} else {
 				pagination.setPage(1);

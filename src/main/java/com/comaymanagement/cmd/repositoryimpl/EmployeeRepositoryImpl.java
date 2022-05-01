@@ -3,13 +3,10 @@ package com.comaymanagement.cmd.repositoryimpl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.Query;
 import javax.sql.DataSource;
@@ -22,16 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
-import com.comaymanagement.cmd.customentity.CustomEmployeeAll;
-import com.comaymanagement.cmd.customentity.CustomPositionAll;
-import com.comaymanagement.cmd.customentity.CustomTeamAll;
-import com.comaymanagement.cmd.customentity.User;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.Team;
+import com.comaymanagement.cmd.model.DepartmentModel;
+import com.comaymanagement.cmd.model.EmployeeModel;
+import com.comaymanagement.cmd.model.PositionModel;
+import com.comaymanagement.cmd.model.TeamModel;
+import com.comaymanagement.cmd.model.User;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
 
 @Repository
@@ -54,7 +51,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	// find all employee with position in department
 	@Override
 	@Transactional
-	public Set<CustomEmployeeAll> findAll(String name, String dob, String email, String phone, String dep,
+	public Set<EmployeeModel> findAll(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order, Integer limit, Integer offset) {
 		Set<Employee> employeeSet = new LinkedHashSet<>();
 		StringBuilder hql = new StringBuilder();
@@ -72,7 +69,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		hql.append("order by " + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
 		Set<Employee> empSet = new LinkedHashSet<>();
-		Set<CustomEmployeeAll> cusEmpSet = new LinkedHashSet<>();
+		Set<EmployeeModel> employeeModelSet = new LinkedHashSet<>();
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
@@ -90,74 +87,74 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				empSet.add(e);
 			}
 			for(Employee e : empSet) {
-				CustomEmployeeAll cusEmp = new CustomEmployeeAll();
-				List<CustomPositionAll> cusPositionList = new ArrayList<>();
-				List<CustomDepartmentAll> cusDepartmentList = new ArrayList<>();
-				List<CustomTeamAll> cusTeamList= new ArrayList<>();
+				EmployeeModel employeeModel = new EmployeeModel();
+				List<PositionModel> positionModelList = new ArrayList<>();
+				List<DepartmentModel> departmentModelList = new ArrayList<>();
+				List<TeamModel> teamModelList= new ArrayList<>();
 				// Add department list
 				List<Department> departList = e.getDepartments();
 				for(Department d : departList) {
-					CustomDepartmentAll cusDep = new CustomDepartmentAll();
-					cusDep.setId(d.getId());
-					cusDep.setName(d.getName());
-					cusDep.setHeadPosition(d.getHeadPosition());
-					cusDep.setLevel(d.getLevel());
-					cusDepartmentList.add(cusDep);
+					DepartmentModel departmentModel = new DepartmentModel();
+					departmentModel.setId(d.getId());
+					departmentModel.setName(d.getName());
+					departmentModel.setHeadPosition(d.getHeadPosition());
+					departmentModel.setLevel(d.getLevel());
+					departmentModelList.add(departmentModel);
 				}
 				// Add team list
 				List<Team> teams = e.getTeams();
 				for(Team t : teams) {
-					CustomTeamAll cusTeam = new CustomTeamAll();
-					cusTeam.setId(t.getId());
-					cusTeam.setName(t.getName());
-					cusTeam.setDescription(t.getDescription());
-					cusTeam.setHeadPosition(t.getHeadPosition());
-//					cusTeam.setPositions(t.getPositions());
-					cusTeamList.add(cusTeam);
+					TeamModel teamModel = new TeamModel();
+					teamModel.setId(t.getId());
+					teamModel.setName(t.getName());
+					teamModel.setDescription(t.getDescription());
+					teamModel.setHeadPosition(t.getHeadPosition());
+//					teamModel.setPositions(t.getPositions());
+					teamModelList.add(teamModel);
 				}
 				// Add position list
 				for (Position p : e.getPositions()) {
 					if(p.getDepartment()!=null && p.getTeam()==null) {
-						CustomPositionAll cusPos = new CustomPositionAll();
+						PositionModel positionModel = new PositionModel();
 						Role role = new Role();
 						role.setId(p.getRole().getId());
 						role.setName(p.getRole().getName());
-						cusPos.setId(p.getId());
-						cusPos.setName(p.getName());
-						cusPos.setIsManager(p.getIsManager());
-						cusPos.setRole(role);
-						cusPositionList.add(cusPos);
+						positionModel.setId(p.getId());
+						positionModel.setName(p.getName());
+						positionModel.setIsManager(p.getIsManager());
+						positionModel.setRole(role);
+						positionModelList.add(positionModel);
 					}
 					
 				}
 				User user = new User();
 				user.setUsername(e.getUsername());
 				user.setEnableLogin(e.isEnableLogin());
-				cusEmp.setId(e.getId());
-				cusEmp.setCode(e.getCode());
-				cusEmp.setName(e.getName());
-				cusEmp.setAvatar(e.getAvatar());
-				cusEmp.setGender(e.getGender());
-				cusEmp.setDateOfBirth(e.getDateOfBirth());
-				cusEmp.setEmail(e.getEmail());
-				cusEmp.setPhoneNumber(e.getPhoneNumber());
-				cusEmp.setActive(e.isActive());
-				cusEmp.setCreateDate(e.getCreateDate());
-				cusEmp.setDepartments(cusDepartmentList);;
-				cusEmp.setPositions(cusPositionList);
-				cusEmp.setUser(user);
-				cusEmp.setCreateDate(e.getCreateDate());
-				cusEmp.setModifyDate(e.getModifyDate());
-				cusEmp.setCreateBy(e.getCreateBy());
-				cusEmp.setTeams(cusTeamList);
-				cusEmpSet.add(cusEmp);
+				employeeModel.setId(e.getId());
+				employeeModel.setCode(e.getCode());
+				employeeModel.setName(e.getName());
+				employeeModel.setAvatar(e.getAvatar());
+				employeeModel.setGender(e.getGender());
+				employeeModel.setDateOfBirth(e.getDateOfBirth());
+				employeeModel.setEmail(e.getEmail());
+				employeeModel.setPhoneNumber(e.getPhoneNumber());
+				employeeModel.setActive(e.isActive());
+				employeeModel.setCreateDate(e.getCreateDate());
+				employeeModel.setDepartments(departmentModelList);;
+				employeeModel.setPositions(positionModelList);
+				employeeModel.setUser(user);
+				employeeModel.setCreateDate(e.getCreateDate());
+				employeeModel.setModifyDate(e.getModifyDate());
+				employeeModel.setCreateBy(e.getCreateBy());
+				employeeModel.setTeams(teamModelList);
+				employeeModelSet.add(employeeModel);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
 
 		}
 
-		return cusEmpSet;
+		return employeeModelSet;
 	}
 	
 	@Transactional
@@ -237,7 +234,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		hql.append("and emp.activeFlag = true ");
 		hql.append("order by " + sort + " " + order);
 		Session session = this.sessionFactory.getCurrentSession();
-		List<CustomEmployeeAll> cusEmpList = new ArrayList();
+		List<EmployeeModel> employeeModelList = new ArrayList();
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);

@@ -1,10 +1,6 @@
-package com.comaymanagement.cmd.customentity;
+package com.comaymanagement.cmd.model;
 
 import java.util.List;
-import java.util.Set;
-
-import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Position;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomEmployeeAll {
+public class EmployeeModel {
 	private Integer id;
 	private String code;
 	private String name;
@@ -24,9 +20,9 @@ public class CustomEmployeeAll {
 	private String phoneNumber;
 	private String avatar;
 	private String gender;
-	private List<CustomPositionAll> positions;
-	private List<CustomDepartmentAll> departments;
-	private List<CustomTeamAll> teams;
+	private List<PositionModel> positions;
+	private List<DepartmentModel> departments;
+	private List<TeamModel> teams;
 	private User user;
 	private boolean active;
 	private String createDate;

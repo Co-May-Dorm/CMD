@@ -2,17 +2,12 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.Set;
 
-import org.springframework.data.jpa.repository.Query;
-
-import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
 import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.model.DepartmentModel;
 
 public interface IDepartmentRepository{
-
-	@Query(value = "Select * FROM cmd.departments dp inner join cmd.departments_employees de "
-			+ "on dp.id = de.department_id " + "where de.employee_id = :id ", nativeQuery = true)
-	public Set<CustomDepartmentAll> findAll(String name);
-	public Integer save(Department dep);
+	public Set<DepartmentModel> findAll(String name);
+	public Integer add(Department dep);
 	public Integer edit(Department dep);
 	public String delete(Integer id);
 	public boolean isExisted(Integer id, String code);

@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.Query;
 
@@ -19,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.entity.TaskHis;
+import com.comaymanagement.cmd.model.TaskModel;
 import com.comaymanagement.cmd.repository.ITaskRepository;
 
 @Repository
@@ -36,9 +35,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	@Transactional
-	public List<CustomTaskAll> findByStatusId(String statusId, String sort, String order, Integer offset, Integer limit) {
+	public List<TaskModel> findByStatusId(String statusId, String sort, String order, Integer offset, Integer limit) {
 		List<Task> taskList = new ArrayList<Task>();
-		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
+		List<TaskModel> customTaskList = new ArrayList<TaskModel>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("WHERE t.status.id = :statusId");
 		try {
@@ -57,7 +56,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			}
 			for (Task task : taskList) {
 				PriorityQueue<Department> departmentList = new PriorityQueue<>(new TaskComparator());
-				CustomTaskAll customTask = new CustomTaskAll();
+				TaskModel customTask = new TaskModel();
 				for(Department d : task.getCreator().getDepartments()) {
 					departmentList.add(d);
 				}
@@ -83,10 +82,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	@Transactional
-	public List<CustomTaskAll> findAll(String dep, String title, String status, String creator, String receiver,
+	public List<TaskModel> findAll(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit) {
 		Set<Task> taskSet = new LinkedHashSet<Task>();
-		List<CustomTaskAll> customTaskList = new ArrayList<CustomTaskAll>();
+		List<TaskModel> customTaskList = new ArrayList<TaskModel>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
 		hql.append("INNER JOIN t.status as s ");
@@ -125,7 +124,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				for(Department d : task.getCreator().getDepartments()) {
 					departmentList.add(d);
 				}
-				CustomTaskAll customTask = new CustomTaskAll();
+				TaskModel customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
 				customTask.setCreatorId(task.getCreator().getId());
@@ -187,10 +186,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		return count;
 	}
 	@Override
-	public List<CustomTaskAll> findByStatusIds(List<Integer> statusIds, String sort, String order, Integer offset,
+	public List<TaskModel> findByStatusIds(List<Integer> statusIds, String sort, String order, Integer offset,
 			Integer limit) {
 		List<Task> tasks = new ArrayList<Task>();
-		List<CustomTaskAll> customTasks = new ArrayList<CustomTaskAll>();
+		List<TaskModel> customTasks = new ArrayList<TaskModel>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("WHERE status_id IN (:ids) ");
 		hql.append("ORDER BY " + sort + " " + order);
@@ -207,7 +206,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				for(Department d : task.getCreator().getDepartments()) {
 					departmentQueue.add(d);
 				}
-				CustomTaskAll customTask = new CustomTaskAll();
+				TaskModel customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
 				customTask.setCreatorId(task.getCreator().getId());
@@ -277,8 +276,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public CustomTaskAll findById(Integer id) {
-		CustomTaskAll customTask = new CustomTaskAll();
+	public TaskModel findById(Integer id) {
+		TaskModel customTask = new TaskModel();
 		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
 		hql.append(" inner join ta.creator as em");
 		hql.append(" inner join ta.receiver as em1");
@@ -351,10 +350,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 		// filter
 		@Override
-		public List<CustomTaskAll> filter(String createFrom, String createTo, String finishFrom, String finishTo, String title,
+		public List<TaskModel> filter(String createFrom, String createTo, String finishFrom, String finishTo, String title,
 				String creator, String receiver, String department, Integer limit, String order, String page,String sort) {
 			List<Task> tasks = new ArrayList<Task>();
-			List<CustomTaskAll> customTasks = new ArrayList<CustomTaskAll>();
+			List<TaskModel> customTasks = new ArrayList<TaskModel>();
 			StringBuilder hql = new StringBuilder("FROM tasks AS ta");
 			hql.append(" inner join ta.creator as em");
 			hql.append(" inner join em.departments as de");
@@ -405,7 +404,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					tasks.add(task);
 				}
 				for(Task item : tasks) {
-					CustomTaskAll task = new CustomTaskAll();
+					TaskModel task = new TaskModel();
 					task.setId(item.getId());
 					task.setTitle(item.getTitle());
 					task.setCreatorId(item.getCreator().getId());
