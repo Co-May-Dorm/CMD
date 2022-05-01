@@ -1,23 +1,18 @@
-package com.comaymanagement.cmd.customentity;
+package com.comaymanagement.cmd.model;
 
-import java.util.Set;
-
-import com.comaymanagement.cmd.entity.Role;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-@NoArgsConstructor
 @Getter
 @Setter
 @AllArgsConstructor
-public class CustomPositionAll {
+@NoArgsConstructor
+public class OptionModel {
 	private Integer id;
 	private String code;
 	private String name;
-	private Boolean isManager;
-	private Role role;
-	
+	List<PermissionModel> permissions;
 }

@@ -1,7 +1,6 @@
-package com.comaymanagement.cmd.customentity;
+package com.comaymanagement.cmd.model;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomTaskAll {
+public class TaskModel {
 	
 	private Integer id;
 	private Integer creatorId;

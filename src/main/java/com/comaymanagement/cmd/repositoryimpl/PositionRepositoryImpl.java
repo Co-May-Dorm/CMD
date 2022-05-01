@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.customentity.CustomPositionAll;
-import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
+import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.repository.IPositionRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -29,9 +27,9 @@ public class PositionRepositoryImpl implements IPositionRepository {
 	SessionFactory sessionFactory;
 	
 	@Override
-	public List<CustomPositionAll> findAllByRoleId(Integer roleId) {
+	public List<PositionModel> findAllByRoleId(Integer roleId) {
 		StringBuilder hql = new StringBuilder("FROM positions WHERE role_id = :roleId");
-		List <CustomPositionAll> customPositionAlls = new ArrayList<CustomPositionAll>();
+		List <PositionModel> positionModelList = new ArrayList<PositionModel>();
 		List <Position> positions = new ArrayList<Position>();
 
 		try {
@@ -45,18 +43,18 @@ public class PositionRepositoryImpl implements IPositionRepository {
 				positions.add(po);
 			}
 			for(Position po : positions) {
-				CustomPositionAll customPositionAll = new CustomPositionAll();
-				customPositionAll.setId(po.getId());
-				customPositionAll.setName(po.getName());
-				customPositionAll.setIsManager(po.getIsManager());
-//				customPositionAll.setRole(po.getRole());
-				customPositionAlls.add(customPositionAll);
+				PositionModel positionModel = new PositionModel();
+				positionModel.setId(po.getId());
+				positionModel.setName(po.getName());
+				positionModel.setIsManager(po.getIsManager());
+//				positionModel.setRole(po.getRole());
+				positionModelList.add(positionModel);
 			}
 			
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
-		return customPositionAlls;
+		return positionModelList;
 	}
 
 	@Override
@@ -102,9 +100,9 @@ public class PositionRepositoryImpl implements IPositionRepository {
 	}
 	
 	@Override
-	public List<CustomPositionAll> findAllByDepartmentId(Integer depId) {
+	public List<PositionModel> findAllByDepartmentId(Integer depId) {
 		StringBuilder hql = new StringBuilder("FROM positions pos WHERE pos.department.id = :depId");
-		List <CustomPositionAll> customPositionAlls = new ArrayList<CustomPositionAll>();
+		List <PositionModel> positionModelList = new ArrayList<PositionModel>();
 		List <Position> positions = new ArrayList<Position>();
 
 		try {
@@ -118,18 +116,18 @@ public class PositionRepositoryImpl implements IPositionRepository {
 				positions.add(po);
 			}
 			for(Position po : positions) {
-				CustomPositionAll customPositionAll = new CustomPositionAll();
-				customPositionAll.setId(po.getId());
-				customPositionAll.setName(po.getName());
-				customPositionAll.setIsManager(po.getIsManager());
-				customPositionAll.setRole(po.getRole());
-				customPositionAlls.add(customPositionAll);
+				PositionModel positionModel = new PositionModel();
+				positionModel.setId(po.getId());
+				positionModel.setName(po.getName());
+				positionModel.setIsManager(po.getIsManager());
+				positionModel.setRole(po.getRole());
+				positionModelList.add(positionModel);
 			}
 			
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in findAllByDepartmentId() ", e);
 		}
-		return customPositionAlls;
+		return positionModelList;
 	}
 	@Transactional
 	public String delete(Integer id) {

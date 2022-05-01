@@ -1,6 +1,5 @@
 package com.comaymanagement.cmd.entity;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
