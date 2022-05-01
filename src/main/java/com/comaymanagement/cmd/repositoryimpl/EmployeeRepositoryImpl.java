@@ -80,52 +80,54 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			query.setParameter("pos", pos);
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
-
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[]) it.next();
 				Employee e = (Employee)ob[0];
 				empSet.add(e);
 			}
+			
 			for(Employee e : empSet) {
 				EmployeeModel employeeModel = new EmployeeModel();
 				List<PositionModel> positionModelList = new ArrayList<>();
 				List<DepartmentModel> departmentModelList = new ArrayList<>();
 				List<TeamModel> teamModelList= new ArrayList<>();
-				// Add department list
-				List<Department> departList = e.getDepartments();
-				for(Department d : departList) {
-					DepartmentModel departmentModel = new DepartmentModel();
-					departmentModel.setId(d.getId());
-					departmentModel.setName(d.getName());
-					departmentModel.setHeadPosition(d.getHeadPosition());
-					departmentModel.setLevel(d.getLevel());
-					departmentModelList.add(departmentModel);
-				}
 				// Add team list
-				List<Team> teams = e.getTeams();
-				for(Team t : teams) {
-					TeamModel teamModel = new TeamModel();
-					teamModel.setId(t.getId());
-					teamModel.setName(t.getName());
-					teamModel.setDescription(t.getDescription());
-					teamModel.setHeadPosition(t.getHeadPosition());
-//					teamModel.setPositions(t.getPositions());
-					teamModelList.add(teamModel);
-				}
 				// Add position list
+				// Add department list
 				for (Position p : e.getPositions()) {
-					if(p.getDepartment()!=null && p.getTeam()==null) {
-						PositionModel positionModel = new PositionModel();
-						Role role = new Role();
-						role.setId(p.getRole().getId());
-						role.setName(p.getRole().getName());
-						positionModel.setId(p.getId());
-						positionModel.setName(p.getName());
-						positionModel.setIsManager(p.getIsManager());
-						positionModel.setRole(role);
-						positionModelList.add(positionModel);
-					}
+					PositionModel positionModel = new PositionModel();
 					
+					Role role = new Role();
+					role.setId(p.getRole().getId());
+					role.setName(p.getRole().getName());
+					positionModel.setId(p.getId());
+					positionModel.setName(p.getName());
+					positionModel.setIsManager(p.getIsManager());
+					positionModel.setRole(role);
+					if(p.getDepartment()!=null && p.getTeam()==null) {
+						Department department = p.getDepartment();
+						DepartmentModel departmentModel = new DepartmentModel();
+						departmentModel.setId(department.getId());
+						departmentModel.setCode(department.getCode());
+						departmentModel.setName(department.getName());
+						departmentModel.setFatherDepartmentId(department.getFatherDepartmentId());
+						departmentModel.setHeadPosition(department.getHeadPosition());
+						departmentModel.setDescription(department.getDescription());
+						departmentModel.setLevel(department.getLevel());
+						departmentModel.setPosition(positionModel);
+						departmentModelList.add(departmentModel);
+					}
+					else if(p.getDepartment()==null && p.getTeam()!=null) {
+						Team team = p.getTeam();
+						TeamModel teamModel = new TeamModel();
+						teamModel.setId(team.getId());
+						teamModel.setCode(team.getCode());
+						teamModel.setName(team.getName());
+						teamModel.setDescription(team.getDescription());
+						teamModel.setHeadPosition(team.getHeadPosition());
+						teamModel.setPosition(positionModel);
+						teamModelList.add(teamModel);
+					}
 				}
 				User user = new User();
 				user.setUsername(e.getUsername());
@@ -146,6 +148,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 				employeeModel.setCreateDate(e.getCreateDate());
 				employeeModel.setModifyDate(e.getModifyDate());
 				employeeModel.setCreateBy(e.getCreateBy());
+				employeeModel.setModifyBy(e.getModifyBy());
 				employeeModel.setTeams(teamModelList);
 				employeeModelSet.add(employeeModel);
 			}
