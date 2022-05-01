@@ -2,6 +2,11 @@ package com.comaymanagement.cmd.model;
 
 import java.util.List;
 
+import com.comaymanagement.cmd.entity.Position;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,14 +16,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(Include.NON_EMPTY)
 public class DepartmentModel {
 	private Integer id;
 	private String code;
 	private String name;
 	private Integer fatherDepartmentId;
 	private Integer headPosition;
-	private List<PositionModel> positions;
 	private String description;
-	private List<EmployeeModel> employees;
 	private Integer level;
+	private List<PositionModel> positions;
+	private List<EmployeeModel> employees;
+	private PositionModel position;
 }
