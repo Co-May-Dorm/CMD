@@ -1,4 +1,4 @@
-package com.comaymanagement.cmd.repositoryimpl;
+		package com.comaymanagement.cmd.repositoryimpl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.DepartmentModel;
@@ -120,7 +121,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 			return 0;
 		}
 	}
-
+	
 	@Override
 	public String delete(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
@@ -137,12 +138,34 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	}
 
 	@Override
-	public Department findById(Integer id) {
+	public Set<Department> findById(Integer id) {
+
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		Set<Department> departmentSet = new LinkedHashSet<>();
+		hql.append("from departments dep ");
+		hql.append("INNER JOIN dep.positions ");
+		hql.append("where dep.id = " + id);
+		try {
+			Query query = session.createQuery(hql.toString());
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] ob = (Object[]) it.next();
+				Department e = (Department)ob[0];
+				departmentSet.add(e);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in delete() ", e);
+		}
+		
+		return departmentSet;
+	}
+	public Department findByIdToEdit(Integer id) {
 
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		Department department = null;
-		hql.append("from departments dep where dep.id = " + id);
+		hql.append("from departments dep ");
+		hql.append("where dep.id = " + id);
 		try {
 			Query query = session.createQuery(hql.toString());
 			department = (Department) query.getSingleResult();
@@ -152,7 +175,6 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		
 		return department;
 	}
-
 	@Override
 	public Department findByName(String name) {
 		Session session = sessionFactory.getCurrentSession();
