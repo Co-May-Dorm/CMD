@@ -60,7 +60,7 @@ public class DepartmentService {
 			// Get data
 			String code = jsonObjectDepartment.get("code").asText();
 			String name = jsonObjectDepartment.get("name") != null ? jsonObjectDepartment.get("name").asText() : "";
-			Integer fartherDepartmentId = jsonObjectDepartment.get("fartherDepartmentId") != null ? jsonObjectDepartment.get("fartherDepartmentId").asInt() : -1;
+			Integer fatherDepartmentId = jsonObjectDepartment.get("fatherDepartmentId") != null ? jsonObjectDepartment.get("fatherDepartmentId").asInt() : -1;
 			String description = jsonObjectDepartment.get("description") != null ? jsonObjectDepartment.get("description").asText() : "";
 			Integer createBy = jsonObjectDepartment.get("createBy") != null ? jsonObjectDepartment.get("createBy").asInt() : -1;
 			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
@@ -79,7 +79,7 @@ public class DepartmentService {
 			
 			dep.setCode(code);
 			dep.setName(name);
-			dep.setFatherDepartmentId(fartherDepartmentId);
+			dep.setFatherDepartmentId(fatherDepartmentId);
 			dep.setDescription(description);
 			dep.setCreateBy(createBy);
 			dep.setCreateDate(createDate);
@@ -89,6 +89,7 @@ public class DepartmentService {
 			dep.setHeadPosition(headPosition);
 			// save department..............
 			Integer idDepAdded = departmentRepository.add(dep);
+			Department depUpdate =  departmentRepository.findByIdToEdit(idDepAdded);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -103,7 +104,7 @@ public class DepartmentService {
 				pos.setDepartment(dep);
 				positionList.add(pos);
 			}
-
+			dep.setPositions(positionList);
 			for (Position p : positionList) {
 				Integer idAdded = positionRepository.add(p);
 				
@@ -113,8 +114,8 @@ public class DepartmentService {
 							.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1") , ""));
 				}
 				if(p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(idDepAdded);
 					depUpdate.setHeadPosition(idAdded);
+					dep.setHeadPosition(idAdded);
 					departmentRepository.edit(depUpdate);
 				}
 			}
@@ -174,6 +175,7 @@ public class DepartmentService {
 			
 			// save department..............
 			Integer messageEdit = departmentRepository.edit(dep);
+			Department depUpdate = departmentRepository.findByIdToEdit(id);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -207,20 +209,7 @@ public class DepartmentService {
 				
 				
 			}
-			// Add position
-			for (Position p : positionAdds) {
-				Integer idAdded = positionRepository.add(p);
-				if (idAdded == -1) {
-					LOGGER.error("Error has occured in DepartmentService at edit():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
-				}
-				else if(p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(id);
-					depUpdate.setHeadPosition(idAdded);
-					departmentRepository.edit(depUpdate);
-				}
-			}
+			dep.setPositions(new ArrayList<Position>());
 			// Edit position
 			for (Position p : positionEdits) {
 				Integer idAdded = positionRepository.edit(p);
@@ -230,12 +219,29 @@ public class DepartmentService {
 							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
 				}
 				else if (p.getIsManager()) {
-					Department depUpdate = departmentRepository.findById(id);
 					depUpdate.setHeadPosition(idAdded);
+					dep.setHeadPosition(idAdded);
 					departmentRepository.edit(depUpdate);
 				}
+				dep.getPositions().add(p);
 			}
-			
+			// Add position
+			for (Position p : positionAdds) {
+				Integer idAdded = positionRepository.add(p);
+				
+				if (idAdded == -1) {
+					LOGGER.error("Error has occured in DepartmentService at edit():");
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+				}
+				else if(p.getIsManager()) {
+					
+					depUpdate.setHeadPosition(idAdded);
+					dep.setHeadPosition(idAdded);
+					departmentRepository.edit(depUpdate);
+				}
+				dep.getPositions().add(p);
+			}
 			if (messageEdit != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", dep));
 			} else {
@@ -249,9 +255,12 @@ public class DepartmentService {
 	}
 	
 	public ResponseEntity<Object> delete(Integer id){
-		Department depDelete = departmentRepository.findById(id);
+		Department depDelete = (Department)  departmentRepository.findById(id).toArray()[0];
 		if(depDelete.getEmployees().size()>0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE1") , ""));
+		}
+		for(Position p : depDelete.getPositions()) {
+			positionRepository.delete(p.getId());
 		}
 		String deleteStatus = departmentRepository.delete(id);
 		try {
