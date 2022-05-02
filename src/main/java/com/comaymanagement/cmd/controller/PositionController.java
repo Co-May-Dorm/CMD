@@ -33,5 +33,9 @@ public class PositionController {
 	public ResponseEntity<Object> findAllByDepartmentId(@PathVariable(value = "depId", required = true) Integer depId) {
 		return positionService.findAllByDepartmentId(depId);
 	}
+	@GetMapping("team/{teamId}")
+	public ResponseEntity<Object> findAllByTeamId(@PathVariable(value = "teamId", required = true) Integer teamId) {
+		return positionService.findAllByDepartmentId(teamId);
+	}
 	
 }

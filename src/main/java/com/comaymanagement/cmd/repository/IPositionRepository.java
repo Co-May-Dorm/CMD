@@ -16,4 +16,5 @@ public interface IPositionRepository{
 	Integer edit(Position p);
 	Position findById(Integer id);
 	List<Position> findAllByDepId(Integer depId);
+	List<PositionModel> findAllByTeamId(Integer teamId);
 }
