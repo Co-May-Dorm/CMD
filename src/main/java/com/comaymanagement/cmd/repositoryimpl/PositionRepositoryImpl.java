@@ -129,6 +129,36 @@ public class PositionRepositoryImpl implements IPositionRepository {
 		}
 		return positionModelList;
 	}
+	@Override
+	public List<PositionModel> findAllByTeamId(Integer teamId) {
+		StringBuilder hql = new StringBuilder("FROM positions pos WHERE pos.team.id = :teamId");
+		List <PositionModel> positionModelList = new ArrayList<PositionModel>();
+		List <Position> positions = new ArrayList<Position>();
+
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			query.setParameter("teamId", teamId);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object obj = (Object) it.next();
+				Position po = (Position) obj;
+				positions.add(po);
+			}
+			for(Position po : positions) {
+				PositionModel positionModel = new PositionModel();
+				positionModel.setId(po.getId());
+				positionModel.setName(po.getName());
+				positionModel.setIsManager(po.getIsManager());
+				positionModel.setRole(po.getRole());
+				positionModelList.add(positionModel);
+			}
+			
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in findAllByDepartmentId() ", e);
+		}
+		return positionModelList;
+	}
 	@Transactional
 	public String delete(Integer id) {
 		Session session = sessionFactory.getCurrentSession();

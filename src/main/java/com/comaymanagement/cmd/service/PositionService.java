@@ -76,6 +76,29 @@ public class PositionService{
 					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
 		}
 	}
+	public ResponseEntity<Object> findAllByTeamId(Integer teamId) {
+		List<PositionModel> positionModelList = new ArrayList<PositionModel>();;
+		
+		try {
+			if (teamId == null) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("ERROR", "Have error: ", "Department ID is null"));
+			} else {
+				positionModelList = positionRepository.findAllByDepartmentId(teamId);
+				if (positionModelList.size() < 1) {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND)
+							.body(new ResponseObject("", "Have no position by teamId: " + teamId, ""));
+				} else {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("OK", "Query produce successfully:", positionModelList));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
+		}
+	}
 
 	public ResponseEntity<Object> add(String json) {
 		JsonMapper jsonMapper = new JsonMapper();
