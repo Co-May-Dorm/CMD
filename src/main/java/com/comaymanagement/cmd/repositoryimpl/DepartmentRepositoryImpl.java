@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.DepartmentModel;
@@ -138,8 +137,9 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	}
 
 	@Override
+	@javax.transaction.Transactional
 	public Set<Department> findById(Integer id) {
-
+		List<Position> positions = new ArrayList<Position>();
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		Set<Department> departmentSet = new LinkedHashSet<>();
@@ -151,8 +151,13 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[]) it.next();
 				Department e = (Department)ob[0];
+				
+				Position po = (Position) ob[1];
+				positions.add(po);
 				departmentSet.add(e);
 			}
+			Department de = (Department) departmentSet.toArray()[0];
+			de.setPositions(positions);
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in delete() ", e);
 		}
