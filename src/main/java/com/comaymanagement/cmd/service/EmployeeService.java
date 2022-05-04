@@ -114,7 +114,7 @@ public class EmployeeService {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 			} else {
 				pagination.setPage(1);
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", result));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("E", "Not found", result));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
