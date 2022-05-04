@@ -121,7 +121,7 @@ public class TaskService {
 
 	}
 
-	@SuppressWarnings("unused")
+
 	public ResponseEntity<Object> findByStatusIds(String json, String sort, String order, String page) {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
