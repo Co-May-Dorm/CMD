@@ -1,7 +1,7 @@
 package com.comaymanagement.cmd.repository;
 
-import com.comaymanagement.cmd.customentity.CustomRoleDetailAll;
+import com.comaymanagement.cmd.model.RoleDetailModel;
 
 public interface IRoleDetailRepository {
-	public CustomRoleDetailAll findAllByRoleId(Integer roleId);
+	public RoleDetailModel findAllByRoleId(Integer roleId);
 }

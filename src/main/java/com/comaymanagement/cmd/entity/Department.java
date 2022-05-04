@@ -1,11 +1,9 @@
 package com.comaymanagement.cmd.entity;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +16,8 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +29,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(Include.NON_EMPTY)
 public class Department {
 	
 	@Id
@@ -53,7 +54,8 @@ public class Department {
 	private Integer level;
 	@OneToMany
 	@JoinColumn(name = "department_id")
-	@JsonBackReference
+//	@JsonBackReference
+	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Position> positions;
 
 	@OneToMany

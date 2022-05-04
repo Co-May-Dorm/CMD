@@ -4,20 +4,20 @@ import java.util.List;
 
 import org.springframework.data.repository.query.Param;
 
-import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Task;
+import com.comaymanagement.cmd.model.TaskModel;
 
 
 public interface ITaskRepository {
 	
-	List<CustomTaskAll> findByStatusId(
+	List<TaskModel> findByStatusId(
 			@Param("status_id") String statusId,
 			@Param("sort") String sort,
 			@Param("order") String order,
 			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
 	
-	List<CustomTaskAll> findAll( 
+	List<TaskModel> findAll( 
 			@Param("dep") String dep, 
 			@Param("title") String title, 
 			@Param("status") String status, 
@@ -32,7 +32,7 @@ public interface ITaskRepository {
 	Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order);
 	Integer countFindByIds(List<Integer> ids);
-	List<CustomTaskAll> findByStatusIds(
+	List<TaskModel> findByStatusIds(
 			@Param("status_id") List<Integer> statusIds,
 			@Param("sort") String sort,
 			@Param("order") String order,
@@ -40,10 +40,10 @@ public interface ITaskRepository {
 			@Param("limit") Integer limit);
 	Integer add(Task task);
 	Integer getMaxId();
-	CustomTaskAll findById(Integer id);
+	TaskModel findById(Integer id);
 	String deleteTaskById(Integer id);
 	Integer edit(Task task);
-	List<CustomTaskAll> filter(
+	List<TaskModel> filter(
 			@Param("createFrom") String createFrom,
 			@Param("createTo") String createTo,
 			@Param("finishFrom") String finishFrom,

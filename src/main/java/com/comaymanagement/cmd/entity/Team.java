@@ -31,6 +31,7 @@ public class Team {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	private String code;
 	private String name;
 	@Column(name="head_position")
 	private Integer headPosition;

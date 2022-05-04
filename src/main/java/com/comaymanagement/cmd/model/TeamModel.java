@@ -1,8 +1,9 @@
-package com.comaymanagement.cmd.customentity;
+package com.comaymanagement.cmd.model;
 
 import java.util.List;
 
-import com.comaymanagement.cmd.entity.Team;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,13 +13,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomTeamAll{
+@JsonInclude(Include.NON_EMPTY)
+public class TeamModel{
 	private Integer id;
 	private String code;
 	private String name;
 	private Integer headPosition;
-	private List<CustomPositionAll> positions;
+	private List<PositionModel> positions;
 	private String description;
-	private List<CustomEmployeeAll> employees;
+	private List<EmployeeModel> employees;
 	private Integer level;
+	private PositionModel position;
 }

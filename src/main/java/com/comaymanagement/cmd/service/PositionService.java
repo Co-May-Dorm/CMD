@@ -2,7 +2,6 @@ package com.comaymanagement.cmd.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,14 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.comaymanagement.cmd.customentity.CustomPositionAll;
-import com.comaymanagement.cmd.customentity.CustomTaskAll;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.Team;
-import com.comaymanagement.cmd.repository.IPositionRepository;
+import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -32,21 +29,21 @@ public class PositionService{
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	public ResponseEntity<Object> findAllByRoleId(Integer roleId) {
-		List<CustomPositionAll> customPositionAlls = new ArrayList<CustomPositionAll>();;
+		List<PositionModel> positionModelList = new ArrayList<PositionModel>();;
 
 		try {
 			if (roleId == null) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("ERROR", "Have error: ", "Role ID is null"));
 			} else {
-				customPositionAlls = positionRepository.findAllByRoleId(roleId);
-				if (customPositionAlls.size() < 1) {
+				positionModelList = positionRepository.findAllByRoleId(roleId);
+				if (positionModelList.size() < 1) {
 					LOGGER.info("Have no task by status_id: " + roleId);
 					return ResponseEntity.status(HttpStatus.NOT_FOUND)
 							.body(new ResponseObject("", "Have no task by status_id: " + roleId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
-							.body(new ResponseObject("OK", "Query produce successfully:", customPositionAlls));
+							.body(new ResponseObject("OK", "Query produce successfully:", positionModelList));
 				}
 			}
 		} catch (Exception e) {
@@ -56,21 +53,44 @@ public class PositionService{
 		}
 	}
 	public ResponseEntity<Object> findAllByDepartmentId(Integer depId) {
-		List<CustomPositionAll> customPositionAlls = new ArrayList<CustomPositionAll>();;
+		List<PositionModel> positionModelList = new ArrayList<PositionModel>();;
 
 		try {
 			if (depId == null) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("ERROR", "Have error: ", "Department ID is null"));
 			} else {
-				customPositionAlls = positionRepository.findAllByDepartmentId(depId);
-				if (customPositionAlls.size() < 1) {
+				positionModelList = positionRepository.findAllByDepartmentId(depId);
+				if (positionModelList.size() < 1) {
 					LOGGER.info("Have no task by status_id: " + depId);
 					return ResponseEntity.status(HttpStatus.NOT_FOUND)
 							.body(new ResponseObject("", "Have no position by departmentId: " + depId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
-							.body(new ResponseObject("OK", "Query produce successfully:", customPositionAlls));
+							.body(new ResponseObject("OK", "Query produce successfully:", positionModelList));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
+		}
+	}
+	public ResponseEntity<Object> findAllByTeamId(Integer teamId) {
+		List<PositionModel> positionModelList = new ArrayList<PositionModel>();;
+		
+		try {
+			if (teamId == null) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ResponseObject("ERROR", "Have error: ", "Department ID is null"));
+			} else {
+				positionModelList = positionRepository.findAllByDepartmentId(teamId);
+				if (positionModelList.size() < 1) {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND)
+							.body(new ResponseObject("", "Have no position by teamId: " + teamId, ""));
+				} else {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("OK", "Query produce successfully:", positionModelList));
 				}
 			}
 		} catch (Exception e) {

@@ -16,14 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.customentity.CustomOptionAll;
-import com.comaymanagement.cmd.customentity.CustomPermissionAll;
-import com.comaymanagement.cmd.customentity.CustomRoleAll;
-import com.comaymanagement.cmd.customentity.CustomRoleDetailAll;
-import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.RoleDetail;
+import com.comaymanagement.cmd.model.OptionModel;
+import com.comaymanagement.cmd.model.PermissionModel;
+import com.comaymanagement.cmd.model.RoleDetailModel;
 import com.comaymanagement.cmd.repository.IRoleDetailRepository;
-import com.comaymanagement.cmd.repository.IRoleRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class RoleDetailRepositoryImpl implements IRoleDetailRepository {
@@ -33,7 +30,7 @@ public class RoleDetailRepositoryImpl implements IRoleDetailRepository {
 
 	@Override
 	@Transactional
-	public CustomRoleDetailAll findAllByRoleId(Integer roleId) {
+	public RoleDetailModel findAllByRoleId(Integer roleId) {
 		List<RoleDetail> roleDetails = new ArrayList<>();
 		StringBuilder hql = new StringBuilder();
 		hql.append("FROM role_details rd ");
@@ -42,7 +39,7 @@ public class RoleDetailRepositoryImpl implements IRoleDetailRepository {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("roleId", roleId);
-			List<CustomOptionAll> customOptions = new ArrayList<>();
+			List<OptionModel> optionModelList = new ArrayList<>();
 			Set<Integer> tmpOptionId = new TreeSet<>();
 			for(Iterator it = query.getResultList().iterator();it.hasNext();) {
 				Object obj  = (Object) it.next();
@@ -52,19 +49,19 @@ public class RoleDetailRepositoryImpl implements IRoleDetailRepository {
 				
 			}
 			for(Integer i : tmpOptionId) {
-				List<CustomPermissionAll> customPermissions = new ArrayList<>();
-				CustomOptionAll customOption = new CustomOptionAll();
+				List<PermissionModel> permissionModels = new ArrayList<>();
+				OptionModel optionModel = new OptionModel();
 				for(RoleDetail rd : roleDetails) {
 					if(rd.getOptionId().equals(i)) {
-						CustomPermissionAll customPermission = new CustomPermissionAll();
-						customPermission.setId(rd.getPermissionId());
-						customPermissions.add(customPermission);
+						PermissionModel permissionModel = new PermissionModel();
+						permissionModel.setId(rd.getPermissionId());
+						permissionModels.add(permissionModel);
 					}
 					
 				}
-				customOption.setId(i);
-				customOption.setCustomPermissions(customPermissions);
-				customOptions.add(customOption);
+				optionModel.setId(i);
+				optionModel.setPermissions(permissionModels);
+				optionModelList.add(optionModel);
 			}
 			System.out.println(tmpOptionId);
 		} catch (Exception e) {

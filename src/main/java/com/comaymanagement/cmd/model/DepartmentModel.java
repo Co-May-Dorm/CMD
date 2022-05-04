@@ -1,9 +1,9 @@
-package com.comaymanagement.cmd.customentity;
+package com.comaymanagement.cmd.model;
 
 import java.util.List;
-import java.util.Set;
 
-import com.comaymanagement.cmd.entity.Position;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,14 +14,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomDepartmentAll {
+@JsonInclude(Include.NON_EMPTY)
+public class DepartmentModel {
 	private Integer id;
 	private String code;
 	private String name;
 	private Integer fatherDepartmentId;
 	private Integer headPosition;
-	private List<CustomPositionAll> positions;
 	private String description;
-	private List<CustomEmployeeAll> employees;
 	private Integer level;
+	private List<PositionModel> positions;
+	private List<EmployeeModel> employees;
+	private PositionModel position;
 }

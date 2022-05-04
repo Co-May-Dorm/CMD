@@ -16,30 +16,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.service.DepartmentService;
+import com.comaymanagement.cmd.service.TeamService;
 
 @RestController
-@RequestMapping("/departments")
+@RequestMapping("/teams")
 @CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
-public class DepartmentController {
+public class TeamController {
 	@Autowired
-	DepartmentService departmentService;
+	TeamService teamService;
 
 	@GetMapping("")
 	public ResponseEntity<Object> findAll(@RequestParam(value = "name", required = false) String name) {
-		return departmentService.findAll(name);
+		return teamService.findAll(name);
 	}
 	
 	@PostMapping("/add")
 	public ResponseEntity<Object> add(@RequestBody String json){
-		return departmentService.add(json);
+		return teamService.add(json);
 	}
 	@PutMapping("/edit")
 	public ResponseEntity<Object> edit(@RequestBody String json){
-		return departmentService.edit(json);
+		return teamService.edit(json);
 	}
 	@DeleteMapping(value = "/delete/{id}")
 	@ResponseBody
 	public ResponseEntity<Object> delete(@PathVariable Integer id){
-		return departmentService.delete(id);
+		return teamService.delete(id);
 	}
 }
