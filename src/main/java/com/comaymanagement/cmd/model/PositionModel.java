@@ -1,8 +1,8 @@
-package com.comaymanagement.cmd.customentity;
-
-import java.util.Set;
+package com.comaymanagement.cmd.model;
 
 import com.comaymanagement.cmd.entity.Role;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CustomPositionAll {
+@JsonInclude(Include.NON_EMPTY)
+public class PositionModel {
 	private Integer id;
 	private String code;
 	private String name;

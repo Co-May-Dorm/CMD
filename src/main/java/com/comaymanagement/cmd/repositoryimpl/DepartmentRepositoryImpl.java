@@ -1,4 +1,4 @@
-package com.comaymanagement.cmd.repositoryimpl;
+		package com.comaymanagement.cmd.repositoryimpl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,12 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.customentity.CustomDepartmentAll;
-import com.comaymanagement.cmd.customentity.CustomPositionAll;
 import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.model.DepartmentModel;
+import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.repository.IDepartmentRepository;
 
 @Repository
@@ -35,10 +34,10 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	
 	@Override
 	@Transactional
-	public Set<CustomDepartmentAll> findAll(String name) {
+	public Set<DepartmentModel> findAll(String name) {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "from departments dep inner join dep.positions as pos where dep.name like CONCAT('%',:name,'%')";
-		Set<CustomDepartmentAll> cusDepSet = new LinkedHashSet<CustomDepartmentAll>();
+		Set<DepartmentModel> departmentModelSet = new LinkedHashSet<DepartmentModel>();
 		Set<Department> depSetTMP = new LinkedHashSet<Department>();
 		
 		try {
@@ -50,32 +49,33 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 				depSetTMP.add(tmp);
 			}
 			for(Department d : depSetTMP) {
-				CustomDepartmentAll cusDep = new CustomDepartmentAll();
-				List<CustomPositionAll> cusPosList = new ArrayList<>();
-				cusDep.setId(d.getId());
-				cusDep.setCode(d.getCode());
-				cusDep.setName(d.getName());
-				cusDep.setDescription(d.getDescription());
-				cusDep.setFatherDepartmentId(d.getFatherDepartmentId());
-				cusDep.setLevel(d.getLevel());
+				DepartmentModel departmentModel = new DepartmentModel();
+				List<PositionModel> positionModelList = new ArrayList<>();
+				departmentModel.setId(d.getId());
+				departmentModel.setCode(d.getCode());
+				departmentModel.setName(d.getName());
+				departmentModel.setDescription(d.getDescription());
+				departmentModel.setFatherDepartmentId(d.getFatherDepartmentId());
+				departmentModel.setLevel(d.getLevel());
 				for (Position pos : d.getPositions()) {
-					CustomPositionAll cusPos = new CustomPositionAll();
+					PositionModel positionModel = new PositionModel();
 					Role role = new Role();
 					role.setId(pos.getRole().getId());
 					role.setName(pos.getRole().getName());
-					cusPos.setId(pos.getId());
-					cusPos.setName(pos.getName());
-					cusPos.setIsManager(pos.getIsManager());
-					cusPos.setRole(role);
-					cusPosList.add(cusPos);
+					positionModel.setId(pos.getId());
+					positionModel.setName(pos.getName());
+					positionModel.setIsManager(pos.getIsManager());
+					positionModel.setRole(role);
+					positionModelList.add(positionModel);
 				}
-				cusDep.setPositions(cusPosList);
-				cusDepSet.add(cusDep);
+				departmentModel.setPositions(positionModelList);
+				departmentModel.setHeadPosition(d.getHeadPosition());
+				departmentModelSet.add(departmentModel);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentRepositoryImpl at findAll() ", e);
 		}
-		return cusDepSet;
+		return departmentModelSet;
 	}
 
 	@Transactional
@@ -98,7 +98,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 
 	@Transactional
 	@Override
-	public Integer save(Department dep) {
+	public Integer add(Department dep) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
 			Integer id = (Integer) session.save(dep);
@@ -120,7 +120,7 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 			return 0;
 		}
 	}
-
+	
 	@Override
 	public String delete(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
@@ -137,12 +137,40 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	}
 
 	@Override
-	public Department findById(Integer id) {
+	@javax.transaction.Transactional
+	public Set<Department> findById(Integer id) {
+		List<Position> positions = new ArrayList<Position>();
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		Set<Department> departmentSet = new LinkedHashSet<>();
+		hql.append("from departments dep ");
+		hql.append("INNER JOIN dep.positions ");
+		hql.append("where dep.id = " + id);
+		try {
+			Query query = session.createQuery(hql.toString());
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] ob = (Object[]) it.next();
+				Department e = (Department)ob[0];
+				
+				Position po = (Position) ob[1];
+				positions.add(po);
+				departmentSet.add(e);
+			}
+			Department de = (Department) departmentSet.toArray()[0];
+			de.setPositions(positions);
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in delete() ", e);
+		}
+		
+		return departmentSet;
+	}
+	public Department findByIdToEdit(Integer id) {
 
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		Department department = null;
-		hql.append("from departments dep where dep.id = " + id);
+		hql.append("from departments dep ");
+		hql.append("where dep.id = " + id);
 		try {
 			Query query = session.createQuery(hql.toString());
 			department = (Department) query.getSingleResult();
@@ -152,7 +180,6 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		
 		return department;
 	}
-
 	@Override
 	public Department findByName(String name) {
 		Session session = sessionFactory.getCurrentSession();

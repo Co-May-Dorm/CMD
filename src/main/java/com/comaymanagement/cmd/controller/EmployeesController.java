@@ -1,6 +1,6 @@
 package com.comaymanagement.cmd.controller;
 
-import java.sql.SQLException;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ import com.comaymanagement.cmd.service.EmployeeService;
 @RestController
 @RequestMapping("/employees")
 public class EmployeesController {
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	EmployeeService employeeService;
 	@Autowired
@@ -41,7 +41,12 @@ public class EmployeesController {
 			@RequestParam(value = "pos", required = false) String pos,
 			@RequestParam(value = "sort", required = false) String sort,
 			@RequestParam(value = "order", required = false) String order) {
-		return employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
+		Long startTime = new Date().getTime();
+		ResponseEntity<Object> result = employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
+		Long endTime = new Date().getTime();
+		String message = "find all emp: " + (endTime - startTime);
+		LOGGER.info(message);
+		return result;
 	}
 	@PostMapping(value = "/add")
 	@ResponseBody

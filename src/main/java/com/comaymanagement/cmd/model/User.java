@@ -1,6 +1,4 @@
-package com.comaymanagement.cmd.customentity;
-
-import java.util.List;
+package com.comaymanagement.cmd.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,8 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomPermissionAll {
-	private Integer id;
-	private String code;
-	private String name;
+public class User {
+	private String username;
+	private boolean enableLogin;
+	
 }

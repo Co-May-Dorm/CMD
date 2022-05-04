@@ -1,7 +1,9 @@
-package com.comaymanagement.cmd.customentity;
+package com.comaymanagement.cmd.model;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +15,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomTaskAll {
+@JsonInclude(Include.NON_EMPTY)
+public class TaskModel {
 	
 	private Integer id;
 	private Integer creatorId;

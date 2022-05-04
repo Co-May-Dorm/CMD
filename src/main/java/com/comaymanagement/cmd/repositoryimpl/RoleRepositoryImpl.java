@@ -14,11 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.customentity.CustomPositionAll;
-import com.comaymanagement.cmd.customentity.CustomRoleAll;
-import com.comaymanagement.cmd.entity.Pagination;
-import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.model.PositionModel;
+import com.comaymanagement.cmd.model.RoleModel;
 import com.comaymanagement.cmd.repository.IRoleRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -33,9 +31,9 @@ public class RoleRepositoryImpl implements IRoleRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoleRepositoryImpl.class);
 	
 	@Override
-	public List<CustomRoleAll> findAll(String name, String sort, String order, Integer limit, Integer offset) {
+	public List<RoleModel> findAll(String name, String sort, String order, Integer limit, Integer offset) {
 		List<Role> roles = new ArrayList<Role>();
-		List<CustomRoleAll> customRoleList = new ArrayList<CustomRoleAll>();
+		List<RoleModel> roleModelList = new ArrayList<RoleModel>();
 		StringBuilder hql = new StringBuilder();
 		hql.append("FROM roles r ");
 		hql.append("WHERE r.name like CONCAT('%',:name,'%') ");
@@ -56,19 +54,19 @@ public class RoleRepositoryImpl implements IRoleRepository {
 				roles.add(role);
 			}
 			for(Role role : roles) {
-				CustomRoleAll customRoleAll = new CustomRoleAll();
-				customRoleAll.setId(role.getId());
-				customRoleAll.setName(role.getName());
-				List<CustomPositionAll> customPositionAlls = positionRepositoryImpl.findAllByRoleId(role.getId());
-				customRoleAll.setPositions(customPositionAlls);	
-				customRoleList.add(customRoleAll);
+				RoleModel roleModel = new RoleModel();
+				roleModel.setId(role.getId());
+				roleModel.setName(role.getName());
+				List<PositionModel> positionModelList = positionRepositoryImpl.findAllByRoleId(role.getId());
+				roleModel.setPositions(positionModelList);	
+				roleModelList.add(roleModel);
 			}
 
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
 
-		return customRoleList;
+		return roleModelList;
 	}
 	
 	@Override
