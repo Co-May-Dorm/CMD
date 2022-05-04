@@ -180,7 +180,7 @@ public class TaskService {
 			String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
 			String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
 			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
-			String finishDate = "";
+			String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : " ";
 			
 			Employee creator = new Employee();
 			creator.setId(creatorId);
@@ -190,6 +190,7 @@ public class TaskService {
 
 			Status status = new Status();
 			status.setId(statusId);
+			
 			task.setCreator(creator);
 			task.setReceiver(receiver);
 			task.setStatus(status);
