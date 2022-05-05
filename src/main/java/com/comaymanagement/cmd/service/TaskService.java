@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
+import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.ResponseObject;
@@ -37,7 +38,8 @@ public class TaskService {
 	@Autowired
 	TaskRepositoryImpl taskRepository;
 
-	
+	@Autowired
+	Message message;
 	public ResponseEntity<Object> findByStatusId(String statusId, String sort, String order, String page) {
 		order = order == null ? "DESC" : order;
 		sort = sort == null ? "id" : sort;
@@ -203,16 +205,16 @@ public class TaskService {
 			Integer id = taskRepository.add(task); 
 			if ( id != -1) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("OK", "Query produce successfully: ", id));
+						.body(new ResponseObject("OK",message.getMessageByItemCode("TASKS1"), id));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("ERROR", "Can not save task", ""));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(new ResponseObject("ERROR",message.getMessageByItemCode("TASKS1"), ""));
 			}
 
 		} catch (Exception e) {
 			LOGGER.debug("ERROR",e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("ERROR", e.getMessage() , ""));
 		}
 	}
 
@@ -270,8 +272,8 @@ public class TaskService {
 				if (updateStatus.equals("1")) {
 					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
 			} else {
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", updateStatus + "", ""));
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(new ResponseObject("ERROR", updateStatus + "", ""));
 
 				}
 			} catch (Exception e) {
@@ -284,6 +286,7 @@ public class TaskService {
 			Task task = new Task();
 			JsonMapper jsonMapper = new JsonMapper();
 			JsonNode jsonObjectTask;
+			String messageCode = "";
 			try { 
 				jsonObjectTask = jsonMapper.readTree(json);
 				Integer id = jsonObjectTask.get("id").asInt();
@@ -304,6 +307,12 @@ public class TaskService {
 
 				Status status = new Status();
 				status.setId(statusId);
+				// statusId 3 = Đã hủy
+				if(statusId==3) {
+					messageCode = "TASKS3";
+				}else {
+					messageCode = "TASKS2";
+				}
 				task.setId(id);
 				task.setCreator(creator);
 				task.setReceiver(receiver);
@@ -312,17 +321,17 @@ public class TaskService {
 				task.setDescription(description);
 				task.setCreateDate(createDate);
 				task.setFinishDate(finishDate);
-				Integer message = taskRepository.edit(task);
-				if (message != 0) {
-					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", task));
+				Integer messageUpdate = taskRepository.edit(task);
+				if (messageUpdate != 0) {
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode(messageCode), task));
 				} else {
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", message + "", task));
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(new ResponseObject("Error", message.getMessageByItemCode("TASKE3"), task));
 
 				}
 			} catch (Exception e) {
 				LOGGER.error("Error has occured in edit()", e );
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 			}
 		}
 		//filter
