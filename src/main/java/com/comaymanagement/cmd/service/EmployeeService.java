@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
@@ -41,9 +42,9 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class EmployeeService {
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	EmployeeRepositoryImpl employeeRepository;
@@ -114,7 +115,7 @@ public class EmployeeService {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
 			} else {
 				pagination.setPage(1);
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("E", "Not found", result));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", "Not found", result));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
@@ -246,7 +247,7 @@ public class EmployeeService {
 
 			}
 		} catch (Exception e) {
-			logger.error("Error has occured in addEmployee()", e);
+			LOGGER.error("Error has occured in addEmployee()", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("Error", e.getMessage(), ""));
 		}
@@ -386,7 +387,7 @@ public class EmployeeService {
 
 			}
 		} catch (Exception e) {
-			logger.error("Error has occured in edit()", e);
+			LOGGER.error("Error has occured in edit()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 
@@ -418,7 +419,7 @@ public class EmployeeService {
 
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "",e));
 
 		}
 
@@ -497,7 +498,7 @@ public class EmployeeService {
 						.body(new ResponseObject("Error", messageError, ""));
 			}
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
+			LOGGER.error("Error has occured in edit()", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
 		}
 

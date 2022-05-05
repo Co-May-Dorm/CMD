@@ -34,7 +34,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	private SessionFactory sessionFactory;
 
 	@Override
-	@Transactional
 	public List<TaskModel> findByStatusId(String statusId, String sort, String order, Integer offset, Integer limit) {
 		List<Task> taskList = new ArrayList<Task>();
 		List<TaskModel> customTaskList = new ArrayList<TaskModel>();
@@ -81,7 +80,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	@Transactional
 	public List<TaskModel> findAll(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit) {
 		Set<Task> taskSet = new LinkedHashSet<Task>();
@@ -315,7 +313,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 	
 	// delete	
-		@Transactional
 		public String deleteTaskById(Integer id) {
 			Session session = sessionFactory.getCurrentSession();
 			try {
@@ -337,7 +334,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 	//edit
 		@Override
-		@Transactional
 		public Integer edit(Task task) {
 			Session session = sessionFactory.getCurrentSession();
 			try {

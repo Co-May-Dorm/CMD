@@ -3,6 +3,7 @@ package com.comaymanagement.cmd.repositoryimpl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -50,7 +51,6 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 	// find all employee with position in department
 	@Override
-	@Transactional
 	public Set<EmployeeModel> findAll(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order, Integer limit, Integer offset) {
 		Set<Employee> employeeSet = new LinkedHashSet<>();
@@ -160,7 +160,6 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		return employeeModelSet;
 	}
 	
-	@Transactional
 	public boolean checkEmployeeCodeExisted(Integer id, String code) {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "select count(*) from employees emp where emp.code = :code and emp.id != :id";
@@ -181,11 +180,9 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	}
 
 	@Override
-	@Transactional
-	public Integer add(Employee emp) {
+	public Integer add(Employee emp){
 		Session session = sessionFactory.getCurrentSession();
 		try {
-
 			return Integer.parseInt(session.save(emp).toString());
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee() ", e);
@@ -195,7 +192,6 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	}
 
 	@Override
-	@Transactional
 	public Integer edit(Employee emp) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
@@ -218,7 +214,6 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 	}
 	 	
-	@Transactional
 	@Override
 	public Integer countAllPaging(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order) {
@@ -261,9 +256,22 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	@Override
 	public Employee findById(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		hql.append("from employees emp ");
+		hql.append("INNER JOIN emp.positions as pos ");
+		hql.append("where emp.id = :id");
 		Employee employee = null;
 		try {
-			employee = session.find(Employee.class, id);
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("id", id);
+			Iterator it = query.getResultList().iterator();
+			Object[] ob = (Object[]) it.next();
+			employee = (Employee) ob[0];
+			// Please don't delete this line, this fix lazy load error when load position
+			employee.getPositions().size();
+			employee.getDepartments().size();
+			employee.getTeams().size();
+			// Please don't delete this line, this fix lazy load error when load position
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in findById() ", e);
 		}
@@ -272,34 +280,11 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 
 	@Override
 	public boolean add(Set<Employee> emps) {
-		Connection connection = null;
-		try {
-			connection = dataSource.getConnection();
-			connection.setAutoCommit(false);
-			int count = 0;
-			for (Employee em : emps) {
-				Integer id = -1;
-				id = add(em);
-				count++;
-			}
-			if(count == emps.size()) {
-				connection.commit();
-				return true;
-			}else {
-				connection.rollback();
+		for (Employee em : emps) {
+			if(add(em)==-1) {
 				return false;
 			}
-			
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (Exception e2) {
-				LOGGER.error(e2.getMessage());
-			}
-			return false;
 		}
-
+		return true;
 	}
 }

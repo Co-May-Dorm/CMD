@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class PositionService{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired

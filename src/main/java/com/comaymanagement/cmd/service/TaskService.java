@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.entity.Employee;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class TaskService {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());

@@ -56,41 +56,38 @@ public class Employee{
 	@Column(name="is_active")
 	private boolean active;
 	
-	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany()
 	@JoinTable(name = "departments_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "department_id", referencedColumnName = "id") })
 	private List<Department> departments;
 	
-	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany()
 	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "position_id", referencedColumnName = "id") })
 	private List<Position> positions;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany()
 	@JoinColumn(name = "employee_id")
 	private List<ProposalPermission> proposalPermissions;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany()
 	@JoinColumn(name = "creator_id")
 	private List<Task> taskListCreated;
 	
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany()
 	@JoinColumn(name = "receiver_id")
 	private List<Task> taskListReceived;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany()
 	@JoinColumn(name = "creator_id")
 	private List<Proposal> proposals;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany()
 	@JoinColumn(name = "employee_id")
 	private List<ApprovalStepDetail> approvalStepDetails;
 	
-	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {

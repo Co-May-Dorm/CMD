@@ -33,7 +33,6 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 
 	
 	@Override
-	@Transactional
 	public Set<DepartmentModel> findAll(String name) {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "from departments dep inner join dep.positions as pos where dep.name like CONCAT('%',:name,'%')";
@@ -78,7 +77,6 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		return departmentModelSet;
 	}
 
-	@Transactional
 	public boolean isExisted(Integer id, String code) {
 		Session session = sessionFactory.getCurrentSession();
 		String hql = "from departments dep where dep.code = :code and dep.id != :id";
@@ -96,7 +94,6 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		return false;
 	}
 
-	@Transactional
 	@Override
 	public Integer add(Department dep) {
 		Session session = sessionFactory.getCurrentSession();
@@ -151,13 +148,13 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] ob = (Object[]) it.next();
 				Department e = (Department)ob[0];
-				
-				Position po = (Position) ob[1];
-				positions.add(po);
+//				
+//				Position po = (Position) ob[1];
+//				positions.add(po);
 				departmentSet.add(e);
 			}
-			Department de = (Department) departmentSet.toArray()[0];
-			de.setPositions(positions);
+//			Department de = (Department) departmentSet.toArray()[0];
+//			de.setPositions(positions);
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in delete() ", e);
 		}
