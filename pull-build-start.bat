@@ -1,1 +1,22 @@
-git pull&&mvn clean install&&cd target&&java -jar CMD-1.0.jar
+Employee
+   add
+   edit
+   delete
+
+Department
+	add
+	edit
+	delete
+ 
+   
+			
+   
+   
+   
+   
+   
+                           
+						   
+						   
+						   
+						   

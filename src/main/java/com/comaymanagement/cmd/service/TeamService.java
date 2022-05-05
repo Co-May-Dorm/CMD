@@ -116,7 +116,7 @@ public class TeamService {
 			}
 			
 			if (idTeamAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAME4"), teamUpdate));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS4"), teamUpdate));
 			} else {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR",message.getMessageByItemCode("TEAME2"), teamUpdate));
 			}
@@ -227,7 +227,7 @@ public class TeamService {
 			}
 			
 			if (messageEdit != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAME5"), teamUpdate));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS5"), teamUpdate));
 			} else {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", "", teamUpdate));
 			}
@@ -246,7 +246,7 @@ public class TeamService {
 		String deleteStatus = teamRepository.delete(id);
 		try {
 			if (deleteStatus.equals("1")) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAME6"), ""));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS6"), ""));
 		} else {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("ERROR", deleteStatus + "", ""));
