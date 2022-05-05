@@ -55,7 +55,6 @@ public class Department {
 	@OneToMany
 	@JoinColumn(name = "department_id")
 //	@JsonBackReference
-	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Position> positions;
 
 	@OneToMany
@@ -66,7 +65,6 @@ public class Department {
 	@JoinColumn(name = "department_id")
 	private List<ApprovalStepDetail> approvalStepDetails;
 	
-	@LazyCollection(LazyCollectionOption.FALSE)
 	@ManyToMany()
 	@JoinTable(name = "departments_employees", joinColumns = {
 			@JoinColumn(name = "department_id", referencedColumnName = "id") }, inverseJoinColumns = {

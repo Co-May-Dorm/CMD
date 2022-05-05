@@ -159,7 +159,6 @@ public class PositionRepositoryImpl implements IPositionRepository {
 		}
 		return positionModelList;
 	}
-	@Transactional
 	public String delete(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
 		try {

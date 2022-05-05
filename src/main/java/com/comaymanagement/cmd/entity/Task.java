@@ -30,15 +30,15 @@ public class Task{
 	@Column(name= "finish_date")
 	private String finishDate;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne()
 	@JoinColumn(name = "creator_id")
 	private Employee creator;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne()
 	@JoinColumn(name = "receiver_id")
 	private Employee receiver;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne()
 	@JoinColumn(name = "status_id")
 	private Status status;
 

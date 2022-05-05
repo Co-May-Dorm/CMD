@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.ResponseObject;
@@ -17,6 +18,7 @@ import com.comaymanagement.cmd.model.RoleModel;
 import com.comaymanagement.cmd.repositoryimpl.RoleRepositoryImpl;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class RoleService {
 	@Autowired
 	RoleRepositoryImpl roleRepository;

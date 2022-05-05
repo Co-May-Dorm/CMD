@@ -46,7 +46,6 @@ public class Team {
 	@Column(name="description")
 	private String description;
 	
-	@LazyCollection(LazyCollectionOption.FALSE)
 	@ManyToMany
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "team_id", referencedColumnName = "id") }, inverseJoinColumns = {

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Department;
@@ -26,6 +27,7 @@ import com.comaymanagement.cmd.repositoryimpl.TeamRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class TeamService {
 	@Autowired
 	TeamRepositoryImpl teamRepository;
@@ -43,7 +45,7 @@ public class TeamService {
 		if (teamModelSet.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", teamModelSet));
 		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "Not found", ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "Not found", ""));
 		}
 
 	}
@@ -72,7 +74,7 @@ public class TeamService {
 
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", message.getMessageByItemCode("TEAME1") , ""));
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME1") , ""));
 			}
 			
 			team.setCode(code);
@@ -104,9 +106,8 @@ public class TeamService {
 			for (Position p : positionList) {
 				Integer idAdded = positionRepository.add(p);
 				if (idAdded == -1) {
-					LOGGER.error("Error has occured in DepartmentService at save():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1") , ""));
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1") , ""));
 				}
 				if(p.getIsManager()) {
 					teamUpdate.setHeadPosition(idAdded);
@@ -115,13 +116,13 @@ public class TeamService {
 			}
 			
 			if (idTeamAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idTeamAdded + "", teamUpdate));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAME4"), teamUpdate));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", teamUpdate));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR",message.getMessageByItemCode("TEAME2"), teamUpdate));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured at add() ", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 
 		}
 	}
@@ -151,7 +152,7 @@ public class TeamService {
 			boolean isExisted = teamRepository.isExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", message.getMessageByItemCode("TEAME1"), ""));
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME3"), ""));
 			}
 			team.setId(id);
 			team.setCode(code);
@@ -202,8 +203,7 @@ public class TeamService {
 			for (Position p : positionAdds) {
 				Integer idAdded = positionRepository.add(p);
 				if (idAdded == -1) {
-					LOGGER.error("Error has occured in DepartmentService at edit():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 							.body(new ResponseObject("Error",message.getMessageByItemCode("POSE1"), ""));
 				}
 				else if(p.getIsManager()) {
@@ -216,9 +216,9 @@ public class TeamService {
 			for (Position p : positionEdits) {
 				Integer idAdded = positionRepository.edit(p);
 				if (idAdded == -1) {
-					LOGGER.error("Error has occured in DepartmentService at edit():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1"), ""));
+					LOGGER.error("Error has occured at edit():");
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE2"), ""));
 				}
 				else if (p.getIsManager()) {
 					teamUpdate.setHeadPosition(p.getId());
@@ -227,13 +227,13 @@ public class TeamService {
 			}
 			
 			if (messageEdit != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", teamUpdate));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAME5"), teamUpdate));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", teamUpdate));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", "", teamUpdate));
 			}
 		} catch (Exception e) {
-			LOGGER.error("Error has occured in DepartmentService at add() ", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			LOGGER.error("Error has occured at add() ", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
 
 		}
 	}
@@ -246,15 +246,15 @@ public class TeamService {
 		String deleteStatus = teamRepository.delete(id);
 		try {
 			if (deleteStatus.equals("1")) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", deleteStatus + "", ""));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAME6"), ""));
 		} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error", deleteStatus + "", ""));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", deleteStatus + "", ""));
 
 			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
+					.body(new ResponseObject("ERROR", e.getMessage(),""));
 			}
 		}
 

@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
@@ -26,6 +28,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class DepartmentService {
 	@Autowired
 	DepartmentRepositoryImpl departmentRepository;
@@ -43,7 +46,7 @@ public class DepartmentService {
 		if (departmentModelSet.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", departmentModelSet));
 		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "Not found", ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "Not found", ""));
 		}
 
 	}
@@ -73,8 +76,8 @@ public class DepartmentService {
 			boolean isExisted = departmentRepository.isExisted(-1, code);
 
 			if (isExisted) {
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", message.getMessageByItemCode("DEPE2") , ""));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE2") , ""));
 			}
 			
 			dep.setCode(code);
@@ -110,8 +113,8 @@ public class DepartmentService {
 				
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at save():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1") , ""));
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1") , ""));
 				}
 				if(p.getIsManager()) {
 					depUpdate.setHeadPosition(idAdded);
@@ -123,11 +126,11 @@ public class DepartmentService {
 			if (idDepAdded != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", dep));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE3"), dep));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentService at add() ", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
 
 		}
 	}
@@ -158,8 +161,8 @@ public class DepartmentService {
 			Integer id = jsonObjectDepartment.get("id").asInt();
 			boolean isExisted = departmentRepository.isExisted(id, code);
 			if (isExisted) {
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1"), ""));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE2"), ""));
 			}
 			dep.setId(id);
 			dep.setCode(code);
@@ -216,7 +219,7 @@ public class DepartmentService {
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE2"), ""));
 				}
 				else if (p.getIsManager()) {
 					depUpdate.setHeadPosition(idAdded);
@@ -231,8 +234,8 @@ public class DepartmentService {
 				
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new ResponseObject("Error", "Thêm chức vụ vào phòng ban thất bại!", ""));
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1"), ""));
 				}
 				else if(p.getIsManager()) {
 					
@@ -245,7 +248,7 @@ public class DepartmentService {
 			if (messageEdit != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", dep));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", dep));
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE4"), dep));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentService at add() ", e);
@@ -257,8 +260,9 @@ public class DepartmentService {
 	public ResponseEntity<Object> delete(Integer id){
 		Department depDelete = (Department)  departmentRepository.findById(id).toArray()[0];
 		if(depDelete.getEmployees().size()>0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE1") , ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE1") , ""));
 		}
+		List<Position> positions = depDelete.getPositions();
 		for(Position p : depDelete.getPositions()) {
 			positionRepository.delete(p.getId());
 		}
@@ -268,12 +272,13 @@ public class DepartmentService {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", deleteStatus + "", ""));
 		} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error", deleteStatus + "", ""));
+					.body(new ResponseObject("ERROR", deleteStatus, ""));
 
 			}
 		} catch (Exception e) {
+			LOGGER.error("Has error: ", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ResponseObject("ERROR", "Have error:" , e.getMessage()));
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 			}
 		}
 
