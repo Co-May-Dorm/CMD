@@ -38,9 +38,6 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
 	
 	@Autowired
-	private DataSource dataSource;
-	
-	@Autowired
 	private SessionFactory sessionFactory;
 
 	@Override

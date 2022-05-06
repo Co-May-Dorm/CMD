@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.model;
 
+import com.comaymanagement.cmd.entity.Option;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -12,9 +13,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(Include.NON_EMPTY)
+@JsonInclude(Include.NON_NULL)
 public class PermissionModel {
 	private Integer id;
-	private String code;
 	private String name;
+	private String label;
+	private boolean selected = false;
 }

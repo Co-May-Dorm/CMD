@@ -2,6 +2,11 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
+import com.comaymanagement.cmd.entity.Option;
+import com.comaymanagement.cmd.entity.Permission;
+import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.entity.RoleDetail;
+import com.comaymanagement.cmd.model.RoleDetailModel;
 import com.comaymanagement.cmd.model.RoleModel;
 
 public interface IRoleRepository {
@@ -12,4 +17,8 @@ public interface IRoleRepository {
 			Integer limit,
 			Integer offset);
 	Integer CountTotalItem();
+	public RoleDetailModel findRoleDetailByRoleId(Integer roleId);
+	public Integer add(Role role);
+	public Role findById(Integer id);
+	public Integer delete(Integer id);
 }

@@ -29,7 +29,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 	@Override
 	public List<PositionModel> findAllByRoleId(Integer roleId) {
 		StringBuilder hql = new StringBuilder("FROM positions WHERE role_id = :roleId");
-		List <PositionModel> positionModelList = new ArrayList<PositionModel>();
+		List <PositionModel> positionModelList = null;
 		List <Position> positions = new ArrayList<Position>();
 
 		try {
@@ -42,6 +42,7 @@ public class PositionRepositoryImpl implements IPositionRepository {
 				Position po = (Position) obj;
 				positions.add(po);
 			}
+			positionModelList = new ArrayList<PositionModel>();
 			for(Position po : positions) {
 				PositionModel positionModel = new PositionModel();
 				positionModel.setId(po.getId());

@@ -16,10 +16,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@JsonInclude(Include.NON_EMPTY)
+@JsonInclude(Include.NON_NULL)
 public class RoleDetailModel {
 	private Integer id;
-	private List<Option> options;
-	private List<Permission> permissions;
-	private Role role;
+	private String name;	
+	private List<OptionModel> options;
 }
