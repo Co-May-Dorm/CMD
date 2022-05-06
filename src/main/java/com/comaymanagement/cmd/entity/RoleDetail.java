@@ -6,7 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +23,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "role_details")
+@JsonInclude(Include.NON_NULL)
 public class RoleDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +53,8 @@ public class RoleDetail {
 	@Column(name = "permission_id")
 	private Integer permissionId;
 
-	@OneToOne()
+	@OneToOne
 	@JoinColumn(name = "role_id")
+	@JsonBackReference
 	private Role role;
 }

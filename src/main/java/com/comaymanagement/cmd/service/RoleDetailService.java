@@ -12,11 +12,4 @@ import com.comaymanagement.cmd.repositoryimpl.RoleDetailRepositoryImpl;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class RoleDetailService {
-	@Autowired
-	RoleDetailRepositoryImpl roleDetailRepositoryImpl;
-	
-	public ResponseEntity<Object> findAllByRoleId(Integer roleId){
-		RoleDetailModel cusRoleDetail = roleDetailRepositoryImpl.findAllByRoleId(roleId);
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("","",cusRoleDetail));  
-	}
 }

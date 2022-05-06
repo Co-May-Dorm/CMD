@@ -13,10 +13,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(Include.NON_EMPTY)
+@JsonInclude(Include.NON_NULL)
 public class OptionModel {
 	private Integer id;
-	private String code;
 	private String name;
 	List<PermissionModel> permissions;
 }
