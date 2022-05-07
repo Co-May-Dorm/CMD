@@ -167,18 +167,6 @@ public class RoleRepositoryImpl implements IRoleRepository {
 	}
 	
 	@Override
-	public Integer add(Role role){
-		Session session = sessionFactory.getCurrentSession();
-		try {
-			return Integer.parseInt(session.save(role).toString());
-		} catch (Exception e) {
-			LOGGER.error("Error has occured in addEmployee() ", e);
-			return -1;
-		}
-
-	}
-
-	@Override
 	public Role findById(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
 		Role role = null;
@@ -193,7 +181,31 @@ public class RoleRepositoryImpl implements IRoleRepository {
 		}
 		return role;
 	}
+	
+	@Override
+	public Integer add(Role role){
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			return Integer.parseInt(session.save(role).toString());
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in addEmployee() ", e);
+			return -1;
+		}
 
+	}
+
+	@Override
+	public Integer edit(Role role) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			session.update(role);
+			return 1;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in at edit() ", e);
+			return -1;
+		}
+	}
+	
 	@Override
 	public Integer delete(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
@@ -208,4 +220,6 @@ public class RoleRepositoryImpl implements IRoleRepository {
 		}
 		
 	}
+
+	
 }

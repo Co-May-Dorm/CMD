@@ -19,6 +19,7 @@ public interface IRoleRepository {
 	Integer CountTotalItem();
 	public RoleDetailModel findRoleDetailByRoleId(Integer roleId);
 	public Integer add(Role role);
+	public Integer edit(Role role);
 	public Role findById(Integer id);
 	public Integer delete(Integer id);
 }

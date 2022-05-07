@@ -35,11 +35,11 @@ public class Role {
 //	@JoinColumn(name = "role_id")
 //	@JsonBackReference
 //	private Set<Auth> auths;
-
-	@OneToMany
-	@JoinColumn(name = "role_id")
-	@JsonBackReference
-	private List<RoleDetail> roleDetails;
+//
+//	@OneToMany()
+//	@JoinColumn(name = "role_id")
+//	@JsonBackReference
+//	private List<RoleDetail> roleDetails;
 
 	@OneToMany()
 	@JoinColumn(name = "role_id")

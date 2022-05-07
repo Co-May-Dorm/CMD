@@ -56,20 +56,18 @@ public class RoleDetailRepositoryImpl implements IRoleDetailRepository {
 		List<RoleDetail> roleDetails = null;
 
 		StringBuilder hql = new StringBuilder();
-		hql.append("FROM role_details rd where rd.role.id = :id");
+		hql.append("FROM role_details as rd where rd.role_id = " + roleId);
 		try {
 			Query query = session.createQuery(hql.toString());
-			query.setParameter("id", roleId);
+//			query.setParameter("id", roleId);
 			roleDetails = new ArrayList<>();
 			for(Iterator it = query.getResultList().iterator();it.hasNext();) {
 				RoleDetail roleDetail = (RoleDetail) it.next();
 				roleDetails.add(roleDetail);
 			}
 		} catch (Exception e) {
-			LOGGER.error("Have error at findAllByr=RoleId(): ",e);
+			LOGGER.error("Have error at findAllByRoleId(): ",e);
 		}
-		
-		
 		return roleDetails;
 	}
 

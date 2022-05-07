@@ -53,8 +53,8 @@ public class RoleDetail {
 	@Column(name = "permission_id")
 	private Integer permissionId;
 
-	@OneToOne
-	@JoinColumn(name = "role_id")
-	@JsonBackReference
-	private Role role;
+//	@OneToOne
+//	@JoinColumn(name = "role_id")
+//	private Role role;
+	private Integer role_id;
 }

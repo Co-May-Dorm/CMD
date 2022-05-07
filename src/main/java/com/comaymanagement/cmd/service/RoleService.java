@@ -125,7 +125,7 @@ public class RoleService {
 						roleDetail.setModifyBy(createBy);
 						roleDetail.setCreateDate(createDate);
 						roleDetail.setModifyDate(createDate);
-						roleDetail.setRole(roleAdded);
+						roleDetail.setRole_id(idAdded);
 						Integer rdAddedId  = roleDetailRepository.add(roleDetail);
 					}
 				}
@@ -133,17 +133,73 @@ public class RoleService {
 			if (idAdded != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("ROLES1"), role));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 						.body(new ResponseObject("Error",  message.getMessageByItemCode("ROLEE1") , role));
 
 			}
 		} catch (Exception e) {
 			LOGGER.error("Have error at add(): ", e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseObject("Error",  message.getMessageByItemCode("ROLEE1") , e));
+					.body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 		
 	}
+	
+	// edit
+	public ResponseEntity<Object> edit(String json){
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObjectRole;
+		JsonNode jsonObjectOption;
+		JsonNode jsonObjectPermission;
+		List<RoleDetail> roleDetails = new ArrayList<>();
+		Role role = new Role();
+		try {
+			jsonObjectRole = jsonMapper.readTree(json);
+			jsonObjectOption = jsonObjectRole.get("options");
+			
+			Integer roleId = jsonObjectRole.get("id").asInt();
+			String roleName = jsonObjectRole.get("name").asText();
+			Integer createBy = jsonObjectRole.get("createBy").asInt();
+			Integer modifyBy = jsonObjectRole.get("modifyBy").asInt();
+			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+			
+			role.setId(roleId);
+			role.setName(roleName);
+			Integer editSatatus = roleRepository.edit(role);
+			roleDetails = roleDetailRepository.findAllByRoleId(roleId);
+			for(RoleDetail rd : roleDetails) {
+				roleDetailRepository.delete(rd.getId());
+			}
+			for(JsonNode optionNode : jsonObjectOption) {
+				for(JsonNode permissionNode : optionNode.get("permissions")) {
+					if(permissionNode.get("selected").asBoolean() == true) {
+						RoleDetail roleDetail = new RoleDetail();
+						roleDetail.setOptionId(optionNode.get("id").asInt());
+						roleDetail.setPermissionId(permissionNode.get("id").asInt());
+						roleDetail.setCreateBy(createBy);
+						roleDetail.setModifyBy(createBy);
+						roleDetail.setCreateDate(createDate);
+						roleDetail.setModifyDate(createDate);
+						roleDetail.setRole_id(roleId);
+						Integer rdAddedId  = roleDetailRepository.add(roleDetail);
+					}
+				}
+			}
+			if (editSatatus != -1) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("ROLES3"), role));
+			} else {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(new ResponseObject("Error",  message.getMessageByItemCode("ROLEE4") , role));
+				
+			}
+		} catch (Exception e) {
+			LOGGER.error("Have error at edit(): ", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("Error", e.getMessage(), ""));
+		}
+		
+	}
+	
 	public ResponseEntity<Object> delete(Integer id){
 		List<PositionModel> positions = positionRepository.findAllByRoleId(id);
 		if(positions!=null && positions.size()>0) {
@@ -170,4 +226,5 @@ public class RoleService {
 		}
 		
 	}
+	
 }
