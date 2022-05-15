@@ -1,5 +1,23 @@
 package com.comaymanagement.cmd.controller;
-
+/**
+All option name
+	todolist
+	request
+	type
+	employee
+	department
+	position
+	inventory
+	team
+All permission name
+ 	view
+ 	create
+ 	update
+ 	detele
+ 	view_all
+ 	update_all
+ 	delete_all
+ **/
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
