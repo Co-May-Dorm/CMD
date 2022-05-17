@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.model.LoginRequest;
@@ -27,6 +29,8 @@ import com.comaymanagement.cmd.model.User;
 import com.comaymanagement.cmd.security.jwt.JwtUtils;
 import com.comaymanagement.cmd.service.AuthService;
 import com.comaymanagement.cmd.service.UserDetailsImpl;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 /**
 All option name
 	todolist
@@ -54,7 +58,8 @@ All permission name
 public class AuthController {
     @Autowired
     AuthService authService;
-
+   
+    
     @PostMapping("/signin")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
@@ -99,4 +104,14 @@ public class AuthController {
 //
 //        return ResponseEntity.ok("User registered successfully!");
 //    }
+    
+	@PreAuthorize(
+			"@customRoleService.canUpdate('employee', principal) "
+			+ "or @customRoleService.canUpdateAll('employee', principal)")
+    @PostMapping("/change-password")
+	@ResponseBody
+	public ResponseEntity<Object> changePassword(@RequestBody String json){
+     
+     return authService.changePassword(json);
+    }
 }

@@ -43,7 +43,7 @@ public class DepartmentController {
 	@Autowired
 	DepartmentService departmentService;
 
-	@PreAuthorize("@customRoleService.canView('department',principal)")
+	@PreAuthorize("@customRoleService.canView('department',principal) or @customRoleService.canViewAll('department', principal)")
 	@GetMapping("")
 	public ResponseEntity<Object> findAll(@RequestParam(value = "name", required = false) String name) {
 		return departmentService.findAll(name);
@@ -55,13 +55,13 @@ public class DepartmentController {
 		return departmentService.add(json);
 	}
 	
-	@PreAuthorize("@customRoleService.canUpdate('department',principal)")
+	@PreAuthorize("@customRoleService.canUpdate('department',principal) or @customRoleService.canUpdateAll('department', principal)")
 	@PutMapping("/edit")
 	public ResponseEntity<Object> edit(@RequestBody String json){
 		return departmentService.edit(json);
 	}
 
-	@PreAuthorize("@customRoleService.canDelete('department',principal)")
+	@PreAuthorize("@customRoleService.canDelete('department',principal) or @customRoleService.canDeleteAll('department', principal)")
 	@DeleteMapping(value = "/delete/{id}")
 	@ResponseBody
 	public ResponseEntity<Object> delete(@PathVariable Integer id){

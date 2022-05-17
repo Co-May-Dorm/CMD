@@ -70,7 +70,12 @@ public class CustomRoleService {
 		return authorization(option, userDetail, IMPORT);
 	}
 	
-	
+	public boolean isTheSameUser(Integer empId, UserDetailsImpl userDetail) {
+			if(userDetail.getId().equals(empId)) {
+				return true;
+			}
+			return false;
+	}
 	
 	public boolean authorization(String option, UserDetailsImpl userDetail, String action) {
 		// loop through roles
@@ -80,7 +85,7 @@ public class CustomRoleService {
 				// If same with option => // loop through permission in option
 				if(optionModel.getName().equals(option)) {
 					for(PermissionModel p : optionModel.getPermissions()) {
-						if (p.getName().equals(action)) {
+						if (p.getName().equals(action) && p.isSelected() == true) {
 							return true;
 						}
 					}

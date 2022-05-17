@@ -50,7 +50,7 @@ public class EmployeesController {
 	@Autowired
 	DepartmentService departmentService;
 	
-	@PreAuthorize("@customRoleService.canView('employee',principal)")
+	@PreAuthorize("@customRoleService.canView('employee',principal) or @customRoleService.canViewAll('employee', principal)")
 	@GetMapping(value = "", produces = "application/json")
 	public ResponseEntity<Object> paggingAllEmployee(
 			@RequestParam(value = "page", required = false) String page,
@@ -62,11 +62,7 @@ public class EmployeesController {
 			@RequestParam(value = "pos", required = false) String pos,
 			@RequestParam(value = "sort", required = false) String sort,
 			@RequestParam(value = "order", required = false) String order) {
-		Long startTime = new Date().getTime();
 		ResponseEntity<Object> result = employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
-		Long endTime = new Date().getTime();
-		String message = "find all emp: " + (endTime - startTime);
-		LOGGER.info(message);
 		return result;
 	}
 	
