@@ -128,7 +128,7 @@ public class EmployeeService {
 	public ResponseEntity<Object> addEmployee(String json) {
 		Employee emp = new Employee();
 		User user = new User();
-		String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+		String createDate = new SimpleDateFormat("ddMMyyyy").format(new Date().getTime());
 		String modifyDate = createDate;
 		List<Position> positionList = new ArrayList<>();
 		List<Team> teamList = new ArrayList<>();

@@ -20,6 +20,7 @@ All permission name
  **/
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,20 +43,26 @@ import com.comaymanagement.cmd.service.TeamService;
 public class TeamController {
 	@Autowired
 	TeamService teamService;
-
+	
+	@PreAuthorize("@customRoleService.canView('team',principal)")
 	@GetMapping("")
 	public ResponseEntity<Object> findAll(@RequestParam(value = "name", required = false) String name) {
 		return teamService.findAll(name);
 	}
 	
+	@PreAuthorize("@customRoleService.canCreate('team',principal)")
 	@PostMapping("/add")
 	public ResponseEntity<Object> add(@RequestBody String json){
 		return teamService.add(json);
 	}
+	
+	@PreAuthorize("@customRoleService.canUpdate('team',principal)")
 	@PutMapping("/edit")
 	public ResponseEntity<Object> edit(@RequestBody String json){
 		return teamService.edit(json);
 	}
+	
+	@PreAuthorize("@customRoleService.canDelete('team',principal)")
 	@DeleteMapping(value = "/delete/{id}")
 	@ResponseBody
 	public ResponseEntity<Object> delete(@PathVariable Integer id){
