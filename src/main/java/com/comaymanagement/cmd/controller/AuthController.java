@@ -105,9 +105,9 @@ public class AuthController {
 //        return ResponseEntity.ok("User registered successfully!");
 //    }
     
-	@PreAuthorize(
-			"@customRoleService.canUpdate('employee', principal) "
-			+ "or @customRoleService.canUpdateAll('employee', principal)")
+//	@PreAuthorize(
+//			"@customRoleService.canUpdate('employee', principal) "
+//			+ "or @customRoleService.canUpdateAll('employee', principal)")
     @PostMapping("/change-password")
 	@ResponseBody
 	public ResponseEntity<Object> changePassword(@RequestBody String json){

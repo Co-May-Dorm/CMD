@@ -36,67 +36,86 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 public class AuthService {
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-	   @Autowired
-	   AuthenticationManager authenticationManager;
-	 
-	   @Autowired
-	   PasswordEncoder encoder;
+	@Autowired
+	AuthenticationManager authenticationManager;
 
-	   @Autowired
-	   JwtUtils jwtUtils;
-	
-	   @Autowired
-	   UserRepository userRepository;
-	   
-	   @Autowired 
-	   Message message;
-	   
-	   @Autowired 
-	   EmployeeRepositoryImpl employeeRepository;
-	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest){
+	@Autowired
+	PasswordEncoder encoder;
+
+	@Autowired
+	JwtUtils jwtUtils;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	Message message;
+
+	@Autowired
+	EmployeeRepositoryImpl employeeRepository;
+
+	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
 		User user = userRepository.findByUsername(loginRequest.getUsername());
-		if(user == null) {
-			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR",message.getMessageByItemCode("LOGINE2") ,""));
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseObject("ERROR", message.getMessageByItemCode("LOGINE2"), ""));
 		}
 		Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        if(userDetails == null ) {
-        	
-        }
-			
-        String jwt = jwtUtils.generateJwtToken(userDetails);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		if (userDetails == null) {
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("LOGINS1"),jwt));
+		}
+
+		String jwt = jwtUtils.generateJwtToken(userDetails);
+
+		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+				.collect(Collectors.toList());
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new ResponseObject("OK", message.getMessageByItemCode("LOGINS1"), jwt));
 	}
-	
-	public ResponseEntity<Object> changePassword(String json){
-		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+	public ResponseEntity<Object> changePassword(String json) {
+		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
 		JsonMapper jsonMapper = new JsonMapper();
 		Integer empId = null;
-		 String existingPassword = null;
-		 String newPassword = null;
+		String existingPassword = null;
+		String newPassword = null;
 		try {
-			   JsonNode jsonObject = jsonMapper.readTree(json);
-			    empId = jsonObject.get("empId").asInt();
-			    existingPassword = jsonObject.get("existingPassword").asText();
-			    newPassword = jsonObject.get("newPassword").asText();
+			JsonNode jsonObject = jsonMapper.readTree(json);
+			empId = jsonObject.get("id").asInt();
+			existingPassword = jsonObject.get("existingPassword").asText();
+			newPassword = jsonObject.get("newPassword").asText();
 		} catch (Exception e) {
 			LOGGER.error("Have error at changePassword();", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", "Cập nhật mật khẩu thất bại", ""));
 		}
-	 
-		if(encoder.matches( existingPassword,userDetail.getPassword())) {
-			String newPasswordEncoder = encoder.encode(newPassword);
-			userDetail.setPassword(newPasswordEncoder);
-			Employee employee = employeeRepository.findById(empId);
-			employee.setPassword(newPasswordEncoder);
-			employeeRepository.edit(employee);
+		// check if matches user id
+		if (userDetail.getId().equals(empId)) {
+			if (encoder.matches(existingPassword, userDetail.getPassword())) {
+				String newPasswordEncoder = encoder.encode(newPassword);
+				userDetail.setPassword(newPasswordEncoder);
+				Employee employee = employeeRepository.findById(empId);
+				employee.setPassword(newPasswordEncoder);
+				employeeRepository.edit(employee);
+
+			}else {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(new ResponseObject("ERROR", "Cập nhật mật khẩu thất bại", ""));
+			}
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", "Cập nhật mật khẩu thất bại", ""));
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Cập nhật mật khẩu thành công",""));
 	}
+
+	public void resetPassword(String json) {
+
+	}
+
 }

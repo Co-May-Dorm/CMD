@@ -1,7 +1,10 @@
 package com.comaymanagement.cmd.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.comaymanagement.cmd.entity.Permission;
 import com.comaymanagement.cmd.entity.Role;
@@ -37,7 +40,15 @@ public class CustomRoleService {
 	public static final String UPDATE_ALL = "update_all";
 	public static final String DELETE_ALL = "delete_all";
 	public static final String IMPORT = "import";
-	
+	public static String getTokenFromRequest(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            return token.substring(7, token.length());
+        }
+
+        return null;
+    }
 	public boolean canView(String option, UserDetailsImpl userDetail) {
 		return authorization(option, userDetail, VIEW);
 	}

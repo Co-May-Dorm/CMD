@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.comaymanagement.cmd.service.CustomRoleService;
 import com.comaymanagement.cmd.service.UserDetailsServiceImpl;
 
 
@@ -33,7 +34,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            String token = getTokenFromRequest(request);
+            String token = CustomRoleService.getTokenFromRequest(request);
             UserDetails userDetails = null;
             if (token != null && jwtUtils.validateJwtToken(token)) {
                 String username = jwtUtils.getUserNameFromJwtToken(token);
@@ -54,13 +55,5 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
-            return token.substring(7, token.length());
-        }
-
-        return null;
-    }
+    
 }

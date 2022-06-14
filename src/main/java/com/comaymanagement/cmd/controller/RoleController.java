@@ -57,7 +57,7 @@ public class RoleController {
 		return roleService.findAll(name, sort, order, page);
 	}
 	
-	@PreAuthorize("@customRoleService.canView('role',principal)")
+	@PreAuthorize("@customRoleService.canView('role',principal) or @customRoleService.canViewAll('role',principal)")
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> findRoleDetailByRoleId(@PathVariable Integer id) {
 		return roleService.findRoleDetailByRoleId(id);
