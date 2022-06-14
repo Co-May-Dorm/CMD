@@ -39,6 +39,7 @@ public class OptionRepositoryImpl implements IOptionRepository{
 				 OptionModel optionModel = new OptionModel();
 				 optionModel.setId(option.getId());
 				 optionModel.setName(option.getName());
+				 optionModel.setLabel(option.getLabel());
 				 optionModelList.add(optionModel);
 			}
 		} catch (Exception e) {

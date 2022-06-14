@@ -17,5 +17,6 @@ import lombok.Setter;
 public class OptionModel {
 	private Integer id;
 	private String name;
+	private String label;
 	List<PermissionModel> permissions;
 }

@@ -26,7 +26,9 @@ public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException,ServletException, UsernameNotFoundException {
+//                         AuthenticationException authException) 
+    AuthenticationException authException) 
+                        		 throws IOException,ServletException, UsernameNotFoundException {
         logger.error("Unauthorized error: {}", authException.getMessage());
         String messageResult = "";
         String statusResult = "";
