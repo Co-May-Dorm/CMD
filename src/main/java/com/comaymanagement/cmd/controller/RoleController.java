@@ -1,7 +1,26 @@
 package com.comaymanagement.cmd.controller;
-
+/**
+All option name
+	todolist
+	request
+	type
+	employee
+	department
+	position
+	inventory
+	team
+All permission name
+ 	view
+ 	create
+ 	update
+ 	detele
+ 	view_all
+ 	update_all
+ 	delete_all
+ **/
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +45,8 @@ public class RoleController {
 	RoleService roleService;
 	@Autowired
 	RoleDetailService roleDetailService;
+	
+	@PreAuthorize("@customRoleService.canView('role',principal) or @customRoleService.canViewAll('role',principal)")
 	@GetMapping("")
 	public ResponseEntity<Object> findAll(
 			@RequestParam(value = "name", required = false) String name,
@@ -36,22 +57,27 @@ public class RoleController {
 		return roleService.findAll(name, sort, order, page);
 	}
 	
+	@PreAuthorize("@customRoleService.canView('role',principal) or @customRoleService.canViewAll('role',principal)")
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> findRoleDetailByRoleId(@PathVariable Integer id) {
 		return roleService.findRoleDetailByRoleId(id);
 	}
+	
+	@PreAuthorize("@customRoleService.canCreate('role',principal)")
 	@PostMapping("/add")
 	@ResponseBody
 	public ResponseEntity<Object> add(@RequestBody String json){
 		return roleService.add(json);
 	}
 	
+	@PreAuthorize("@customRoleService.canUpdate('role',principal)")
 	@PutMapping("/edit")
 	@ResponseBody
 	public ResponseEntity<Object> edit(@RequestBody String json){
 		return roleService.edit(json);
 	}
 	
+	@PreAuthorize("@customRoleService.canDelete('role',principal)")
 	@DeleteMapping("/delete/{id}")
 	@ResponseBody
 	public ResponseEntity<Object> delete(@PathVariable Integer id){

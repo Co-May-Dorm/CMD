@@ -125,7 +125,7 @@ public class RoleService {
 						roleDetail.setModifyBy(createBy);
 						roleDetail.setCreateDate(createDate);
 						roleDetail.setModifyDate(createDate);
-						roleDetail.setRole_id(idAdded);
+						roleDetail.setRoleId(idAdded);
 						Integer rdAddedId  = roleDetailRepository.add(roleDetail);
 					}
 				}
@@ -180,7 +180,7 @@ public class RoleService {
 						roleDetail.setModifyBy(createBy);
 						roleDetail.setCreateDate(createDate);
 						roleDetail.setModifyDate(createDate);
-						roleDetail.setRole_id(roleId);
+						roleDetail.setRoleId(roleId);
 						Integer rdAddedId  = roleDetailRepository.add(roleDetail);
 					}
 				}

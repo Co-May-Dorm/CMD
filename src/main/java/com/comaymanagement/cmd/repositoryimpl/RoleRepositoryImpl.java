@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Option;
 import com.comaymanagement.cmd.entity.Permission;
+import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.RoleDetail;
 import com.comaymanagement.cmd.model.OptionModel;
@@ -101,7 +103,7 @@ public class RoleRepositoryImpl implements IRoleRepository {
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		hql.append("FROM role_details as rd ");
-		hql.append("INNER JOIN rd.role as r ");
+		hql.append("INNER JOIN roles as r on rd.roleId = r.id ");
 		hql.append("INNER JOIN options as op on rd.optionId = op.id ");
 		hql.append("INNER JOIN permissions as per on rd.permissionId = per.id ");
 		hql.append("WHERE r.id = :roleId ORDER BY rd.optionId asc");
@@ -220,6 +222,6 @@ public class RoleRepositoryImpl implements IRoleRepository {
 		}
 		
 	}
-
+	
 	
 }

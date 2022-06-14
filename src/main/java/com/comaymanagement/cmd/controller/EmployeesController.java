@@ -1,11 +1,30 @@
 package com.comaymanagement.cmd.controller;
-
+/**
+All option name
+	todolist
+	request
+	type
+	employee
+	department
+	position
+	inventory
+	team
+All permission name
+ 	view
+ 	create
+ 	update
+ 	detele
+ 	view_all
+ 	update_all
+ 	delete_all
+ **/
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +49,8 @@ public class EmployeesController {
 	EmployeeService employeeService;
 	@Autowired
 	DepartmentService departmentService;
+	
+	@PreAuthorize("@customRoleService.canView('employee',principal) or @customRoleService.canViewAll('employee', principal)")
 	@GetMapping(value = "", produces = "application/json")
 	public ResponseEntity<Object> paggingAllEmployee(
 			@RequestParam(value = "page", required = false) String page,
@@ -41,25 +62,25 @@ public class EmployeesController {
 			@RequestParam(value = "pos", required = false) String pos,
 			@RequestParam(value = "sort", required = false) String sort,
 			@RequestParam(value = "order", required = false) String order) {
-		Long startTime = new Date().getTime();
 		ResponseEntity<Object> result = employeeService.employeePaging(page,name, dob, email, phone, dep, pos, sort, order);
-		Long endTime = new Date().getTime();
-		String message = "find all emp: " + (endTime - startTime);
-		LOGGER.info(message);
 		return result;
 	}
+	
+	@PreAuthorize("@customRoleService.canCreate('employee',principal)")
 	@PostMapping(value = "/add")
 	@ResponseBody
 	public ResponseEntity<Object> addEmployee(@RequestBody String json) {
 		return employeeService.addEmployee(json);
 	}
 
+	@PreAuthorize("@customRoleService.canUpdate('employee',principal)")
 	@PutMapping(value = "/edit")
 	@ResponseBody
 	public ResponseEntity<Object> editEmployee(@RequestBody String json) {
 		return employeeService.edit(json);
 	}
 
+	@PreAuthorize("@customRoleService.canDelete('employee',principal)")
 	@DeleteMapping(value = "/delete/{id}")
 	@ResponseBody
 	public ResponseEntity<Object> deleteEmployee(@PathVariable Integer id) {
@@ -110,6 +131,8 @@ public class EmployeesController {
 //					
 //		
 //	}
+	
+	@PreAuthorize("@customRoleService.canImport('employee',principal)")
 	@PostMapping("/import")
 	public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile multipartFile,@RequestParam("creatorId") Integer creatorId) {
 		return employeeService.importEmployees(multipartFile,creatorId);

@@ -1,9 +1,28 @@
 package com.comaymanagement.cmd.controller;
-
+/**
+All option name
+	todolist
+	request
+	type
+	employee
+	department
+	position
+	inventory
+	team
+All permission name
+ 	view
+ 	create
+ 	update
+ 	detele
+ 	view_all
+ 	update_all
+ 	delete_all
+ **/
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +69,8 @@ public class TaskController {
 					.body(new ResponseObject("Not found", "Can not find task list", ""));
 		}
 	}*/
-
+	
+	@PreAuthorize("@customRoleService.canView('task',principal)")
 	@GetMapping(value= "",produces = "application/json")
 	public ResponseEntity<Object> findAll(				
 			@RequestParam(value="page",required = false) String page, 
@@ -68,6 +88,7 @@ public class TaskController {
 		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,page);
 	}
 	
+	@PreAuthorize("@customRoleService.canCreate('task',principal)")
 	@PostMapping("/add")
 	@ResponseBody
 	public ResponseEntity<Object> add(@RequestBody String json) {
@@ -75,6 +96,7 @@ public class TaskController {
 	}
 
 	//Get task list by status id 
+	@PreAuthorize("@customRoleService.canView('task',principal)")
 	@GetMapping(value="/status/{statusId}",produces = "application/json")
 	public ResponseEntity<Object> findByStatusId(@PathVariable String statusId,
 			@RequestParam(value="page",required = false) String page, 
@@ -86,6 +108,7 @@ public class TaskController {
 	
 	//Get task list by status ids 
 //	Axios not support on GET method with body param
+	@PreAuthorize("@customRoleService.canView('task',principal)")
 	@PostMapping(value="/statuses",produces = "application/json")
 	public ResponseEntity<Object> findByStatusIds(
 			@RequestBody String json,
@@ -96,23 +119,28 @@ public class TaskController {
 		return taskService.findByStatusIds(json, sort, order, page);
 	}
 	
+	@PreAuthorize("@customRoleService.canView('task',principal)")
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<Object> findById(@PathVariable Integer id){
 
 		return taskService.findById(id);
 	}
 
-	@DeleteMapping(value = "/delete/{id}")
+	@PreAuthorize("@customRoleService.canDelete('task',principal)")
+	@DeleteMapping(value = "/delete/{id}")	
 	public ResponseEntity<Object> deleteTaskById(@PathVariable Integer id){
 		
 			return taskService.deleteTaskById(id);
 	}
-
+	
+	@PreAuthorize("@customRoleService.canUpdate('task',principal)")
 	@PutMapping(value = "/edit")
 	@ResponseBody
 	public ResponseEntity<Object> editTask(@RequestBody String json) {
 		return taskService.edit(json);
 	}
+	
+	@PreAuthorize("@customRoleService.canView('task',principal)")
 	@GetMapping(value="/filter")
 	public ResponseEntity<Object> filter(
 			@RequestParam(value="createFrom", required=false) String createFrom,
