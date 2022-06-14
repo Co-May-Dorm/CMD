@@ -22,7 +22,7 @@ public class JwtUtils {
 
     private String jwtSecret = "HRlELXqpSB";
 
-    private int jwtExpirationMs = 864000000;
+    private int jwtExpirationMs = 604800000;
 
     public String generateJwtToken(UserDetailsImpl userDetails) {
         return Jwts.builder()
