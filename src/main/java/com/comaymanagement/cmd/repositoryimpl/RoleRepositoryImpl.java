@@ -223,5 +223,26 @@ public class RoleRepositoryImpl implements IRoleRepository {
 		
 	}
 	
+	@Override
+	public List<Role> findAllByEmpId(Integer empId){
+		Session session = sessionFactory.getCurrentSession();
+		List<Role> roles = null;
+		StringBuilder hql = new StringBuilder();
+		hql.append("SELECT pos.role.id FROM employees emp ");
+		hql.append("inner join emp.positions as pos ");
+		hql.append("WHERE emp.id = :empId");
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("empId", empId);
+			if(query.getResultList().size() > 0 ) {
+				roles = new ArrayList<>();
+				roles =  query.getResultList();
+			}
+		} catch (Exception e) {
+			LOGGER.error("Have error at findAllByEmpId(): ",e);
+		}
+		return roles;
+	}
+	
 	
 }

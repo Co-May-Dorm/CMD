@@ -70,7 +70,7 @@ public class TaskController {
 		}
 	}*/
 	
-	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@PreAuthorize("@customRoleService.canView('todolist',principal)")
 	@GetMapping(value= "",produces = "application/json")
 	public ResponseEntity<Object> findAll(				
 			@RequestParam(value="page",required = false) String page, 
@@ -88,7 +88,7 @@ public class TaskController {
 		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,page);
 	}
 	
-	@PreAuthorize("@customRoleService.canCreate('task',principal)")
+	@PreAuthorize("@customRoleService.canCreate('todolist',principal)")
 	@PostMapping("/add")
 	@ResponseBody
 	public ResponseEntity<Object> add(@RequestBody String json) {
@@ -96,7 +96,7 @@ public class TaskController {
 	}
 
 	//Get task list by status id 
-	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@PreAuthorize("@customRoleService.canView('todolist',principal)")
 	@GetMapping(value="/status/{statusId}",produces = "application/json")
 	public ResponseEntity<Object> findByStatusId(@PathVariable String statusId,
 			@RequestParam(value="page",required = false) String page, 
@@ -108,7 +108,7 @@ public class TaskController {
 	
 	//Get task list by status ids 
 //	Axios not support on GET method with body param
-	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@PreAuthorize("@customRoleService.canView('todolist',principal)")
 	@PostMapping(value="/statuses",produces = "application/json")
 	public ResponseEntity<Object> findByStatusIds(
 			@RequestBody String json,
@@ -119,28 +119,28 @@ public class TaskController {
 		return taskService.findByStatusIds(json, sort, order, page);
 	}
 	
-	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@PreAuthorize("@customRoleService.canView('todolist',principal)")
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<Object> findById(@PathVariable Integer id){
 
 		return taskService.findById(id);
 	}
 
-	@PreAuthorize("@customRoleService.canDelete('task',principal)")
+	@PreAuthorize("@customRoleService.canDelete('todolist',principal)")
 	@DeleteMapping(value = "/delete/{id}")	
 	public ResponseEntity<Object> deleteTaskById(@PathVariable Integer id){
 		
 			return taskService.deleteTaskById(id);
 	}
 	
-	@PreAuthorize("@customRoleService.canUpdate('task',principal)")
+	@PreAuthorize("@customRoleService.canUpdate('todolist',principal)")
 	@PutMapping(value = "/edit")
 	@ResponseBody
 	public ResponseEntity<Object> editTask(@RequestBody String json) {
 		return taskService.edit(json);
 	}
 	
-	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@PreAuthorize("@customRoleService.canView('todolist',principal)")
 	@GetMapping(value="/filter")
 	public ResponseEntity<Object> filter(
 			@RequestParam(value="createFrom", required=false) String createFrom,
