@@ -23,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.LoginRequest;
 import com.comaymanagement.cmd.model.User;
 import com.comaymanagement.cmd.repository.UserRepository;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
+import com.comaymanagement.cmd.repositoryimpl.RoleRepositoryImpl;
 import com.comaymanagement.cmd.security.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -54,6 +56,8 @@ public class AuthService {
 	@Autowired
 	EmployeeRepositoryImpl employeeRepository;
 
+	@Autowired
+	RoleRepositoryImpl roleRepository;
 	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
 		User user = userRepository.findByUsername(loginRequest.getUsername());
 		if (user == null) {
@@ -68,11 +72,11 @@ public class AuthService {
 		if (userDetails == null) {
 
 		}
-
+		List<Role> roleIds = roleRepository.findAllByEmpId(userDetails.getId());
 		String jwt = jwtUtils.generateJwtToken(userDetails);
 
-		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-				.collect(Collectors.toList());
+//		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+//				.collect(Collectors.toList());
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(new ResponseObject("OK", message.getMessageByItemCode("LOGINS1"), jwt));
 	}
