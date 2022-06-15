@@ -20,5 +20,7 @@ public class PositionModel {
 	private String name;
 	private Boolean isManager;
 	private Role role;
+	private DepartmentModel department;
+	
 	
 }

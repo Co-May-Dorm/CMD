@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
+import com.comaymanagement.cmd.model.DepartmentModel;
 import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.repository.IPositionRepository;
 @Repository
@@ -48,6 +50,11 @@ public class PositionRepositoryImpl implements IPositionRepository {
 				positionModel.setId(po.getId());
 				positionModel.setName(po.getName());
 				positionModel.setIsManager(po.getIsManager());
+				Department department = po.getDepartment();
+				DepartmentModel departmentModel = new DepartmentModel();
+				departmentModel.setId(department.getId());
+				departmentModel.setName(department.getName());
+				positionModel.setDepartment(departmentModel);
 //				positionModel.setRole(po.getRole());
 				positionModelList.add(positionModel);
 			}
