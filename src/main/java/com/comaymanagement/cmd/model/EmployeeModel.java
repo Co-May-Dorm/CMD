@@ -27,7 +27,7 @@ public class EmployeeModel {
 	private List<PositionModel> positions;
 	private List<DepartmentModel> departments;
 	private List<TeamModel> teams;
-	private User user;
+	private UserModel user;
 	private boolean active;
 	private String createDate;
 	private String modifyDate;

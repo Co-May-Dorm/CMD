@@ -19,7 +19,7 @@ import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.RoleDetailModel;
 import com.comaymanagement.cmd.model.RoleModel;
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repository.UserRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -32,11 +32,11 @@ public class UserRepositoryImpl implements UserRepository{
 	@Autowired
 	RoleRepositoryImpl roleRepository;
 	@Override
-	public User findByUsername(String username) {
+	public UserModel findByUsername(String username) {
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		hql.append("FROM employees as emp where emp.username = :username");
-		User user = null;
+		UserModel user = null;
 		List<RoleDetailModel> roleDetailModels = null;
 		try {
 			Query query = session.createQuery(hql.toString());
@@ -44,9 +44,9 @@ public class UserRepositoryImpl implements UserRepository{
 			List ob = query.getResultList();
 			if(ob.size() > 0) {
 				Employee employee = (Employee) ob.get(0);
-				user = new User();
+				user = new UserModel();
 				roleDetailModels = new ArrayList<>();
-				user.setEmployeeId(employee.getId());
+				user.setId(employee.getId());
 				user.setUsername(employee.getUsername());
 				user.setEmail(employee.getEmail());
 				user.setPassword(employee.getPassword());

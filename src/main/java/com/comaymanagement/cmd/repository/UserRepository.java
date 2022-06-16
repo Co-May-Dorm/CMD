@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.UserModel;
 
 
 @Repository
 public interface UserRepository{
-    User findByUsername(String username);
+    UserModel findByUsername(String username);
 
     Boolean existsByUsername(String username);
 

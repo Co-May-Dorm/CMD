@@ -1,7 +1,10 @@
 package com.comaymanagement.cmd.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -25,7 +28,8 @@ import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.LoginRequest;
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.RoleDetailModel;
+import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repository.UserRepository;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.RoleRepositoryImpl;
@@ -59,8 +63,13 @@ public class AuthService {
 	@Autowired
 	RoleRepositoryImpl roleRepository;
 	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-		User user = userRepository.findByUsername(loginRequest.getUsername());
-		if (user == null) {
+		List<Integer> roleIds = new ArrayList<>();
+		List<RoleDetailModel> roleDetailModels = new ArrayList<>();
+		RoleDetailModel roleDetailModel = new RoleDetailModel();
+		String jwt = "";
+		Map<String, Object> result = new TreeMap<>();
+		UserModel userModel = userRepository.findByUsername(loginRequest.getUsername());
+		if (userModel == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseObject("ERROR", message.getMessageByItemCode("LOGINE2"), ""));
 		}
@@ -69,16 +78,23 @@ public class AuthService {
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		if (userDetails == null) {
-
+		if (userDetails != null) {
+			roleIds = roleRepository.findAllRoleIdByEmpId(userDetails.getId());
+			for(Integer roleId : roleIds) {
+				roleDetailModel = roleRepository.findRoleDetailByRoleId(roleId);
+				roleDetailModels.add(roleDetailModel);
+			}
+			userModel.setPassword(null);
+			userModel.setRoles(roleDetailModels);
+			jwt = jwtUtils.generateJwtToken(userDetails);
+			result.put("accessToken", jwt);
+			result.put("userInfo", userModel);
 		}
-		List<Role> roleIds = roleRepository.findAllByEmpId(userDetails.getId());
-		String jwt = jwtUtils.generateJwtToken(userDetails);
-
+		
 //		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 //				.collect(Collectors.toList());
 		return ResponseEntity.status(HttpStatus.OK)
-				.body(new ResponseObject("OK", message.getMessageByItemCode("LOGINS1"), jwt));
+				.body(new ResponseObject("OK", message.getMessageByItemCode("LOGINS1"), result));
 	}
 
 	public ResponseEntity<Object> changePassword(String json) {

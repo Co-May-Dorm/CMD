@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repository.UserRepository;
 import com.comaymanagement.cmd.repositoryimpl.RoleRepositoryImpl;
 
@@ -30,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
-    	User user = null;
+    	UserModel user = null;
 		user = userRepository.findByUsername(username);
 		if(user == null) {
 			throw new UsernameNotFoundException("User Not Found with username: " + username);

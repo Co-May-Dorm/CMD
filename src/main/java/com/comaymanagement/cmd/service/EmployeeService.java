@@ -31,7 +31,7 @@ import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Team;
 import com.comaymanagement.cmd.model.EmployeeModel;
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
@@ -127,7 +127,7 @@ public class EmployeeService {
 	// Add and edit employee
 	public ResponseEntity<Object> addEmployee(String json) {
 		Employee emp = new Employee();
-		User user = new User();
+		UserModel user = new UserModel();
 		String createDate = new SimpleDateFormat("ddMMyyyy").format(new Date().getTime());
 		String modifyDate = createDate;
 		List<Position> positionList = new ArrayList<>();
@@ -257,7 +257,7 @@ public class EmployeeService {
 	// API edit and clock account (isActive true || false)
 	public ResponseEntity<Object> edit(String json) {
 		Employee emp = new Employee();
-		User user = new User();
+		UserModel user = new UserModel();
 		List<Position> positionList = new ArrayList<>();
 		List<Team> teamList = new ArrayList<>();
 		List<Department> departmentList = new ArrayList<>();
