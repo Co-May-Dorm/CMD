@@ -94,8 +94,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
 		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
 		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
-		//hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
-		//hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
+		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
+		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
 		hql.append("order by t." + sort + " " + order );
 		
 		try {
