@@ -29,7 +29,7 @@ import com.comaymanagement.cmd.model.DepartmentModel;
 import com.comaymanagement.cmd.model.EmployeeModel;
 import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.model.TeamModel;
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repository.IEmployeeRepository;
 
 @Repository
@@ -126,7 +126,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 						teamModelList.add(teamModel);
 					}
 				}
-				User user = new User();
+				UserModel user = new UserModel();
 				user.setUsername(e.getUsername());
 				user.setEnableLogin(e.isEnableLogin());
 				employeeModel.setId(e.getId());

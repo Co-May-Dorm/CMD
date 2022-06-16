@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comaymanagement.cmd.model.LoginRequest;
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.security.jwt.JwtUtils;
 import com.comaymanagement.cmd.service.AuthService;
 import com.comaymanagement.cmd.service.UserDetailsImpl;

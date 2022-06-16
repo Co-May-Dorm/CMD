@@ -22,5 +22,5 @@ public interface IRoleRepository {
 	public Integer edit(Role role);
 	public Role findById(Integer id);
 	public Integer delete(Integer id);
-	public List<Role> findAllByEmpId(Integer empId);
+	public List<Integer> findAllRoleIdByEmpId(Integer empId);
 }

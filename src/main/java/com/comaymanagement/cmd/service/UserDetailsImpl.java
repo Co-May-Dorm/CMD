@@ -22,7 +22,7 @@ import com.comaymanagement.cmd.entity.Status;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.model.OptionModel;
 import com.comaymanagement.cmd.model.RoleDetailModel;
-import com.comaymanagement.cmd.model.User;
+import com.comaymanagement.cmd.model.UserModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -45,7 +45,7 @@ public class UserDetailsImpl implements UserDetails {
     private List<RoleDetailModel> roles;
     private Collection<? extends GrantedAuthority> authorities;
     
-    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl build(UserModel user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         List<RoleDetailModel> roleDetailModels = null;
         try {
@@ -61,7 +61,7 @@ public class UserDetailsImpl implements UserDetails {
        
        
         return new UserDetailsImpl(
-                user.getEmployeeId(),
+                user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),

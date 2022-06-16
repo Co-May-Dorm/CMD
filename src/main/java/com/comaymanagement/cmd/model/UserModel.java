@@ -15,8 +15,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
-public class User {
-	private Integer employeeId;
+public class UserModel {
+	private Integer id;
 	private String username;
 	private String password;
 	private boolean enableLogin;
