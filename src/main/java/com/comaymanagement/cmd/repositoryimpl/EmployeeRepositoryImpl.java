@@ -250,6 +250,66 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		
 		return employeeSet.size();
 	}
+//	@Override
+//	public Employee findById(Integer id) {
+//		Session session = sessionFactory.getCurrentSession();
+//		StringBuilder hql = new StringBuilder();
+//		hql.append("from employees emp ");
+//		hql.append("INNER JOIN emp.positions as pos ");
+//		hql.append("where emp.id = :id");
+//		Employee employee = null;
+//		try {
+//			Query query = session.createQuery(hql.toString());
+//			query.setParameter("id", id);
+//			Iterator it = query.getResultList().iterator();
+//			Object[] ob = (Object[]) it.next();
+//			employee = (Employee) ob[0];
+//			// Please don't delete this line, this fix lazy load error when load position
+//			employee.getPositions().size();
+//			employee.getDepartments().size();
+//			employee.getTeams().size();
+//			// Please don't delete this line, this fix lazy load error when load position
+//		} catch (Exception e) {
+//			LOGGER.error("Error has occured in findById() ", e);
+//		}
+//		return employee;
+//	}
+
+	@Override
+	public boolean add(Set<Employee> emps) {
+		for (Employee em : emps) {
+			if(add(em)==-1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public Employee findEmpModelById(Integer id) {
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		hql.append("from employees emp ");
+		hql.append("INNER JOIN emp.positions as pos ");
+		hql.append("where emp.id = :id");
+		Employee employee = null;
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("id", id);
+			Iterator it = query.getResultList().iterator();
+			Object[] ob = (Object[]) it.next();
+			employee = (Employee) ob[0];
+			// Please don't delete this line, this fix lazy load error when load position
+			employee.getPositions().size();
+			employee.getDepartments().size();
+			employee.getTeams().size();
+			// Please don't delete this line, this fix lazy load error when load position
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in findById() ", e);
+		}
+		
+		return null;
+	}
 	@Override
 	public Employee findById(Integer id) {
 		Session session = sessionFactory.getCurrentSession();
@@ -272,16 +332,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in findById() ", e);
 		}
-		return employee;
-	}
-
-	@Override
-	public boolean add(Set<Employee> emps) {
-		for (Employee em : emps) {
-			if(add(em)==-1) {
-				return false;
-			}
-		}
-		return true;
+		
+		return null;
 	}
 }

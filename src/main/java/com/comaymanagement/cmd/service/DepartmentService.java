@@ -44,7 +44,7 @@ public class DepartmentService {
 		Set<DepartmentModel> departmentModelSet = departmentRepository.findAll(name);
 		
 		if (departmentModelSet.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successful", departmentModelSet));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "SUCCESSFULLY", departmentModelSet));
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "Not found", ""));
 		}

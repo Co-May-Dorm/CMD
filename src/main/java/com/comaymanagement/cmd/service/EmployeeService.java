@@ -112,7 +112,7 @@ public class EmployeeService {
 			result.put("pagination", pagination);
 			result.put("employees", employeeModelSet);
 			if (employeeModelSet.size() > 0) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "SUCCESSFULLY:", result));
 			} else {
 				pagination.setPage(1);
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", "Not found", result));
@@ -164,7 +164,7 @@ public class EmployeeService {
 
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
+						.body(new ResponseObject("ERROR", "Mã sinh viên này đã tồn tại!", ""));
 			}
 			emp.setCode(jsonObjectEmployee.get("code").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
@@ -243,13 +243,13 @@ public class EmployeeService {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", emp));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", idAdded + "", emp));
+						.body(new ResponseObject("ERROR", idAdded + "", emp));
 
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee()", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ResponseObject("Error", e.getMessage(), ""));
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 
 	}
@@ -280,7 +280,7 @@ public class EmployeeService {
 			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
+						.body(new ResponseObject("ERROR", "Mã sinh viên này đã tồn tại!", ""));
 			}
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 			boolean active = jsonObjectEmployee.get("active").asBoolean();
@@ -293,7 +293,7 @@ public class EmployeeService {
 				for (Position p : empCheck.getPositions()) {
 					if (p.getIsManager()) {
 						return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-								.body(new ResponseObject("Error", message.getMessageByItemCode("EMPE1"), ""));
+								.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE1"), ""));
 					}
 				}
 			}
@@ -380,15 +380,16 @@ public class EmployeeService {
 			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
 			Integer message = employeeRepository.edit(emp);
 			if (message != 0) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
+				Employee employeeModel = employeeRepository.findEmpModelById(id);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", employeeModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", message + "", emp));
+						.body(new ResponseObject("ERROR", message + "", emp));
 
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in edit()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 
 	}
@@ -415,11 +416,11 @@ public class EmployeeService {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", updateStatus + "", ""));
+						.body(new ResponseObject("ERROR", updateStatus + "", ""));
 
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "",e));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "",e));
 
 		}
 
@@ -495,11 +496,11 @@ public class EmployeeService {
 			} else {
 				String messageError = message.getMessageByItemCode("EMPE3");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", messageError, ""));
+						.body(new ResponseObject("ERROR", messageError, ""));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in edit()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "", ""));
 		}
 
 	}
