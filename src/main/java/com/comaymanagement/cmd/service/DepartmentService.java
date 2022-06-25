@@ -258,7 +258,7 @@ public class DepartmentService {
 	}
 	
 	public ResponseEntity<Object> delete(Integer id){
-		Department depDelete = (Department)  departmentRepository.findById(id).toArray()[0];
+		Department depDelete = (Department)  departmentRepository.findById(id);
 		if(depDelete.getEmployees().size()>0) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE1") , ""));
 		}

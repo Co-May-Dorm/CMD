@@ -47,7 +47,6 @@ public interface IEmployeeRepository {
 	public Integer countAllPaging(String name, String dob, String email, String phone, String dep,
 			String pos, String sort, String order);
 	public Employee findById(Integer id);
-	public Employee findEmpModelById(Integer id);
 	
 	public boolean add(Set<Employee> emps);
 	
