@@ -29,8 +29,12 @@ import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.Team;
+import com.comaymanagement.cmd.model.DepartmentModel;
 import com.comaymanagement.cmd.model.EmployeeModel;
+import com.comaymanagement.cmd.model.PositionModel;
+import com.comaymanagement.cmd.model.TeamModel;
 import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repositoryimpl.DepartmentRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
@@ -112,7 +116,7 @@ public class EmployeeService {
 			result.put("pagination", pagination);
 			result.put("employees", employeeModelSet);
 			if (employeeModelSet.size() > 0) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Successfully:", result));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "SUCCESSFULLY:", result));
 			} else {
 				pagination.setPage(1);
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", "Not found", result));
@@ -164,7 +168,7 @@ public class EmployeeService {
 
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
+						.body(new ResponseObject("ERROR", "Mã sinh viên này đã tồn tại!", ""));
 			}
 			emp.setCode(jsonObjectEmployee.get("code").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
@@ -211,22 +215,24 @@ public class EmployeeService {
 //				positionList.add(pos);
 //			}
 			for (JsonNode t : jsonObjectTeam) {
-				Team team = new Team();
-				team.setId(t.get("id").asInt());
-				
-				Position pos = new Position();
-				pos.setId(t.get("position").get("id").asInt());
-				positionList.add(pos);
-				teamList.add(team);
+				Integer teamId = t.get("id") !=null ? t.get("id").asInt() : -1;
+				Team team = teamRepository.findById(teamId);
+				if(team!=null) {
+					Position pos = positionRepository.findById(t.get("position").get("id").asInt());
+					positionList.add(pos);
+					teamList.add(team);
+				};
 			}
 
 			for (JsonNode d : jsonObjectDepartment) {
-				Department department = new Department();
-				department.setId(d.get("id").asInt());
-				Position pos = new Position();
-				pos.setId(d.get("position").get("id").asInt());
-				positionList.add(pos);
-				departmentList.add(department);
+				Integer depId = d.get("id") != null ? d.get("id").asInt() : -1;
+				Department department = departmentRepository.findById(depId);
+				if(department!=null) {
+					Position pos = positionRepository.findById(d.get("position").get("id").asInt());
+					positionList.add(pos);
+					departmentList.add(department);
+					
+				}
 			}
 
 			emp.setPositions(positionList);
@@ -239,17 +245,18 @@ public class EmployeeService {
 			emp.setCreateBy(jsonObjectEmployee.get("createBy").asInt());
 			emp.setModifyBy(jsonObjectEmployee.get("createBy").asInt());
 			Integer idAdded = employeeRepository.add(emp);
+			EmployeeModel employeeModel = toEmployeeModel(emp);
 			if (idAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", emp));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", employeeModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", idAdded + "", emp));
+						.body(new ResponseObject("ERROR", idAdded + "", emp));
 
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee()", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ResponseObject("Error", e.getMessage(), ""));
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 
 	}
@@ -270,17 +277,19 @@ public class EmployeeService {
 		JsonNode jsonLoginAccount;
 		String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
 		try {
+			
 			jsonObjectEmployee = jsonMapper.readTree(json);
 			jsonObjectPosition = jsonObjectEmployee.get("positions");
 			jsonObjectTeam = jsonObjectEmployee.get("teams");
 			jsonObjectDepartment = jsonObjectEmployee.get("departments");
 			Integer id = jsonObjectEmployee.get("id") != null ? jsonObjectEmployee.get("id").asInt() : -1;
+			emp = employeeRepository.findById(id);
 //			Check employee id existed
 			String code = jsonObjectEmployee.get("code").asText();
 			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", "Mã sinh viên này đã tồn tại!", ""));
+						.body(new ResponseObject("ERROR", "Mã sinh viên này đã tồn tại!", ""));
 			}
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 			boolean active = jsonObjectEmployee.get("active").asBoolean();
@@ -289,11 +298,10 @@ public class EmployeeService {
 			 * do not allow the lock
 			 */
 			if (!active) {
-				Employee empCheck = employeeRepository.findById(id);
-				for (Position p : empCheck.getPositions()) {
+				for (Position p : emp.getPositions()) {
 					if (p.getIsManager()) {
 						return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-								.body(new ResponseObject("Error", message.getMessageByItemCode("EMPE1"), ""));
+								.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE1"), ""));
 					}
 				}
 			}
@@ -354,20 +362,25 @@ public class EmployeeService {
 //				positionList.add(pos);
 //			}
 			for (JsonNode t : jsonObjectTeam) {
-				Team team = new Team();
-				team.setId(t.get("id").asInt());
-				Position pos = new Position();
-				pos.setId(t.get("position").get("id").asInt());
-				positionList.add(pos);
-				teamList.add(team);
+				Integer teamId = t.get("id") !=null ? t.get("id").asInt() : -1;
+				Team team = teamRepository.findById(teamId);
+				if(team!=null) {
+					Position pos = positionRepository.findById(t.get("position").get("id").asInt());
+					positionList.add(pos);
+					teamList.add(team);
+				}
+				
 			}
 			for (JsonNode d : jsonObjectDepartment) {
-				Department department = new Department();
-				department.setId(d.get("id").asInt());
-				Position pos = new Position();
-				pos.setId(d.get("position").get("id").asInt());
-				positionList.add(pos);
-				departmentList.add(department);
+				Integer depId = d.get("id") != null ? d.get("id").asInt() : -1;
+				Department department = departmentRepository.findById(depId);
+				if(department!=null) {
+					Position pos = positionRepository.findById(d.get("position").get("id").asInt());
+					positionList.add(pos);
+					departmentList.add(department);
+					
+				}
+				
 			}
 			emp.setPositions(positionList);
 			emp.setTeams(teamList);
@@ -380,15 +393,16 @@ public class EmployeeService {
 			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
 			Integer message = employeeRepository.edit(emp);
 			if (message != 0) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", emp));
+				EmployeeModel employeeModel = toEmployeeModel(emp);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", employeeModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", message + "", emp));
+						.body(new ResponseObject("ERROR", message + "", emp));
 
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in edit()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 
 	}
@@ -415,11 +429,11 @@ public class EmployeeService {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", updateStatus + "", ""));
+						.body(new ResponseObject("ERROR", updateStatus + "", ""));
 
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "",e));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "",e));
 
 		}
 
@@ -495,13 +509,78 @@ public class EmployeeService {
 			} else {
 				String messageError = message.getMessageByItemCode("EMPE3");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", messageError, ""));
+						.body(new ResponseObject("ERROR", messageError, ""));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in edit()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "", ""));
 		}
 
 	}
-
+	public EmployeeModel toEmployeeModel(Employee employee) {
+		EmployeeModel employeeModel = new EmployeeModel();
+		List<PositionModel> positionModelList = new ArrayList<>();
+		List<DepartmentModel> departmentModelList = new ArrayList<>();
+		List<TeamModel> teamModelList= new ArrayList<>();
+		if (employee!=null) {
+			for (Position p : employee.getPositions()) {
+				PositionModel positionModel = new PositionModel();
+				
+				Role role = new Role();
+				role.setId(p.getRole().getId());
+				role.setName(p.getRole().getName());
+				positionModel.setId(p.getId());
+				positionModel.setName(p.getName());
+				positionModel.setIsManager(p.getIsManager());
+				positionModel.setRole(role);
+				if(p.getDepartment()!=null && p.getTeam()==null) {
+					Department department = p.getDepartment();
+					DepartmentModel departmentModel = new DepartmentModel();
+					departmentModel.setId(department.getId());
+					departmentModel.setCode(department.getCode());
+					departmentModel.setName(department.getName());
+					departmentModel.setFatherDepartmentId(department.getFatherDepartmentId());
+					departmentModel.setHeadPosition(department.getHeadPosition());
+					departmentModel.setDescription(department.getDescription());
+					departmentModel.setLevel(department.getLevel());
+					departmentModel.setPosition(positionModel);
+					departmentModelList.add(departmentModel);
+				}
+				else if(p.getDepartment()==null && p.getTeam()!=null) {
+					Team team = p.getTeam();
+					TeamModel teamModel = new TeamModel();
+					teamModel.setId(team.getId());
+					teamModel.setCode(team.getCode());
+					teamModel.setName(team.getName());
+					teamModel.setDescription(team.getDescription());
+					teamModel.setHeadPosition(team.getHeadPosition());
+					teamModel.setPosition(positionModel);
+					teamModelList.add(teamModel);
+				}
+			}
+			UserModel user = new UserModel();
+			user.setUsername(employee.getUsername());
+			user.setEnableLogin(employee.isEnableLogin());
+			employeeModel.setId(employee.getId());
+			employeeModel.setCode(employee.getCode());
+			employeeModel.setName(employee.getName());
+			employeeModel.setAvatar(employee.getAvatar());
+			employeeModel.setGender(employee.getGender());
+			employeeModel.setDateOfBirth(employee.getDateOfBirth());
+			employeeModel.setEmail(employee.getEmail());
+			employeeModel.setPhoneNumber(employee.getPhoneNumber());
+			employeeModel.setActive(employee.isActive());
+			employeeModel.setCreateDate(employee.getCreateDate());
+			employeeModel.setDepartments(departmentModelList);;
+			employeeModel.setPositions(positionModelList);
+			employeeModel.setUser(user);
+			employeeModel.setCreateDate(employee.getCreateDate());
+			employeeModel.setModifyDate(employee.getModifyDate());
+			employeeModel.setCreateBy(employee.getCreateBy());
+			employeeModel.setModifyBy(employee.getModifyBy());
+			employeeModel.setTeams(teamModelList);
+			return employeeModel;
+		}
+		return null;
+	}
 }

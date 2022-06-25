@@ -45,7 +45,7 @@ public class PositionService{
 							.body(new ResponseObject("", "Have no task by status_id: " + roleId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
-							.body(new ResponseObject("OK", "Query produce successfully:", positionModelList));
+							.body(new ResponseObject("OK", "Query produce SUCCESSFULLY:", positionModelList));
 				}
 			}
 		} catch (Exception e) {
@@ -69,7 +69,7 @@ public class PositionService{
 							.body(new ResponseObject("", "Have no position by departmentId: " + depId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
-							.body(new ResponseObject("OK", "Query produce successfully:", positionModelList));
+							.body(new ResponseObject("OK", "Query produce SUCCESSFULLY:", positionModelList));
 				}
 			}
 		} catch (Exception e) {
@@ -92,7 +92,7 @@ public class PositionService{
 							.body(new ResponseObject("", "Have no position by teamId: " + teamId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
-							.body(new ResponseObject("OK", "Query produce successfully:", positionModelList));
+							.body(new ResponseObject("OK", "Query produce SUCCESSFULLY:", positionModelList));
 				}
 			}
 		} catch (Exception e) {

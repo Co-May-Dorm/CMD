@@ -143,11 +143,11 @@ public class TeamRepositoryImpl implements ITeamRepository {
 		try {
 			Query query = session.createQuery(hql.toString());
 			team = (Team) query.getSingleResult();
+			return team;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured at delete() ", e);
+			return null;
 		}
-		
-		return team;
 	}
 
 	@Override

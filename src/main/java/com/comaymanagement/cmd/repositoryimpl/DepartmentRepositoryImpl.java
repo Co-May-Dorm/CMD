@@ -135,31 +135,21 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 
 	@Override
 	@javax.transaction.Transactional
-	public Set<Department> findById(Integer id) {
+	public Department findById(Integer id) {
 		List<Position> positions = new ArrayList<Position>();
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
-		Set<Department> departmentSet = new LinkedHashSet<>();
 		hql.append("from departments dep ");
-		hql.append("INNER JOIN dep.positions ");
 		hql.append("where dep.id = " + id);
 		try {
 			Query query = session.createQuery(hql.toString());
-			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-				Object[] ob = (Object[]) it.next();
-				Department e = (Department)ob[0];
-//				
-//				Position po = (Position) ob[1];
-//				positions.add(po);
-				departmentSet.add(e);
-			}
-//			Department de = (Department) departmentSet.toArray()[0];
-//			de.setPositions(positions);
+			Department e = (Department) query.getSingleResult();
+			return e;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in delete() ", e);
+			return null;
 		}
 		
-		return departmentSet;
 	}
 	public Department findByIdToEdit(Integer id) {
 
