@@ -50,7 +50,7 @@ All permission name
  **/
 @RestController
 @RequestMapping("/departments")
-@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class DepartmentController {
 	@Autowired
 	DepartmentService departmentService;

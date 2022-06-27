@@ -34,7 +34,7 @@ import com.comaymanagement.cmd.service.PositionService;
 
 @RestController
 @RequestMapping("/positions")
-@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class PositionController {
 	@Autowired
 	PositionService positionService;

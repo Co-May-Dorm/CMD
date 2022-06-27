@@ -41,7 +41,7 @@ import com.comaymanagement.cmd.service.TaskService;
 
 @RestController
 @RequestMapping("/tasks")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class TaskController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());

@@ -6,10 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Query;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +57,6 @@ public class RoleRepositoryImpl implements IRoleRepository {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
-			LOGGER.info(hql.toString());
 			
 			for(Iterator it = query.getResultList().iterator();it.hasNext();) {
 				Object obj  = (Object) it.next();
@@ -83,16 +80,20 @@ public class RoleRepositoryImpl implements IRoleRepository {
 	}
 	
 	@Override
-	public Integer CountTotalItem() {
-		Integer count = null;
-		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM roles");
+	public Integer countAllPaging(String name, String sort, String order, Integer limit, Integer offset) {
+		Integer count = 0;
+		StringBuilder hql = new StringBuilder();
+		hql.append("SELECT COUNT(*) FROM roles r ");
+		hql.append("WHERE r.name like CONCAT('%',:name,'%') ");
+		hql.append("ORDER BY " + sort + " " + order);
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
-			LOGGER.info(hql.toString());
-			List list = query.getResultList();
-			count = Integer.valueOf(list.get(0).toString());
-		}catch (Exception e) {
+			query.setParameter("name", name);
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
+			count = Integer.valueOf(query.uniqueResult().toString() );
+		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
 		return count;
