@@ -39,7 +39,7 @@ import com.comaymanagement.cmd.service.RoleService;
 
 @RestController
 @RequestMapping("/roles")
-@CrossOrigin(origins = "*", maxAge = 3600))
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class RoleController {
 	@Autowired
 	RoleService roleService;
