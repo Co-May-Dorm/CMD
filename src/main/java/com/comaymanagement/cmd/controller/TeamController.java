@@ -39,7 +39,7 @@ import com.comaymanagement.cmd.service.TeamService;
 
 @RestController
 @RequestMapping("/teams")
-@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class TeamController {
 	@Autowired
 	TeamService teamService;

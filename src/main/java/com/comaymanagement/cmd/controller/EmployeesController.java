@@ -40,7 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.comaymanagement.cmd.service.DepartmentService;
 import com.comaymanagement.cmd.service.EmployeeService;
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/employees")
 public class EmployeesController {

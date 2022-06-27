@@ -36,7 +36,7 @@ All permission name
  **/
 @RestController
 @RequestMapping("/proposals")
-@CrossOrigin(origins = {CrossOriginConstant.REACT_ORIGIN,CrossOriginConstant.REACT_ORIGIN_LOCAL})
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class ProposalController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(This.class);

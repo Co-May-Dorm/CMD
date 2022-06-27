@@ -9,11 +9,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Query;
+//import javax.persistence.Query;
 import javax.sql.DataSource;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			query.setParameter("phone", phone);
 			query.setParameter("dep", dep);
 			query.setParameter("pos", pos);
+			query.getResultList().iterator();
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
@@ -216,7 +218,8 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			String pos, String sort, String order) {
 		Set<Employee> employeeSet = new LinkedHashSet<>();
 		StringBuilder hql = new StringBuilder();
-		hql.append("from employees emp ");
+		hql.append("select count(*) from ");
+		hql.append("employees emp ");
 		hql.append("inner join emp.positions as pos inner join emp.departments as dep ");
 		hql.append("where emp.name like CONCAT('%',:name,'%') ");
 		hql.append("and emp.dateOfBirth like CONCAT('%',:dob,'%') ");
@@ -238,17 +241,18 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			query.setParameter("phone", phone);
 			query.setParameter("dep", dep);
 			query.setParameter("pos", pos);
-			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-				Object[] ob = (Object[]) it.next();
-				employeeSet.add((Employee) ob[0]);
-			}
-			
+//			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+//				Object[] ob = (Object[]) it.next();
+//				employeeSet.add((Employee) ob[0]);
+//			}
+			Integer countResult = Integer.valueOf(query.uniqueResult().toString() );
+			return countResult;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
 			
 		}
 		
-		return employeeSet.size();
+		return 0;
 	}
 	@Override
 	public Employee findById(Integer id) {

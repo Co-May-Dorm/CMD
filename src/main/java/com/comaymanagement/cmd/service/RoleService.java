@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Option;
 import com.comaymanagement.cmd.entity.Pagination;
@@ -52,7 +53,7 @@ public class RoleService {
 	public ResponseEntity<Object> findAll(String name, String sort, String order, String page) {
 		page = page == null ? "1" : page.trim();
 		name = name == null ? "" : name.trim();
-		int limit = 15;
+		int limit = CMDConstrant.ROLELIMIT;
 		// Caculator offset
 		int offset = (Integer.parseInt(page) - 1) * limit;
 
@@ -68,7 +69,7 @@ public class RoleService {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
-			pagination.setTotalItem(roleRepository.CountTotalItem());
+			pagination.setTotalItem(roleRepository.countAllPaging(name, sort, order , limit, offset));
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("roles", roleModelList);
 			results.put("pagination", pagination);

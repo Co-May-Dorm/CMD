@@ -16,7 +16,7 @@ public interface IRoleRepository {
 			String order,
 			Integer limit,
 			Integer offset);
-	Integer CountTotalItem();
+	Integer countAllPaging(String name, String sort, String order, Integer limit, Integer offset);
 	public RoleDetailModel findRoleDetailByRoleId(Integer roleId);
 	public Integer add(Role role);
 	public Integer edit(Role role);
