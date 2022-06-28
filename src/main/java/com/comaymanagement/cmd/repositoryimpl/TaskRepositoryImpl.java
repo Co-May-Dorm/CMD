@@ -107,8 +107,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("status", status);
 			query.setParameter("creator", creator);
 			query.setParameter("receiver", receiver);
-			//query.setParameter("createDate", createDate);
-			//query.setParameter("finishDate", finishDate);
+			query.setParameter("createDate", createDate);
+			query.setParameter("finishDate", finishDate);
 
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
