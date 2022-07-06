@@ -26,12 +26,12 @@ public class ProposalDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@Column(name="proposal_detail_index")
-	private Integer proposalDetailIndex;
-	
-	private String content;
-
 	@OneToOne()
 	@JoinColumn(name = "proposal_id")
-	private Proposal proposal;
+	private Proposal proposalId;
+	@Column(name="field_id")
+	private String fieldId;
+	@Column(name="field_name")
+	private String fieldName;
+	private String content;
 }

@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.model;
 
+import java.util.List;
+
 import com.comaymanagement.cmd.entity.ProposalType;
 import com.comaymanagement.cmd.entity.Status;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -17,9 +19,9 @@ import lombok.Setter;
 @JsonInclude(Include.NON_NULL)
 public class ProposalModel {
 	private int id;
-	private String creator;
+	private EmployeeModel creator;
 	private ProposalType proposalType;
-	private String content;
+	private List<ContentModel> contents;
 	private String createdDate;
 	private Status status;
 }
