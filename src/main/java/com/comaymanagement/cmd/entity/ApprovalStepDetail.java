@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,15 +31,12 @@ public class ApprovalStepDetail {
 	@JoinColumn(name = "approval_step_id")
 	private ApprovalStep approvalStep;
 
-	@OneToOne()
-	@JoinColumn(name = "department_id")
-	private Department department;
+	@Column(name = "department_id")
+	private String departmentId;
 
-	@OneToOne()
-	@JoinColumn(name = "postion_id")
-	private Position position;
+	@Column(name = "position_id")
+	private String positionId;
 
-	@OneToOne()
-	@JoinColumn(name = "employee_id")
-	private Employee employee;
+	@Column(name = "employee_id")
+	private String employeeId;
 }

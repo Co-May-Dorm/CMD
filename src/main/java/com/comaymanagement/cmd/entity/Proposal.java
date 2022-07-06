@@ -54,4 +54,7 @@ public class Proposal {
 	private String createDate;
 	@Column(name="modify_date")
 	private String modifyDate;
+	@Column(name="current_step")
+	private String currentStep;
+	
 }

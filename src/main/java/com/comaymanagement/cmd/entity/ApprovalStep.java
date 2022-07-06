@@ -31,10 +31,10 @@ public class ApprovalStep {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	@Column(name="approval_step_index")
+	private String approvalStepIndex;
 	@Column(name="approval_step_name")
 	private String approvalStepName;
-	@Column(name="approval_step_index")
-	private Integer approvalStepIndex;
 
 	@OneToOne()
 	@JoinColumn(name = "proposal_type_id")
@@ -43,5 +43,5 @@ public class ApprovalStep {
 	@OneToMany
 	@JoinColumn(name = "approval_step_id")
 	@JsonBackReference
-	private Set<ApprovalStepDetail> approvalStepDetailList;
+	private Set<ApprovalStepDetail> approvalStepDetails;
 }
