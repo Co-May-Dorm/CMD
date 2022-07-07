@@ -57,7 +57,7 @@ public class TaskService {
 			results.put("pagination", pagination);
 			if (tasksByStatusId == null) {
 				LOGGER.info("Have no task by status_id: " + statusId);
-				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("", "Have no task by status_id: " + statusId, ""));
 			} else {
 				return ResponseEntity.status(HttpStatus.OK)
@@ -159,7 +159,7 @@ public class TaskService {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
 			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("Not found", "Can not find task list", results));
 			}
 		} catch (Exception e) {
@@ -207,7 +207,7 @@ public class TaskService {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK",message.getMessageByItemCode("TASKS1"), id));
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR",message.getMessageByItemCode("TASKS1"), ""));
 			}
 
@@ -220,15 +220,14 @@ public class TaskService {
 
 	public ResponseEntity<Object> findById(Integer id){
 		TaskModel taskModel = new TaskModel();
-		taskModel = taskRepository.findById(id);
-		
 		try {
+			taskModel = taskRepository.findById(id);
 			if ( id != null) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "SUCCESSFULLY: ", taskModel));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("ERROR", "Have error", ""));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", "NOT FOUND", ""));
 			}
 
 		} catch (Exception e) {
@@ -272,7 +271,7 @@ public class TaskService {
 				if (updateStatus.equals("1")) {
 					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
 			} else {
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ResponseObject("ERROR", updateStatus + "", ""));
 
 				}
@@ -363,7 +362,7 @@ public class TaskService {
 					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("OK", "Query produce successfully ", results));
 				} else {
-					return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("Not found ", "Can not find task list ", tasks));
 				}
 			} catch (Exception e) {

@@ -76,4 +76,19 @@ public class ProposalService {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
+	public ResponseEntity<Object> findById(Integer id){
+		ProposalModel proposalModel = null;
+		try {
+			proposalModel = proposalRepositoryImpl.findById(id);
+			if (null != proposalModel) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", "Query produce successfully: ", proposalModel));
+			} else {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", ""));
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+		}
+	}
 }

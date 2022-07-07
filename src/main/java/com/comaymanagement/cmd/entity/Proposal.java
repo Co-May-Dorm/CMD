@@ -39,6 +39,10 @@ public class Proposal {
 	@OneToOne()
 	@JoinColumn(name = "creator_id")
 	private Employee employee;
+	
+	@OneToOne()
+	@JoinColumn(name = "receiver_id")
+	private Employee receiver;
 
 	@OneToOne()
 	@JoinColumn(name = "status_id")
