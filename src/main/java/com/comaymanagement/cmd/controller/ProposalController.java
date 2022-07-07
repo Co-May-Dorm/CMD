@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.service.ProposalService;
 
 import net.bytebuddy.asm.Advice.This;
@@ -52,4 +52,13 @@ public class ProposalController {
 		return proposalService.findAll(proposal, content, status, creator, createDate, finishDate, sort, order, limit, page);
 		
 	}
+	
+	@PreAuthorize("@customRoleService.canViewAll('proposal',principal) or @customRoleService.canView('proposal',principal)")
+	@GetMapping(value= "/{id}",produces = "application/json")
+	public ResponseEntity<Object> findById(@PathVariable String id){
+		LOGGER.info("Find proposal by id");
+		return proposalService.findById(Integer.valueOf(id));
+		
+	}
+	
 }

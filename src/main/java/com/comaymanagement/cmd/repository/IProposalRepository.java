@@ -10,4 +10,5 @@ public interface IProposalRepository {
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit);
 	public Integer countAllPaging(String proposal, String content, String status, String creator,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit);
+	public ProposalModel findById(Integer id);
 }
