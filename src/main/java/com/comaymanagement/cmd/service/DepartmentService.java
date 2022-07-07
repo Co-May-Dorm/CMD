@@ -44,9 +44,9 @@ public class DepartmentService {
 		Set<DepartmentModel> departmentModelSet = departmentRepository.findAll(name);
 		
 		if (departmentModelSet.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "SUCCESSFULLY", departmentModelSet));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", departmentModelSet));
 		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "Not found", ""));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", ""));
 		}
 
 	}
@@ -76,7 +76,7 @@ public class DepartmentService {
 			boolean isExisted = departmentRepository.isExisted(-1, code);
 
 			if (isExisted) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE2") , ""));
 			}
 			
@@ -113,7 +113,7 @@ public class DepartmentService {
 				
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at save():");
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1") , ""));
 				}
 				if(p.getIsManager()) {
@@ -126,11 +126,11 @@ public class DepartmentService {
 			if (idDepAdded != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE3"), dep));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE3"), dep));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentService at add() ", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 
 		}
 	}
@@ -161,7 +161,7 @@ public class DepartmentService {
 			Integer id = jsonObjectDepartment.get("id").asInt();
 			boolean isExisted = departmentRepository.isExisted(id, code);
 			if (isExisted) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE2"), ""));
 			}
 			dep.setId(id);
@@ -218,7 +218,7 @@ public class DepartmentService {
 				Integer idAdded = positionRepository.edit(p);
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE2"), ""));
 				}
 				else if (p.getIsManager()) {
@@ -234,7 +234,7 @@ public class DepartmentService {
 				
 				if (idAdded == -1) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1"), ""));
 				}
 				else if(p.getIsManager()) {
@@ -248,11 +248,11 @@ public class DepartmentService {
 			if (messageEdit != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", dep));
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE4"), dep));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE4"), dep));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentService at add() ", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
 
 		}
 	}
@@ -260,7 +260,7 @@ public class DepartmentService {
 	public ResponseEntity<Object> delete(Integer id){
 		Department depDelete = (Department)  departmentRepository.findById(id);
 		if(depDelete.getEmployees().size()>0) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE1") , ""));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE1") , ""));
 		}
 		List<Position> positions = depDelete.getPositions();
 		for(Position p : depDelete.getPositions()) {
@@ -271,7 +271,7 @@ public class DepartmentService {
 			if (deleteStatus.equals("1")) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", deleteStatus + "", ""));
 		} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("ERROR", deleteStatus, ""));
 
 			}

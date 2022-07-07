@@ -70,7 +70,7 @@ public class AuthService {
 		Map<String, Object> result = new TreeMap<>();
 		UserModel userModel = userRepository.findByUsername(loginRequest.getUsername());
 		if (userModel == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("ERROR", message.getMessageByItemCode("LOGINE2"), ""));
 		}
 		Authentication authentication = authenticationManager.authenticate(
