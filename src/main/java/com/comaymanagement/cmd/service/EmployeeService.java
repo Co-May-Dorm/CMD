@@ -116,14 +116,14 @@ public class EmployeeService {
 			result.put("pagination", pagination);
 			result.put("employees", employeeModelSet);
 			if (employeeModelSet.size() > 0) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "SUCCESSFULLY:", result));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", result));
 			} else {
 				pagination.setPage(1);
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", "Not found", result));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", result));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 
 	}
@@ -168,7 +168,7 @@ public class EmployeeService {
 
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("ERROR", "Mã sinh viên này đã tồn tại!", ""));
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE5"), ""));
 			}
 			emp.setCode(jsonObjectEmployee.get("code").asText());
 			emp.setName(jsonObjectEmployee.get("name").asText());
@@ -247,10 +247,10 @@ public class EmployeeService {
 			Integer idAdded = employeeRepository.add(emp);
 			EmployeeModel employeeModel = toEmployeeModel(emp);
 			if (idAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", employeeModel));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK",message.getMessageByItemCode("EMPS2") , employeeModel));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("ERROR", idAdded + "", emp));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE4"), emp));
 
 			}
 		} catch (Exception e) {
@@ -288,8 +288,8 @@ public class EmployeeService {
 			String code = jsonObjectEmployee.get("code").asText();
 			boolean isExisted = employeeRepository.checkEmployeeCodeExisted(id, code);
 			if (isExisted) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("ERROR", "Mã sinh viên này đã tồn tại!", ""));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE5"), ""));
 			}
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 			boolean active = jsonObjectEmployee.get("active").asBoolean();
@@ -300,7 +300,7 @@ public class EmployeeService {
 			if (!active) {
 				for (Position p : emp.getPositions()) {
 					if (p.getIsManager()) {
-						return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						return ResponseEntity.status(HttpStatus.OK)
 								.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE1"), ""));
 					}
 				}
@@ -391,18 +391,18 @@ public class EmployeeService {
 			emp.setModifyDate(modifyDate);
 			emp.setCreateBy(jsonObjectEmployee.get("createBy").asInt());
 			emp.setModifyBy(jsonObjectEmployee.get("modifyBy").asInt());
-			Integer message = employeeRepository.edit(emp);
-			if (message != 0) {
+			Integer status =  employeeRepository.edit(emp);
+			if (status != 0) {
 				EmployeeModel employeeModel = toEmployeeModel(emp);
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message + "", employeeModel));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("EMPS3"), employeeModel));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("ERROR", message + "", emp));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE6"), emp));
 
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in edit()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 
 	}
@@ -426,14 +426,14 @@ public class EmployeeService {
 			String updateStatus = employeeRepository.delete(emp);
 
 			if (updateStatus.equals("1")) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("EMPE7"), ""));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("ERROR", updateStatus + "", ""));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE7") + "", ""));
 
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "",e));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(),""));
 
 		}
 
@@ -508,12 +508,12 @@ public class EmployeeService {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageSuccess, ""));
 			} else {
 				String messageError = message.getMessageByItemCode("EMPE3");
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", messageError, ""));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in edit()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", "", ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", "", ""));
 		}
 
 	}

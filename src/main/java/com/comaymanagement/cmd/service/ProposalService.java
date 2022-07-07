@@ -73,7 +73,7 @@ public class ProposalService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
 	public ResponseEntity<Object> findById(Integer id){
@@ -88,7 +88,7 @@ public class ProposalService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
 }

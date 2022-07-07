@@ -35,13 +35,13 @@ public class PositionService{
 
 		try {
 			if (roleId == null) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", "Have error: ", "Role ID is null"));
 			} else {
 				positionModelList = positionRepository.findAllByRoleId(roleId);
 				if (positionModelList.size() < 1) {
 					LOGGER.info("Have no task by status_id: " + roleId);
-					return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("", "Have no task by status_id: " + roleId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
@@ -50,7 +50,7 @@ public class PositionService{
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
 		}
 	}
@@ -59,13 +59,13 @@ public class PositionService{
 
 		try {
 			if (depId == null) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", "Have error: ", "Department ID is null"));
 			} else {
 				positionModelList = positionRepository.findAllByDepartmentId(depId);
 				if (positionModelList.size() < 1) {
 					LOGGER.info("Have no task by status_id: " + depId);
-					return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 							.body(new ResponseObject("", "Have no position by departmentId: " + depId, ""));
 				} else {
 					return ResponseEntity.status(HttpStatus.OK)
@@ -74,7 +74,7 @@ public class PositionService{
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("ERROR", "Have error: ", e.getMessage()));
 		}
 	}
@@ -83,7 +83,7 @@ public class PositionService{
 		
 		try {
 			if (teamId == null) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", "Have error: ", "Department ID is null"));
 			} else {
 				positionModelList = positionRepository.findAllByDepartmentId(teamId);
@@ -150,12 +150,12 @@ public class PositionService{
 			if (updateStatus.equals("1")) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", updateStatus + "", ""));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("Error", updateStatus + "", ""));
 
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", "", ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", "", ""));
 
 		}
 
@@ -165,7 +165,7 @@ public class PositionService{
 		if (idAdded != -1) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
 		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("Error", idAdded + "", p));
 		}
 	}
