@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.entity.TaskHis;
@@ -347,15 +348,67 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public Integer add(Task task) {
+	public TaskModel add(Task task) throws Exception {
 		try {
 			LOGGER.info("SAVE TASK....");
 			Session session = sessionFactory.getCurrentSession();
-			return Integer.parseInt(session.save(task).toString());
+			TaskModel customTask = null;
+			Integer resultInteger =  Integer.parseInt(session.save(task).toString());
+			if( resultInteger > CMDConstrant.FAILED) {
+				customTask = new TaskModel(); 
+				customTask.setId(task.getId());
+				customTask.setTitle(task.getTitle());
+				
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department :task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
+				return customTask;
+			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee() ", e);
-			return -1;
 		}
+		return null;
 	}
 
 	@Override
@@ -431,7 +484,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-				for(Department department :task.getCreator().getDepartments()) {
+				for(Department department : departmentList) {
 					DepartmentModel dModel = new DepartmentModel();
 					dModel.setCode(department.getCode());
 					dModel.setDescription(department.getDescription());
@@ -474,15 +527,64 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 	//edit
 		@Override
-		public Integer edit(Task task) {
-			Session session = sessionFactory.getCurrentSession();
+		public TaskModel edit(Task task) throws Exception {
 			try {
+				Session session = sessionFactory.getCurrentSession();
 				session.update(task);
-				return 1;
+				TaskModel customTask = new TaskModel();
+				customTask.setId(task.getId());
+				customTask.setTitle(task.getTitle());
+				
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department :task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
+				
+				return customTask;
 			} catch (Exception e) {
 				LOGGER.error("Error has occured in edit task ", e);
-				return 0;
 			}
+			return null;
 		}
 		// filter
 		@Override

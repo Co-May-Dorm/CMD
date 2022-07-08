@@ -25,6 +25,8 @@ import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Status;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.model.TaskModel;
+import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
+import com.comaymanagement.cmd.repositoryimpl.StatusRepositotyImpl;
 import com.comaymanagement.cmd.repositoryimpl.TaskRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -37,6 +39,12 @@ public class TaskService {
 
 	@Autowired
 	TaskRepositoryImpl taskRepository;
+	
+	@Autowired
+	EmployeeRepositoryImpl employeeRepositoryImpl;
+	
+	@Autowired
+	StatusRepositotyImpl statusRepositotyImpl;
 
 	@Autowired
 	Message message;
@@ -176,24 +184,25 @@ public class TaskService {
 			jsonObjectTask = jsonMapper.readTree(json);
 
 			Task task = new Task();
-			
-			
 			Integer statusId = jsonObjectTask.get("statusId") != null ? jsonObjectTask.get("statusId").asInt() : -1;
 			Integer receiverId = jsonObjectTask.get("receiverId") != null ? jsonObjectTask.get("receiverId").asInt() : -1;
 			Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
 			String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
 			String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
-			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
-			String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : " ";
+			String createDate = jsonObjectTask.get("createDate") != null ? jsonObjectTask.get("createDate").asText() : "";;
+			String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+			String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : "";
+			Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
+			Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;
 			
 			Employee creator = new Employee();
-			creator.setId(creatorId);
+			creator = employeeRepositoryImpl.findById(creatorId);
 			
 			Employee receiver = new Employee();
-			receiver.setId(receiverId);
+			receiver = employeeRepositoryImpl.findById(receiverId);
 
 			Status status = new Status();
-			status.setId(statusId);
+			status = statusRepositotyImpl.findById(statusId);
 			
 			task.setCreator(creator);
 			task.setReceiver(receiver);
@@ -202,13 +211,16 @@ public class TaskService {
 			task.setDescription(description);
 			task.setCreateDate(createDate);
 			task.setFinishDate(finishDate);
-			Integer id = taskRepository.add(task); 
-			if ( id != -1) {
+			task.setRate(rate);
+			task.setPriority(priority);
+			
+			TaskModel taskModel = taskRepository.add(task); 
+			if (null != taskModel) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("OK",message.getMessageByItemCode("TASKS1"), id));
+						.body(new ResponseObject("OK",message.getMessageByItemCode("TASKS1"), taskModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("ERROR",message.getMessageByItemCode("TASKS1"), ""));
+						.body(new ResponseObject("ERROR",message.getMessageByItemCode("TASKE1"), ""));
 			}
 
 		} catch (Exception e) {
@@ -297,15 +309,18 @@ public class TaskService {
 				String createDate = jsonObjectTask.get("createDate") != null ? jsonObjectTask.get("createDate").asText() : "";;
 				String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
 				String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : "";
+				Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
+				Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;
 				
 				Employee creator = new Employee();
-				creator.setId(creatorId);
+				creator = employeeRepositoryImpl.findById(creatorId);
 				
 				Employee receiver = new Employee();
-				receiver.setId(receiverId);
+				receiver = employeeRepositoryImpl.findById(receiverId);
 
 				Status status = new Status();
-				status.setId(statusId);
+				status = statusRepositotyImpl.findById(statusId);
+				
 				// statusId 3 = Đã hủy
 				if(statusId==3) {
 					messageCode = "TASKS3";
@@ -320,12 +335,14 @@ public class TaskService {
 				task.setDescription(description);
 				task.setCreateDate(createDate);
 				task.setFinishDate(finishDate);
-				Integer messageUpdate = taskRepository.edit(task);
-				if (messageUpdate != 0) {
-					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode(messageCode), task));
+				task.setRate(rate);
+				task.setPriority(priority);
+				TaskModel taskModel = taskRepository.edit(task);
+				if (null != taskModel) {
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode(messageCode), taskModel));
 				} else {
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-							.body(new ResponseObject("Error", message.getMessageByItemCode("TASKE3"), task));
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("Error", message.getMessageByItemCode("TASKE3"), taskModel));
 
 				}
 			} catch (Exception e) {
