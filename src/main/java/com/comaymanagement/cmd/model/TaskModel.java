@@ -1,7 +1,11 @@
 package com.comaymanagement.cmd.model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 
+import com.comaymanagement.cmd.entity.Employee;
+import com.comaymanagement.cmd.entity.Status;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -17,15 +21,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class TaskModel {
-	
 	private Integer id;
-	private Integer creatorId;
-	private String creatorName;
-	private Integer recieverId;
-	private String recieverName;
-	private String statusName;
+	private EmployeeModel creator;
+	private EmployeeModel receiver;
+	private Status status;
 	private String title;
-	private String departmentName;
+	private List<DepartmentModel> department;
 	private String createDate;
 	private String finishDate;
 	private String description;
