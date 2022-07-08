@@ -103,7 +103,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				}
 				customTask.setDepartment(departmentModels);
 				customTask.setStatus(task.getStatus());
-
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 				customTaskList.add(customTask);
 			}
 		} catch (Exception e) {
@@ -198,6 +199,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDepartment(departmentModels);
 				customTask.setStatus(task.getStatus());
 				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 				customTaskList.add(customTask);
 			}
 		} catch (Exception e) {
@@ -315,6 +318,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDepartment(departmentModels);
 				customTask.setStatus(task.getStatus());
 				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 				customTasks.add(customTask);
 			}
 		} catch (Exception e) {
@@ -438,6 +443,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDepartment(departmentModels);
 				customTask.setStatus(task.getStatus());
 				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
@@ -578,6 +585,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					customTask.setDepartment(departmentModels);
 					customTask.setStatus(task.getStatus());
 					customTask.setDescription(task.getDescription());
+					customTask.setRate(task.getRate());
+					customTask.setPriority(task.getPriority());
 					customTasks.add(customTask);
 				}
 			} catch (Exception e) {
