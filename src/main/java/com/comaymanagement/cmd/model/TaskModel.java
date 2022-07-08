@@ -30,5 +30,7 @@ public class TaskModel {
 	private String createDate;
 	private String finishDate;
 	private String description;
+	private Integer rate;
+	private Integer priority;
 
 }
