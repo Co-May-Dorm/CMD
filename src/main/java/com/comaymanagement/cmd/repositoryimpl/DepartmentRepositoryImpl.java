@@ -159,11 +159,12 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		hql.append("from departments dep ");
 		hql.append("where dep.id = " + id);
 		try {
+			LOGGER.info(hql.toString());
 			Query query = session.createQuery(hql.toString());
 			department = (Department) query.getSingleResult();
 		} catch (Exception e) {
-			LOGGER.error("Error has occured in delete() ", e);
-		}
+			LOGGER.error("Error has occured in findByIdToEdit() ", e);
+		} 
 		
 		return department;
 	}

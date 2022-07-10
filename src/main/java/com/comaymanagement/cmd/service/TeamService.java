@@ -14,12 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.Team;
+import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.model.TeamModel;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
@@ -104,13 +106,13 @@ public class TeamService {
 			}
 
 			for (Position p : positionList) {
-				Integer idAdded = positionRepository.add(p);
-				if (idAdded == -1) {
+				PositionModel positionModel = positionRepository.add(p);
+				if (positionModel == null || positionModel.getId() == CMDConstrant.FAILED) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1") , ""));
 				}
 				if(p.getIsManager()) {
-					teamUpdate.setHeadPosition(idAdded);
+					teamUpdate.setHeadPosition(positionModel.getId());
 					teamRepository.edit(teamUpdate);
 				}
 			}
@@ -201,21 +203,21 @@ public class TeamService {
 			}
 			// Add position
 			for (Position p : positionAdds) {
-				Integer idAdded = positionRepository.add(p);
-				if (idAdded == -1) {
+				PositionModel positionModel = positionRepository.add(p);
+				if (positionModel == null && positionModel.getId() == CMDConstrant.FAILED) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 							.body(new ResponseObject("Error",message.getMessageByItemCode("POSE1"), ""));
 				}
 				else if(p.getIsManager()) {
 					teamUpdate = teamRepository.findById(id);
-					teamUpdate.setHeadPosition(idAdded);
+					teamUpdate.setHeadPosition(positionModel.getId());
 					teamRepository.edit(teamUpdate);
 				}
 			}
 			// Edit position
 			for (Position p : positionEdits) {
-				Integer idAdded = positionRepository.edit(p);
-				if (idAdded == -1) {
+				PositionModel positionModel = positionRepository.edit(p);
+				if (positionModel == null && positionModel.getId() == CMDConstrant.FAILED) {
 					LOGGER.error("Error has occured at edit():");
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE2"), ""));

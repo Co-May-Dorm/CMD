@@ -12,8 +12,8 @@ public interface IPositionRepository{
 	List<PositionModel> findAllByRoleId(
 			@Param("roleID") Integer roleId);
 	Integer CountTotalItem();
-	Integer add(Position p);
-	Integer edit(Position p);
+	PositionModel add(Position p);
+	PositionModel edit(Position p);
 	Position findById(Integer id);
 	List<Position> findAllByDepId(Integer depId);
 	List<PositionModel> findAllByTeamId(Integer teamId);
