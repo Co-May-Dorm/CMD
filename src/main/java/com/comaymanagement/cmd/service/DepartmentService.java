@@ -3,8 +3,12 @@ package com.comaymanagement.cmd.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +130,8 @@ public class DepartmentService {
 			}
 			
 			if (idDepAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", dep));
+				DepartmentModel departmentModel = toDepartmentModel(dep);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", departmentModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE3"), dep));
 			}
@@ -140,7 +145,7 @@ public class DepartmentService {
 	public ResponseEntity<Object> edit(String json) {
 		List<Position> positionEdits = new ArrayList<>();
 		List<Position> positionAdds = new ArrayList<>();
-		Department dep = new Department();
+		Department dep = null;
 		JsonMapper jsonMapper = new JsonMapper();
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonObjectPosition;
@@ -161,17 +166,18 @@ public class DepartmentService {
 			Integer headPosition = -1;
 //			Check department code existed
 			Integer id = jsonObjectDepartment.get("id").asInt();
+			dep = departmentRepository.findByIdToEdit(id);
 			boolean isExisted = departmentRepository.isExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE2"), ""));
 			}
-			dep.setId(id);
 			dep.setCode(code);
 			dep.setName(name);
 			dep.setFatherDepartmentId(fatherDepartmentId);
 			dep.setDescription(description);
 			dep.setCreateDate(createDate);
+			dep.setCreateBy(createBy);
 			dep.setModifyBy(modifyBy);
 			dep.setModifyDate(modifyDate);
 			dep.setLevel(level);
@@ -179,7 +185,6 @@ public class DepartmentService {
 			
 			// save department..............
 			Integer messageEdit = departmentRepository.edit(dep);
-			Department depUpdate = departmentRepository.findByIdToEdit(id);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -223,9 +228,8 @@ public class DepartmentService {
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE2"), ""));
 				}
 				else if (p.getIsManager()) {
-					depUpdate.setHeadPosition(positionEdit.getId());
 					dep.setHeadPosition(positionEdit.getId());
-					departmentRepository.edit(depUpdate);
+					departmentRepository.edit(dep);
 				}
 				dep.getPositions().add(p);
 			}
@@ -240,14 +244,14 @@ public class DepartmentService {
 				}
 				else if(p.getIsManager()) {
 					
-					depUpdate.setHeadPosition(positionAdd.getId());
 					dep.setHeadPosition(positionAdd.getId());
-					departmentRepository.edit(depUpdate);
+					departmentRepository.edit(dep);
 				}
 				dep.getPositions().add(p);
 			}
 			if (messageEdit != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", dep));
+				DepartmentModel departmentModel = toDepartmentModel(dep);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", departmentModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE4"), dep));
 			}
@@ -283,4 +287,33 @@ public class DepartmentService {
 			}
 		}
 
+	public DepartmentModel toDepartmentModel(Department d) {
+		try {
+				DepartmentModel departmentModel = new DepartmentModel();
+				List<PositionModel> positionModelList = new ArrayList<>();
+				departmentModel.setId(d.getId());
+				departmentModel.setCode(d.getCode());
+				departmentModel.setName(d.getName());
+				departmentModel.setDescription(d.getDescription());
+				departmentModel.setFatherDepartmentId(d.getFatherDepartmentId());
+				departmentModel.setLevel(d.getLevel());
+				for (Position pos : d.getPositions()) {
+					PositionModel positionModel = new PositionModel();
+					Role role = new Role();
+					role.setId(pos.getRole().getId());
+					role.setName(pos.getRole().getName());
+					positionModel.setId(pos.getId());
+					positionModel.setName(pos.getName());
+					positionModel.setIsManager(pos.getIsManager());
+					positionModel.setRole(role);
+					positionModelList.add(positionModel);
+				}
+				departmentModel.setPositions(positionModelList);
+				departmentModel.setHeadPosition(d.getHeadPosition());
+				return departmentModel;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentRepositoryImpl at findAll() ", e);
+			return null;
+		}
+	}
 }
