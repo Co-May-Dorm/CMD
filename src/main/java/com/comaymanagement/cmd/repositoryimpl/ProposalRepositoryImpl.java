@@ -104,7 +104,7 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 		List<Position> positions = new ArrayList<>();
 		
 		
-		appSteps = findApprovalStepDetail("45", "", "");
+//		appSteps = findApprovalStepDetail("45", "", "");
 		List<Proposal> proposals = new ArrayList<>();
 		for(ApprovalStep appStep : appSteps) {
 			String proposalTypeId = appStep.getProposalType().getId().toString();
