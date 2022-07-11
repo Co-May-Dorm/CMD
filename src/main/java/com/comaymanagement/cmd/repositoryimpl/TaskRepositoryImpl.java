@@ -18,9 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.entity.TaskHis;
+import com.comaymanagement.cmd.model.DepartmentModel;
+import com.comaymanagement.cmd.model.EmployeeModel;
 import com.comaymanagement.cmd.model.TaskModel;
 import com.comaymanagement.cmd.repository.ITaskRepository;
 
@@ -61,15 +64,48 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				}
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				customTask.setCreatorId(task.getCreator().getId());
-				customTask.setCreatorName(task.getCreator().getName());
-				customTask.setRecieverId(task.getReceiver().getId());
-				customTask.setRecieverName(task.getReceiver().getName());
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(departmentList.remove().getName());
-				customTask.setStatusName(task.getStatus().getName());
-
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department :task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 				customTaskList.add(customTask);
 			}
 		} catch (Exception e) {
@@ -118,21 +154,54 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				taskSet.add(task);
 			}
 			for (Task task : taskSet) {
-				PriorityQueue<Department> departmentList = new PriorityQueue<>(new TaskComparator());
-				for(Department d : task.getCreator().getDepartments()) {
-					departmentList.add(d);
-				}
 				TaskModel customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				customTask.setCreatorId(task.getCreator().getId());
-				customTask.setCreatorName(task.getCreator().getName());
-				customTask.setRecieverId(task.getReceiver().getId());
-				customTask.setRecieverName(task.getReceiver().getName());
+				
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(departmentList.remove().getName());
-				customTask.setStatusName(task.getStatus().getName());
+				
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department :task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 				customTaskList.add(customTask);
 			}
 		} catch (Exception e) {
@@ -207,14 +276,51 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				TaskModel customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				customTask.setCreatorId(task.getCreator().getId());
-				customTask.setCreatorName(task.getCreator().getName());
-				customTask.setRecieverId(task.getReceiver().getId());
-				customTask.setRecieverName(task.getReceiver().getName());
+				
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
-				customTask.setDepartmentName(departmentQueue.remove().getName());
-				customTask.setStatusName(task.getStatus().getName());
+				
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department :task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 				customTasks.add(customTask);
 			}
 		} catch (Exception e) {
@@ -242,15 +348,67 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public Integer add(Task task) {
+	public TaskModel add(Task task) throws Exception {
 		try {
 			LOGGER.info("SAVE TASK....");
 			Session session = sessionFactory.getCurrentSession();
-			return Integer.parseInt(session.save(task).toString());
+			TaskModel customTask = null;
+			Integer resultInteger =  Integer.parseInt(session.save(task).toString());
+			if( resultInteger > CMDConstrant.FAILED) {
+				customTask = new TaskModel(); 
+				customTask.setId(task.getId());
+				customTask.setTitle(task.getTitle());
+				
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department :task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
+				return customTask;
+			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee() ", e);
-			return -1;
 		}
+		return null;
 	}
 
 	@Override
@@ -296,15 +454,50 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				}
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				customTask.setCreatorId(task.getCreator().getId());
-				customTask.setCreatorName(task.getCreator().getName());
-				customTask.setRecieverId(task.getReceiver().getId());
-				customTask.setRecieverName(task.getReceiver().getName());
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
-				customTask.setStatusName(task.getStatus().getName());
-				customTask.setDepartmentName(departmentList.remove().getName());
+				
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department : departmentList) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
 				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
@@ -334,15 +527,64 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 	//edit
 		@Override
-		public Integer edit(Task task) {
-			Session session = sessionFactory.getCurrentSession();
+		public TaskModel edit(Task task) throws Exception {
 			try {
+				Session session = sessionFactory.getCurrentSession();
 				session.update(task);
-				return 1;
+				TaskModel customTask = new TaskModel();
+				customTask.setId(task.getId());
+				customTask.setTitle(task.getTitle());
+				
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+				
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for(Department department :task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
+				
+				return customTask;
 			} catch (Exception e) {
 				LOGGER.error("Error has occured in edit task ", e);
-				return 0;
 			}
+			return null;
 		}
 		// filter
 		@Override
@@ -399,19 +641,55 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					Task task = (Task) obj[0];
 					tasks.add(task);
 				}
-				for(Task item : tasks) {
-					TaskModel task = new TaskModel();
-					task.setId(item.getId());
-					task.setTitle(item.getTitle());
-					task.setCreatorId(item.getCreator().getId());
-					task.setCreatorName(item.getCreator().getName());
-					task.setRecieverId(item.getReceiver().getId());
-					task.setRecieverName(item.getReceiver().getName());
-					task.setCreateDate(item.getCreateDate());
-					task.setFinishDate(item.getFinishDate());
-//					task.setDepartmentName(item.getCreator().getDepartment().getName());
-					task.setStatusName(item.getStatus().getName());
-					customTasks.add(task);
+				for(Task task : tasks) {
+					TaskModel customTask = new TaskModel();
+					customTask.setId(task.getId());
+					customTask.setTitle(task.getTitle());
+					EmployeeModel creatorTemp = new EmployeeModel();
+					creatorTemp.setId(task.getCreator().getId());
+					creatorTemp.setCode(task.getCreator().getCode());
+					creatorTemp.setName(task.getCreator().getName());
+					creatorTemp.setAvatar(task.getCreator().getAvatar());
+					creatorTemp.setGender(task.getCreator().getGender());
+					creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+					creatorTemp.setEmail(task.getCreator().getEmail());
+					creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+					creatorTemp.setActive(task.getCreator().isActive());
+					creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+					customTask.setCreator(creatorTemp);
+
+					EmployeeModel receiverTemp = new EmployeeModel();
+					receiverTemp.setId(task.getReceiver().getId());
+					receiverTemp.setCode(task.getReceiver().getCode());
+					receiverTemp.setName(task.getReceiver().getName());
+					receiverTemp.setAvatar(task.getReceiver().getAvatar());
+					receiverTemp.setGender(task.getReceiver().getGender());
+					receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+					receiverTemp.setEmail(task.getReceiver().getEmail());
+					receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+					receiverTemp.setActive(task.getReceiver().isActive());
+					receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+					customTask.setReceiver(receiverTemp);
+					
+					customTask.setCreateDate(task.getCreateDate());
+					customTask.setFinishDate(task.getFinishDate());
+					
+					List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+					for(Department departmentTmp :task.getCreator().getDepartments()) {
+						DepartmentModel dModel = new DepartmentModel();
+						dModel.setCode(departmentTmp.getCode());
+						dModel.setDescription(departmentTmp.getDescription());
+						dModel.setId(departmentTmp.getId());
+						dModel.setName(departmentTmp.getName());
+						dModel.setLevel(departmentTmp.getLevel());
+						departmentModels.add(dModel);
+					}
+					customTask.setDepartment(departmentModels);
+					customTask.setStatus(task.getStatus());
+					customTask.setDescription(task.getDescription());
+					customTask.setRate(task.getRate());
+					customTask.setPriority(task.getPriority());
+					customTasks.add(customTask);
 				}
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage());

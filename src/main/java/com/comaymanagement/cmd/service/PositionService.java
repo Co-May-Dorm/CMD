@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
@@ -131,16 +132,16 @@ public class PositionService{
 			p.setTeam(team);
 			p.setDepartment(dep);
 			p.setRole(role);
-			Integer idAdded = positionRepository.add(p);
-			if (idAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
+			PositionModel positionModel = positionRepository.add(p);
+			if (null != positionModel && positionModel.getId() != CMDConstrant.FAILED) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", positionModel.getId() + "", "employee" + positionModel));
 			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ResponseObject("Error", idAdded + "", p));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("Error", positionModel.getId() + "", positionModel));
 			}
 		} catch (Exception e) {
 			logger.error("Error has occured in PositionService at save()", e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
 		}
 	}
 	public ResponseEntity<Object> delete(String id) {
@@ -161,12 +162,12 @@ public class PositionService{
 
 	}
 	public ResponseEntity<Object> add(Position p) {
-		Integer idAdded = positionRepository.add(p);
-		if (idAdded != -1) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idAdded + "", "employee" + p));
+		PositionModel positionModel = positionRepository.add(p);
+		if (null != positionModel && positionModel.getId() != CMDConstrant.FAILED) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", positionModel.getId() + "", "employee" + positionModel));
 		} else {
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseObject("Error", idAdded + "", p));
+					.body(new ResponseObject("Error", positionModel.getId() + "", positionModel));
 		}
 	}
 

@@ -38,11 +38,11 @@ public interface ITaskRepository {
 			@Param("order") String order,
 			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
-	Integer add(Task task);
+	TaskModel add(Task task) throws Exception;
 	Integer getMaxId();
 	TaskModel findById(Integer id);
 	String deleteTaskById(Integer id);
-	Integer edit(Task task);
+	TaskModel edit(Task task) throws Exception;
 	List<TaskModel> filter(
 			@Param("createFrom") String createFrom,
 			@Param("createTo") String createTo,

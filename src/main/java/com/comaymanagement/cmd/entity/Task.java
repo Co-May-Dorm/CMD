@@ -45,5 +45,8 @@ public class Task{
 	@OneToOne()
 	@JoinColumn(name = "status_id")
 	private Status status;
+	
+	private Integer rate;
+	private Integer priority;
 
 }

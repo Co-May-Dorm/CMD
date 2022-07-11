@@ -8,4 +8,5 @@ public class CMDConstrant {
 	public static final Integer LIMIT = 15;
 	public static final Path path = Paths.get("D:\\CMD-proect\\Source\\CMD");
 	public static final Integer ROLELIMIT = 10;
+	public static final Integer FAILED = -1;
 }
