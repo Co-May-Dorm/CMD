@@ -190,7 +190,7 @@ public class TaskService {
 			String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
 			String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
 			String createDate = jsonObjectTask.get("createDate") != null ? jsonObjectTask.get("createDate").asText() : "";;
-			String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+			String modifyDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 			String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : "";
 			Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
 			Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;
@@ -307,7 +307,7 @@ public class TaskService {
 				String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
 				String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
 				String createDate = jsonObjectTask.get("createDate") != null ? jsonObjectTask.get("createDate").asText() : "";;
-				String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+				String modifyDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 				String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : "";
 				Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
 				Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;

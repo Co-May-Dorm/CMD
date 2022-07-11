@@ -111,7 +111,7 @@ public class RoleService {
 			String roleName = jsonObjectRole.get("name").asText();
 			Integer createBy = jsonObjectRole.get("createBy").asInt();
 			Integer modifyBy = jsonObjectRole.get("modifyBy").asInt();
-			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 			
 			role.setName(roleName);
 			Integer idAdded = roleRepository.add(role);
@@ -162,7 +162,7 @@ public class RoleService {
 			String roleName = jsonObjectRole.get("name").asText();
 			Integer createBy = jsonObjectRole.get("createBy").asInt();
 			Integer modifyBy = jsonObjectRole.get("modifyBy").asInt();
-			String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 			
 			role.setId(roleId);
 			role.setName(roleName);

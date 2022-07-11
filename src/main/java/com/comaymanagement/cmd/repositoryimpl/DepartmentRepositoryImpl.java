@@ -6,8 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Query;
-
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -185,5 +184,28 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		}
 		return department;
 	}
-
+	@Override
+	public List<Department> findAllByEmployeeId(String empId) {
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		List<Department> departments = new ArrayList<>();
+		hql.append("from departments dep ");
+		hql.append("inner join dep.employees as emp");
+		hql.append("where emp.id = :empId");
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("empId", empId);
+			LOGGER.info(hql.toString());
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] ob = (Object[]) it.next();
+				Department tmp = (Department) ob[0];
+				departments.add(tmp);
+			}
+			return departments;
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+	}
+	
 }

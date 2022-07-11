@@ -39,8 +39,15 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 	@Autowired
 	SessionFactory sessionFactory;
 
+	@Autowired
+	DepartmentRepositoryImpl departmentRepository;
+	
+	@Autowired
+	PositionRepositoryImpl positionRepository;
+	
 	private final Logger LOGGER = LoggerFactory.getLogger(This.class);
 
+	// proposals
 	@Override
 	public List<ProposalModel> findAll(String proposalType, String content, String status, String creator,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit) {
@@ -93,6 +100,9 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 //		} catch (Exception e) {
 //			LOGGER.error(e.getMessage());
 //		}
+		List<Department> departments = new ArrayList<>();
+		List<Position> positions = new ArrayList<>();
+		
 		
 //		appSteps = findApprovalStepDetail("45", "", "");
 		List<Proposal> proposals = new ArrayList<>();
@@ -118,6 +128,8 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 		// Check all record of approvalStepDetail is exist empId or empId exist in department or position
 		return false;
 	}
+	
+	// select with empId, departmentIds, positionIds
 	public List<ApprovalStep> findApprovalStepDetail(Integer employeeId){
 		StringBuilder hql = new StringBuilder();
 		List<ApprovalStep> approvalSteps = new ArrayList<>();

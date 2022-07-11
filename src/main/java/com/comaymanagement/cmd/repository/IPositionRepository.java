@@ -17,4 +17,5 @@ public interface IPositionRepository{
 	Position findById(Integer id);
 	List<Position> findAllByDepId(Integer depId);
 	List<PositionModel> findAllByTeamId(Integer teamId);
+	List<Position> findAllByEmployeeId(Integer empId);
 }

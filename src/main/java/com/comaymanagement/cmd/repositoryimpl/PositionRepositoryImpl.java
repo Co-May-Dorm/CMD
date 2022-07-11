@@ -240,13 +240,35 @@ public class PositionRepositoryImpl implements IPositionRepository {
 				Position po = (Position) obj;
 				positions.add(po);
 			}
-			
+			return positions;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in findAllByDepartmentId() ", e);
+			return null;
 		}
-		return positions;
 	}
 	
-
+	@Override
+	public List<Position> findAllByEmployeeId(Integer empId) {
+		StringBuilder hql =  new StringBuilder();
+		List <Position> positions = new ArrayList<Position>();
+		hql.append("from positions pos ");
+		hql.append("inner join pos.employees emp ");
+		hql.append("where emp.id = :empId");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			query.setParameter("empId", empId);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object obj = (Object) it.next();
+				Position po = (Position) obj;
+				positions.add(po);
+			}
+			return positions;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in findAllByEmployeeId() ", e);
+			return null;
+		}
+	}
 	
 }

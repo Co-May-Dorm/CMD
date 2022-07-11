@@ -65,7 +65,7 @@ public class Position {
 			@JoinColumn(name = "position_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
 //	@JsonBackReference
-	private List<Employee> employeeList;
+	private List<Employee> employees;
 
 	@OneToMany
 	@JoinColumn(name = "position_id")

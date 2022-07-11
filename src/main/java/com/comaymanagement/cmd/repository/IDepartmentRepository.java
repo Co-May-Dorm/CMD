@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.repository;
 
+import java.util.List;
 import java.util.Set;
 
 import com.comaymanagement.cmd.entity.Department;
@@ -13,4 +14,5 @@ public interface IDepartmentRepository{
 	public boolean isExisted(Integer id, String code);
 	public Department findById(Integer id);
 	public Department findByName(String name);
+	public List<Department> findAllByEmployeeId(String empId);
 }

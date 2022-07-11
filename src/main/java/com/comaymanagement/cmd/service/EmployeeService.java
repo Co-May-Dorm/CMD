@@ -132,7 +132,7 @@ public class EmployeeService {
 	public ResponseEntity<Object> addEmployee(String json) {
 		Employee emp = new Employee();
 		UserModel user = new UserModel();
-		String createDate = new SimpleDateFormat("ddMMyyyy").format(new Date().getTime());
+		String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 		String modifyDate = createDate;
 		List<Position> positionList = new ArrayList<>();
 		List<Team> teamList = new ArrayList<>();
@@ -275,7 +275,7 @@ public class EmployeeService {
 		JsonNode jsonObjectTeam;
 		JsonNode jsonObjectDepartment;
 		JsonNode jsonLoginAccount;
-		String modifyDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+		String modifyDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 		try {
 			
 			jsonObjectEmployee = jsonMapper.readTree(json);
@@ -469,7 +469,7 @@ public class EmployeeService {
 				department = departmentRepository.findByName(dep);
 				List<Position> positions = positionRepository.findAllByDepId(department.getId());
 				List<Position> positionsEmp = new ArrayList<Position>();
-				String createDate = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date().getTime());
+				String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 				for (Position po : positions) {
 					if (po.getName().equals(pos)) {
 						positionsEmp.add(po);
