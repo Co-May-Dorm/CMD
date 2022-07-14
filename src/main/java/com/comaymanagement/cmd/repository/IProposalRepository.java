@@ -6,9 +6,9 @@ import com.comaymanagement.cmd.model.ProposalModel;
 
 
 public interface IProposalRepository {
-	public List<ProposalModel> findAll(String proposal, String content, String status, String creator,
+	public List<ProposalModel> findAllProposalApproveByMe(Integer employeeId,Integer proposalTypeId, String content, String status, String creator,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit);
-	public Integer countAllPaging(String proposal, String content, String status, String creator,
+	public Integer countAllPaging(Integer employeeId,Integer proposal, String content, String status, String creator,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit);
 	public ProposalModel findById(Integer id);
 }
