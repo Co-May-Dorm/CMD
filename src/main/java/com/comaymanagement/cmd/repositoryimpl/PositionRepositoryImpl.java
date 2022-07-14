@@ -260,8 +260,8 @@ public class PositionRepositoryImpl implements IPositionRepository {
 			LOGGER.info(hql.toString());
 			query.setParameter("empId", empId);
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-				Object obj = (Object) it.next();
-				Position po = (Position) obj;
+				Object[] obj = (Object[]) it.next();
+				Position po = (Position) obj[0];
 				positions.add(po);
 			}
 			return positions;
