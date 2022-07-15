@@ -19,12 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Status;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.entity.TaskHis;
+import com.comaymanagement.cmd.model.DepartmentModel;
 import com.comaymanagement.cmd.model.TaskModel;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.StatusRepositotyImpl;
@@ -95,38 +97,31 @@ public class TaskService {
 		sort = sort == null || sort == "" ? "id" : sort;
 		page = page == null ? "1" : page.trim();
 		Integer limit = CMDConstrant.LIMIT;
-		Integer limitTemp = CMDConstrant.LIMIT;
 		// Caculator offset
 		int offset = (Integer.parseInt(page) - 1) * limit;
-		Set<TaskModel> taskModelSet = new LinkedHashSet<TaskModel>();
+		List<TaskModel> taskModelResult = new ArrayList<TaskModel>();
 		List<TaskModel> taskModelListTMP = new ArrayList<TaskModel>();
 		try {
 			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order);
-			Integer numberOfItemNeeded = 0;
-
-			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
-			Integer numberDuplicate = numberOfItemNeeded;
-			while (taskModelSet.size() < numberOfItemNeeded) {
-				if(offset >= totalItem) {
-					break;
+			taskModelListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order, offset, limit);
+			if(!dep.trim().equals("")) {
+				for(int i = offset; i < totalItem; i++) {
+					if(taskModelResult.size() >= limit) {
+						break;
+					}
+					taskModelResult.add(taskModelListTMP.get(i));
 				}
-				numberDuplicate -= taskModelSet.size();  
-				offset = taskModelSet.size() == 0 ? offset : (offset + taskModelSet.size() + numberDuplicate);
-				limitTemp = numberOfItemNeeded - taskModelSet.size();
-				taskModelListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order, offset, limitTemp);
-				for(TaskModel taskModel : taskModelListTMP) {
-					taskModelSet.add(taskModel);
-				}
-				taskModelListTMP.clear();
+			}else {
+				taskModelResult = taskModelListTMP;
 			}
-			Integer totalItemEmployee = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate,priority, rate, sort, order);
+
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
-			pagination.setTotalItem(totalItemEmployee);
+			pagination.setTotalItem(totalItem);
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
-			results.put("tasks", taskModelSet);
+			results.put("tasks", taskModelResult);
 			if (results.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
