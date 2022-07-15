@@ -117,7 +117,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	public List<TaskModel> findAll(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit) {
+			String createDate, String finishDate,String priority,String rate, String sort, String order, Integer offset, Integer limit) {
 		Set<Task> taskSet = new LinkedHashSet<Task>();
 		List<TaskModel> customTaskList = new ArrayList<TaskModel>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
@@ -132,12 +132,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
 		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
 		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
+		hql.append("AND t.priority LIKE CONCAT('%',:priority,'%') ");
+		hql.append("AND t.rate LIKE CONCAT('%',:rate,'%') ");
 		hql.append("order by t." + sort + " " + order );
 		
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
-//			LOGGER.info(hql.toString());
+			LOGGER.info(hql.toString());
 			query.setParameter("dep", dep);
 			query.setParameter("title", title);
 			query.setParameter("status", status);
@@ -145,6 +147,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("receiver", receiver);
 			query.setParameter("createDate", createDate);
 			query.setParameter("finishDate", finishDate);
+			query.setParameter("priority", priority);
+			query.setParameter("rate", rate);
 
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
@@ -212,7 +216,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	
 	@Override
 	public Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String sort, String order) {
+			String createDate, String finishDate,String priority,String rate, String sort, String order) {
 		Integer count = 0;
 		Set<Task> taskSet = new LinkedHashSet<Task>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
@@ -225,8 +229,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
 		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
 		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
-		//hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
-		//hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
+		hql.append("AND t.priority LIKE CONCAT('%',:priority,'%') ");
+		hql.append("AND t.rate LIKE CONCAT('%',:rate,'%') ");
+		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
+		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
 		hql.append("order by t." + sort + " " + order );
 		
 		try {
@@ -238,8 +244,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("status", status);
 			query.setParameter("creator", creator);
 			query.setParameter("receiver", receiver);
-			//query.setParameter("createDate", createDate);
-			//query.setParameter("finishDate", finishDate);
+			query.setParameter("createDate", createDate);
+			query.setParameter("finishDate", finishDate);
+			query.setParameter("priority", priority);
+			query.setParameter("rate", rate);
 
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();

@@ -25,12 +25,14 @@ public interface ITaskRepository {
 			@Param("receiver") String receiver,
 			@Param("createDate") String createDate,
 			@Param("finishDate") String finishDate,
+			@Param("priority") String priority,
+			@Param("rate") String rate,
 			@Param("sort") String sort,
 			@Param("order") String order,
 			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
 	Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String sort, String order);
+			String createDate, String finishDate,String priority, String rate, String sort, String order);
 	Integer countFindByIds(List<Integer> ids);
 	List<TaskModel> findByStatusIds(
 			@Param("status_id") List<Integer> statusIds,

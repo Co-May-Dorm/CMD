@@ -60,5 +60,7 @@ public class Proposal {
 	private String modifyDate;
 	@Column(name="current_step")
 	private String currentStep;
+	@Column(name = "validflag")
+	private Boolean validFlag;
 	
 }

@@ -81,11 +81,13 @@ public class TaskController {
 			@RequestParam(value="receiver", required = false) String receiver, 
 			@RequestParam(value="dateCreated", required = false) String createDate,
 			@RequestParam(value="dateFinish", required = false) String finishDate,
+			@RequestParam(value="priority", required = false) String priority,
+			@RequestParam(value="rate", required = false) String rate,
 			@RequestParam(value="sort", required = false) String sort,
 			@RequestParam(value="order", required = false) String order
 			) {
 		LOGGER.info("Get task list");
-		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,sort,order,page);
+		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,priority,rate,sort,order,page);
 	}
 	
 	@PreAuthorize("@customRoleService.canCreate('task',principal)")

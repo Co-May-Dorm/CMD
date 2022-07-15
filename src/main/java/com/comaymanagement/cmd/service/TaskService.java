@@ -80,7 +80,7 @@ public class TaskService {
 	}
 	
 	public ResponseEntity<Object> findAllTask(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String sort, String order, String page) {
+			String createDate, String finishDate,String priority, String rate,String sort, String order, String page) {
 		dep = dep == null ? "" : dep.trim();
 		title = title == null ? "" : title.trim();
 		status = status == null ? "" : status.trim();
@@ -88,8 +88,10 @@ public class TaskService {
 		receiver = receiver == null ? "" : receiver.trim();
 		createDate = createDate == null ? "" : createDate.trim();
 		finishDate = finishDate == null ? "" : finishDate.trim();
-		order = order == null ? "DESC" : order;
-		sort = sort == null ? "id" : sort;
+		priority = priority == null ? "" : priority.trim();
+		rate = rate == null ? "" : rate.trim();
+		order = order == null || order == "" ? "DESC" : order;
+		sort = sort == null || sort == "" ? "id" : sort;
 		page = page == null ? "1" : page.trim();
 		Integer limit = CMDConstrant.LIMIT;
 		// Caculator offset
@@ -97,7 +99,7 @@ public class TaskService {
 		Set<TaskModel> taskModelSet = new LinkedHashSet<TaskModel>();
 		List<TaskModel> taskModelListTMP = new ArrayList<TaskModel>();
 		try {
-			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, sort, order);
+			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order);
 			Integer numberOfItemNeeded = 0;
 			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
 			Integer numberDuplicate = numberOfItemNeeded;
@@ -105,13 +107,13 @@ public class TaskService {
 				numberDuplicate -= taskModelSet.size();  
 				offset = taskModelSet.size() == 0 ? offset : (offset + taskModelSet.size() + numberDuplicate);
 				limit = numberOfItemNeeded - taskModelSet.size();
-				taskModelListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, sort, order, offset, limit);
+				taskModelListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order, offset, limit);
 				for(TaskModel taskModel : taskModelListTMP) {
 					taskModelSet.add(taskModel);
 				}
 				taskModelListTMP.clear();
 			}
-			Integer totalItemEmployee = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, sort, order);
+			Integer totalItemEmployee = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate,priority, rate, sort, order);
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));

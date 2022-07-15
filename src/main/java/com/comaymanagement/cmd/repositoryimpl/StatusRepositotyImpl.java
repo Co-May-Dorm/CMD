@@ -1,11 +1,9 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
 
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,16 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Status;
-import com.comaymanagement.cmd.entity.Task;
-import com.comaymanagement.cmd.model.DepartmentModel;
-import com.comaymanagement.cmd.model.EmployeeModel;
-import com.comaymanagement.cmd.model.TaskModel;
 import com.comaymanagement.cmd.repository.IStatusRepositoty;
 
 import net.bytebuddy.asm.Advice.This;
 @Repository
+@Transactional
 public class StatusRepositotyImpl implements IStatusRepositoty {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(This.class);

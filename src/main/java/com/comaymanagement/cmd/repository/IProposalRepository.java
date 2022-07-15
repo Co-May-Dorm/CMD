@@ -2,6 +2,8 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
+import com.comaymanagement.cmd.entity.Proposal;
+import com.comaymanagement.cmd.entity.ProposalDetail;
 import com.comaymanagement.cmd.model.ProposalModel;
 
 
@@ -11,4 +13,5 @@ public interface IProposalRepository {
 	public Integer countAllPaging(String proposal, String content, String status, String creator,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit);
 	public ProposalModel findById(Integer id);
+	public ProposalModel add(Proposal proposal, List<ProposalDetail> proposalDetails);
 }
