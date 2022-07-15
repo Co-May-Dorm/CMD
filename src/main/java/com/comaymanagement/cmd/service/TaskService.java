@@ -152,7 +152,6 @@ public class TaskService {
 			JsonNode jsonStatusObject = jsonObject.get("statusIds");
 			List<Integer> ids = new ArrayList<Integer>();
 			for(JsonNode statusId : jsonStatusObject) {
-				System.out.println(statusId.toString());
 				ids.add(Integer.valueOf(statusId.toString()));
 			}
 			

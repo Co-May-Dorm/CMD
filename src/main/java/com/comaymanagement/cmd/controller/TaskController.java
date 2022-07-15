@@ -89,7 +89,6 @@ public class TaskController {
 			@RequestParam(value="order", required = false) String order
 			) {
 		LOGGER.info("Get task list");
-		LOGGER.debug("aaaaaaaaaaaa");
 		return taskService.findAll(dep,title,status,creator,receiver,createDate,finishDate,priority,rate,sort,order,page);
 	}
 	
