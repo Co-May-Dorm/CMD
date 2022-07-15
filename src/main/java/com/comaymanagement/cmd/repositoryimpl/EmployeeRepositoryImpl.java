@@ -282,4 +282,30 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		}
 		return true;
 	}
+
+	@Override
+	public Set<EmployeeModel> findByName(String name) {
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hql = new StringBuilder();
+		Set<EmployeeModel> empModelSet = new LinkedHashSet<>();
+		hql.append("from employees emp ");
+		hql.append("where emp.name like CONCAT('%',:name,'%') ");
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("name", name);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Employee employee = (Employee)it.next();
+				EmployeeModel employeeModel = new EmployeeModel();
+				employeeModel.setId(employee.getId());
+				employeeModel.setCode(employee.getCode());
+				employeeModel.setName(employee.getName());
+				employeeModel.setAvatar(employee.getAvatar());
+				empModelSet.add(employeeModel);
+			}
+			return empModelSet;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in findByName() ", e);
+			return null;
+		}
+	}
 }

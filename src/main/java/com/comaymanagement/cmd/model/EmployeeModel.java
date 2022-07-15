@@ -33,4 +33,5 @@ public class EmployeeModel {
 	private String modifyDate;
 	private Integer createBy;
 	private Integer modifyBy;
+	private List<RoleDetailModel> roles;
 }

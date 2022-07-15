@@ -27,6 +27,7 @@ import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
+import com.comaymanagement.cmd.model.EmployeeModel;
 import com.comaymanagement.cmd.model.LoginRequest;
 import com.comaymanagement.cmd.model.RoleDetailModel;
 import com.comaymanagement.cmd.model.UserModel;
@@ -84,11 +85,14 @@ public class AuthService {
 				roleDetailModel = roleRepository.findRoleDetailByRoleId(roleId);
 				roleDetailModels.add(roleDetailModel);
 			}
-			userModel.setPassword(null);
-			userModel.setRoles(roleDetailModels);
+			Employee employee = employeeRepository.findById(userDetails.getId());
+			EmployeeModel employeeModel = EmployeeService.toEmployeeModel(employee);
+			employeeModel.setRoles(roleDetailModels);
+//			userModel.setPassword(null);
+//			userModel.setRoles(roleDetailModels);
 			jwt = jwtUtils.generateJwtToken(userDetails);
 			result.put("accessToken", jwt);
-			result.put("userInfo", userModel);
+			result.put("userInfo", employeeModel);
 		}
 		
 //		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
