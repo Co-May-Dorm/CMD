@@ -137,6 +137,7 @@ public class DepartmentService {
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentService at add() ", e);
+			LOGGER.error(json);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
 
 		}
