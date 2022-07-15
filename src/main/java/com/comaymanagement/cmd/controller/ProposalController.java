@@ -38,7 +38,7 @@ All permission name
  	delete_all
  **/
 @RestController
-@RequestMapping("/proposals")
+@RequestMapping("/proposals/approveByMe")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ProposalController {
 	
@@ -49,10 +49,20 @@ public class ProposalController {
 	
 	@PreAuthorize("@customRoleService.canViewAll('proposal',principal) or @customRoleService.canView('proposal',principal)")
 	@GetMapping(value= "",produces = "application/json")
-	public ResponseEntity<Object> findAll(String proposal, String content, String status, String creator,
-			String createDate, String finishDate, String sort, String order, Integer limit, String page){
+	public ResponseEntity<Object> findAllApproveByMe(
+				@PathVariable(value = "proposal", required = false) Integer proposalTypeId,
+				@PathVariable(value = "content", required = false) String content, 
+				@PathVariable(value = "status", required = false) String status,
+				@PathVariable(value = "creator", required = false) String creator,
+				@PathVariable(value = "createDate", required = false) String createDate,
+				@PathVariable(value = "finishDate", required = false) String finishDate,
+				@PathVariable(value = "sort", required = false) String sort,
+				@PathVariable(value = "order", required = false) String order,
+				@PathVariable(value = "limit", required = false) Integer limit,
+				@PathVariable(value = "page", required = false) String page){
 		LOGGER.info("Find all proposals");
-		return proposalService.findAll(proposal, content, status, creator, createDate, finishDate, sort, order, limit, page);
+		
+		return proposalService.findAllApproveByMe(proposalTypeId, content, status, creator, createDate, finishDate, sort, order, limit, page);
 		
 	}
 	

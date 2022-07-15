@@ -14,5 +14,5 @@ public interface IDepartmentRepository{
 	public boolean isExisted(Integer id, String code);
 	public Department findById(Integer id);
 	public Department findByName(String name);
-	public List<Department> findAllByEmployeeId(String empId);
+	public List<Department> findAllByEmployeeId(Integer empId);
 }

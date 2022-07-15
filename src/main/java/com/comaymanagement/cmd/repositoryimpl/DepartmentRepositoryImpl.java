@@ -185,12 +185,12 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 		return department;
 	}
 	@Override
-	public List<Department> findAllByEmployeeId(String empId) {
+	public List<Department> findAllByEmployeeId(Integer empId) {
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		List<Department> departments = new ArrayList<>();
 		hql.append("from departments dep ");
-		hql.append("inner join dep.employees as emp");
+		hql.append("inner join dep.employees as emp ");
 		hql.append("where emp.id = :empId");
 		try {
 			Query query = session.createQuery(hql.toString());

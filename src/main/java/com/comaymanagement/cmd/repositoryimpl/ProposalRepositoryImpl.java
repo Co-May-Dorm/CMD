@@ -1,9 +1,11 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Query;
 
@@ -41,17 +43,22 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 
 	@Autowired
 	DepartmentRepositoryImpl departmentRepository;
-	
+
 	@Autowired
 	PositionRepositoryImpl positionRepository;
-	
+
 	private final Logger LOGGER = LoggerFactory.getLogger(This.class);
 
 	// proposals
 	@Override
-	public List<ProposalModel> findAll(String proposalType, String content, String status, String creator,
-			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit) {
-		List<ApprovalStep> appSteps = new ArrayList<>(); 
+	public List<ProposalModel> findAllProposalApproveByMe(Integer employeeId, Integer proposalTypeId, String content,
+			String status, String creator, String createDate, String finishDate, String sort, String order,
+			Integer offset, Integer limit) {
+		List<ApprovalStep> appSteps = new ArrayList<>();
+		List<Department> departments = new ArrayList<>();
+		List<Position> positions = new ArrayList<>();
+		List<Proposal> proposals = new ArrayList<>();
+		List<ProposalModel> proposalModelResult = new ArrayList<>();
 //		List<ProposalModel> proposalModels = new ArrayList<>();
 //		StringBuilder hql = new StringBuilder("FROM proposals AS pro ");
 ////		hql.append("INNER JOIN pro.employee AS em ");
@@ -100,48 +107,69 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 //		} catch (Exception e) {
 //			LOGGER.error(e.getMessage());
 //		}
-		List<Department> departments = new ArrayList<>();
-		List<Position> positions = new ArrayList<>();
-		
-		
-//		appSteps = findApprovalStepDetail("45", "", "");
-		List<Proposal> proposals = new ArrayList<>();
-		for(ApprovalStep appStep : appSteps) {
-			String proposalTypeId = appStep.getProposalType().getId().toString();
+		positions = positionRepository.findAllByEmployeeId(employeeId);
+		departments = departmentRepository.findAllByEmployeeId(employeeId);
+		appSteps = findApprovalStepDetail(employeeId, positions, departments);
+
+		for (ApprovalStep appStep : appSteps) {
+			Integer currentEmpProposalTypeId = appStep.getProposalType().getId();
 			String step = appStep.getApprovalStepIndex();
-			List<Proposal> proposalsTMP = new ArrayList<>();
-			proposalsTMP = findAllProposalPretreatment(proposalType, content, status, creator, createDate, finishDate, proposalTypeId, step, sort, order);
+			Set<Proposal> proposalsTMP = new LinkedHashSet();
+			proposalsTMP = findAllApproveByMe(currentEmpProposalTypeId, content, status, creator, createDate, finishDate,
+					step, sort, order);
 			// store proposal of each proposalType and step
-			if(proposalsTMP!=null || proposalsTMP.size()>0) {
-				for(Proposal pro : proposalsTMP) {
+			if (proposalsTMP != null && proposalsTMP.size() > 0) {
+				for (Proposal pro : proposalsTMP) {
 					proposals.add(pro);
 				}
 			}
 		}
-		
-		
-		
-		return null;
+		for(Proposal pro : proposals) {
+			ProposalModel proposalModel = this.findById(pro.getId());
+			proposalModelResult.add(proposalModel);
+		}
+		return proposalModelResult;
 	}
-	
+
 	public boolean checkExitsInStep(String employeeId) {
-		// Check all record of approvalStepDetail is exist empId or empId exist in department or position
+		// Check all record of approvalStepDetail is exist empId or empId exist in
+		// department or position
 		return false;
 	}
-	
+
 	// select with empId, departmentIds, positionIds
-	public List<ApprovalStep> findApprovalStepDetail(Integer employeeId){
+	public List<ApprovalStep> findApprovalStepDetail(Integer employeeId, List<Position> positions, List<Department> departments){
 		StringBuilder hql = new StringBuilder();
 		List<ApprovalStep> approvalSteps = new ArrayList<>();
 		//Checl if employeeId cannot found => check employeeId in department and position
+//	    String listStatus = status.stream().map(stat -> "'" + stat + "'").collect(Collectors.joining(","));
+
 		hql.append("from approval_steps appStep ");
 		hql.append("inner join appStep.approvalStepDetails as appStepDetail ");
 		hql.append("where appStepDetail.employeeId = :employeeId ");
+		hql.append("or appStepDetail.positionId in (");
+		if(positions!=null && positions.size()>0) {
+			  String listPosition = positions.stream().map(pos ->  pos.getId() + "").collect(Collectors.joining(","));
+			  hql.append(listPosition);
+		}else {
+			 hql.append("''");
+		}
+	  
+	    hql.append(") ");
+	    hql.append("or appStepDetail.departmentId in (");
+	    if(departments!=null && departments.size()>0) {
+	    	String listDepartment = departments.stream().map(dep ->dep.getId() + "").collect(Collectors.joining(","));
+	 	    hql.append(listDepartment);
+		}else {
+			 hql.append("''");
+		}
+	   
+	    hql.append(") ");
+	    LOGGER.info(hql.toString());
 		try {
 			Session session = sessionFactory.getCurrentSession();
-			LOGGER.info(hql.toString());
 			Query query = session.createQuery(hql.toString());
-			query.setParameter("employeeId", employeeId);
+			query.setParameter("employeeId", employeeId+"");
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] objects = (Object[]) it.next();
 				ApprovalStep approvalStep = (ApprovalStep) objects[0]; 
@@ -154,34 +182,35 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 		}
 		return approvalSteps;
 	}
-	
-	public List<Proposal> findAllProposalPretreatment(String proposalType, String content, String status, String creator,
-			String createDate, String finishDate,String proposalTypeId, String step, String sort, String order){
-		List<Proposal> proposals = new ArrayList<>();
+
+	public Set<Proposal> findAllApproveByMe(Integer proposalTypeId, String content, String status,
+			String creator, String createDate, String finishDate, String step, String sort, String order) {
+		Set<Proposal> proposals = new LinkedHashSet();
 		StringBuilder hql = new StringBuilder("FROM proposals AS pro ");
 		hql.append("INNER JOIN pro.employee AS em ");
 		hql.append("INNER JOIN pro.proposalType AS pt ");
 		hql.append("INNER JOIN pro.status AS st ");
 		hql.append("INNER JOIN pro.proposalDetails AS pd ");
-		hql.append("WHERE pd.fieldId = 1 ");
-		hql.append("AND pt.name LIKE CONCAT('%',:proposalType,'%') ");
-		hql.append("AND st.name LIKE CONCAT('%',:status,'%') ");
-		hql.append("AND em.name LIKE CONCAT('%',:creator,'%') ");
-		hql.append("AND pd.content LIKE CONCAT('%',:content,'%') ");
-		hql.append("AND pro.createDate LIKE CONCAT('%',:createDate,'%') ");
-		hql.append("AND pt.id LIKE CONCAT('%',:proposalTypeId,'%') ");
-		hql.append("AND pro.currentStep >= :step  ");
+		hql.append("WHERE pt.id = :proposalTypeId ");
+		hql.append("AND pro.currentStep >= :step ");
+//		hql.append("WHERE pd.fieldId = 1 ");
+//		hql.append("AND pt.name LIKE CONCAT('%',:proposalType,'%') ");
+//		hql.append("AND st.name LIKE CONCAT('%',:status,'%') ");
+//		hql.append("AND em.name LIKE CONCAT('%',:creator,'%') ");
+//		hql.append("AND pd.content LIKE CONCAT('%',:content,'%') ");
+//		hql.append("AND pro.createDate LIKE CONCAT('%',:createDate,'%') ");
+//		hql.append("AND pt.id LIKE CONCAT('%',:proposalTypeId,'%') ");
 		hql.append("ORDER BY " + sort + " " + order);
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			LOGGER.info(hql.toString());
 			Query query = session.createQuery(hql.toString());
-			query.setParameter("proposalType", proposalType);
-			query.setParameter("status", status);
-			query.setParameter("creator", creator);
-			query.setParameter("content", content);
-			query.setParameter("createDate", createDate);
 			query.setParameter("proposalTypeId", proposalTypeId);
+//			query.setParameter("status", status);
+//			query.setParameter("creator", creator);
+//			query.setParameter("content", content);
+//			query.setParameter("createDate", createDate);
+//			query.setParameter("proposalTypeId", proposalTypeId);
 			query.setParameter("step", step);
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] objects = (Object[]) it.next();
@@ -195,8 +224,9 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 		}
 		return proposals;
 	}
+
 	@Override
-	public Integer countAllPaging(String proposal, String content, String status, String creator,
+	public Integer countAllPaging(Integer employeeId, Integer proposal, String content, String status, String creator,
 			String createDate, String finishDate, String sort, String order, Integer offset, Integer limit) {
 		List<ProposalModel> proposalModels = new ArrayList<>();
 		StringBuilder hql = new StringBuilder("FROM proposals AS pro ");
@@ -229,7 +259,7 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 				proposalModels.add(proposalModel);
 
 			}
-			count = proposalModels !=null ? proposalModels.size() : 0;
+			count = proposalModels != null ? proposalModels.size() : 0;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}
@@ -242,13 +272,11 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			/*
-			select * from proposals AS pro
-			INNER JOIN statuses AS stu ON pro.status_id = stu.id
-			INNER JOIN employees AS emp ON pro.creator_id = emp.id
-			INNER JOIN proposal_types AS prt ON pro.proposal_type_id = prt.id
-			INNER JOIN proposal_details AS prd ON pro.id = prd.proposal_id
-			WHERE pro.id = 1; 
-			*/
+			 * select * from proposals AS pro INNER JOIN statuses AS stu ON pro.status_id =
+			 * stu.id INNER JOIN employees AS emp ON pro.creator_id = emp.id INNER JOIN
+			 * proposal_types AS prt ON pro.proposal_type_id = prt.id INNER JOIN
+			 * proposal_details AS prd ON pro.id = prd.proposal_id WHERE pro.id = 1;
+			 */
 			StringBuilder hql = new StringBuilder();
 			hql.append("FROM proposals AS pro ");
 			hql.append("INNER JOIN statuses AS stu ON pro.status.id = stu.id ");
@@ -259,29 +287,29 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 			hql.append("WHERE pro.id = :id");
 			LOGGER.info(hql.toString());
 			Query query = session.createQuery(hql.toString());
-			query.setParameter("id",id);
-			
+			query.setParameter("id", id);
+
 			List<ContentModel> contents = new ArrayList<ContentModel>();
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();
 				Proposal proposal = (Proposal) obj[0];
 				Status status = (Status) obj[1];
 				Employee e = (Employee) obj[2];
-				Employee r = (Employee)obj[3];
+				Employee r = (Employee) obj[3];
 				ProposalType proposalType = (ProposalType) obj[4];
 				ProposalDetail proposalDetail = (ProposalDetail) obj[5];
-				
-				if(0 == proposalModel.getId()) {
+
+				if (0 == proposalModel.getId()) {
 					proposalModel.setId(proposal.getId());
 				}
-				if(null == proposalModel.getProposal()) {
+				if (null == proposalModel.getProposal()) {
 					proposalModel.setProposal(proposalType);
 				}
-				if(null == status) {
+				if (null == status) {
 					proposalModel.setStatus(status);
 				}
-				
-				if(null == proposalModel.getCreator()) {
+
+				if (null == proposalModel.getCreator()) {
 					EmployeeModel employeeModel = new EmployeeModel();
 					employeeModel.setId(e.getId());
 					employeeModel.setCode(e.getCode());
@@ -293,9 +321,9 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 					employeeModel.setPhoneNumber(e.getPhoneNumber());
 					employeeModel.setActive(e.isActive());
 					employeeModel.setCreateDate(e.getCreateDate());
-					
+
 					List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-					for(Department department : e.getDepartments()) {
+					for (Department department : e.getDepartments()) {
 						DepartmentModel dModel = new DepartmentModel();
 						dModel.setCode(department.getCode());
 						dModel.setDescription(department.getDescription());
@@ -304,10 +332,11 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 						dModel.setLevel(department.getLevel());
 						departmentModels.add(dModel);
 					}
-					employeeModel.setDepartments(departmentModels);;
-					
+					employeeModel.setDepartments(departmentModels);
+					;
+
 					List<PositionModel> positionModels = new ArrayList<PositionModel>();
-					for(Position po : e.getPositions()) {
+					for (Position po : e.getPositions()) {
 						PositionModel positionModel = new PositionModel();
 						positionModel.setId(po.getId());
 						positionModel.setName(po.getName());
@@ -322,8 +351,8 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 					employeeModel.setModifyBy(e.getModifyBy());
 					proposalModel.setCreator(employeeModel);
 				}
-				
-				if(null == proposalModel.getReceiver()) {
+
+				if (null == proposalModel.getReceiver()) {
 					EmployeeModel employeeModel = new EmployeeModel();
 					employeeModel.setId(r.getId());
 					employeeModel.setCode(r.getCode());
@@ -335,9 +364,9 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 					employeeModel.setPhoneNumber(r.getPhoneNumber());
 					employeeModel.setActive(r.isActive());
 					employeeModel.setCreateDate(r.getCreateDate());
-					
+
 					List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-					for(Department department : r.getDepartments()) {
+					for (Department department : r.getDepartments()) {
 						DepartmentModel dModel = new DepartmentModel();
 						dModel.setCode(department.getCode());
 						dModel.setDescription(department.getDescription());
@@ -346,10 +375,11 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 						dModel.setLevel(department.getLevel());
 						departmentModels.add(dModel);
 					}
-					employeeModel.setDepartments(departmentModels);;
-					
+					employeeModel.setDepartments(departmentModels);
+					;
+
 					List<PositionModel> positionModels = new ArrayList<PositionModel>();
-					for(Position po : r.getPositions()) {
+					for (Position po : r.getPositions()) {
 						PositionModel positionModel = new PositionModel();
 						positionModel.setId(po.getId());
 						positionModel.setName(po.getName());
@@ -364,11 +394,11 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 					employeeModel.setModifyBy(r.getModifyBy());
 					proposalModel.setReceiver(employeeModel);
 				}
-				
-				if(null == proposalModel.getCreatedDate()) {
+
+				if (null == proposalModel.getCreatedDate()) {
 					proposalModel.setCreatedDate(proposal.getCreateDate());
 				}
-				
+
 				ContentModel contentModel = new ContentModel();
 				contentModel.setFieldId(proposalDetail.getFieldId());
 				contentModel.setContent(proposalDetail.getContent());
