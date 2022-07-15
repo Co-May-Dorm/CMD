@@ -98,6 +98,10 @@ public class DepartmentService {
 			dep.setHeadPosition(headPosition);
 			// save department..............
 			Integer idDepAdded = departmentRepository.add(dep);
+			if(idDepAdded == -1) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE3") , ""));
+			}
 			Department depUpdate =  departmentRepository.findByIdToEdit(idDepAdded);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
