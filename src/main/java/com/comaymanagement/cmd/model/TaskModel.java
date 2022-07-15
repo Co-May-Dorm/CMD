@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.persistence.Entity;
 
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Status;
+import com.comaymanagement.cmd.entity.TaskHis;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -29,8 +29,11 @@ public class TaskModel {
 	private List<DepartmentModel> department;
 	private String createDate;
 	private String finishDate;
+	private String startDate;
+	private String modifyDate;
 	private String description;
 	private Integer rate;
 	private Integer priority;
+	List<TaskHis> taskHis;
 
 }

@@ -27,7 +27,7 @@ public class StatusRepositotyImpl implements IStatusRepositoty {
 	
 	@Override
 	public Status findById(Integer id) {
-		Status status = new Status();
+		Status status = null;
 		StringBuilder hql = new StringBuilder("FROM statuses AS st ");
 		hql.append("WHERE st.id = :id");
 		try {
