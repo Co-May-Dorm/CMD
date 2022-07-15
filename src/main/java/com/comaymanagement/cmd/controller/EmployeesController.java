@@ -86,6 +86,13 @@ public class EmployeesController {
 	public ResponseEntity<Object> deleteEmployee(@PathVariable Integer id) {
 		return employeeService.delete(id);
 	}
+	@PreAuthorize("@customRoleService.canView('employee',principal)")
+	@GetMapping(value = "/name/{name}")
+	@ResponseBody
+	public ResponseEntity<Object> findByName(
+			@PathVariable String name) {
+		return employeeService.findByName(name);
+	}
 
 	// Example return ResponseEntity
 
