@@ -96,6 +96,9 @@ public class EmployeeService {
 			numberOfItemNeeded = totalItem < limit ? totalItem : limit;
 			Integer numberDuplicate = numberOfItemNeeded;
 			while (employeeModelSet.size() < numberOfItemNeeded) {
+				if(offset >= totalItem) {
+					break;
+				}
 				offset = employeeModelSet.size() == 0 ? offset : (offset + employeeModelSet.size() + numberDuplicate);
 				limit = numberOfItemNeeded - employeeModelSet.size();
 				employeeModelSetTMP = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit,
