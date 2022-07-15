@@ -1,6 +1,8 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.persistence.Query;
 import javax.transaction.Transactional;
@@ -43,6 +45,27 @@ public class StatusRepositotyImpl implements IStatusRepositoty {
 			LOGGER.error(e.getMessage());
 		}
 		return status;
+	}
+
+	@Override
+	public List<Status> findAll() {
+		List<Status> statuses = null;
+		String hql = "FROM statuses AS st";
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql);
+			statuses = new ArrayList<>();
+			for(Iterator it = query.getResultList().iterator();it.hasNext();) {
+				Object object = it.next();
+				Status status = new Status();
+				status = (Status) object;
+				statuses.add(status);
+			}
+			
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return statuses;
 	}
 
 }
