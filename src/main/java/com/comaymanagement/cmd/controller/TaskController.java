@@ -87,7 +87,7 @@ public class TaskController {
 			@RequestParam(value="order", required = false) String order
 			) {
 		LOGGER.info("Get task list");
-		return taskService.findAllTask(dep,title,status,creator,receiver,createDate,finishDate,priority,rate,sort,order,page);
+		return taskService.findAll(dep,title,status,creator,receiver,createDate,finishDate,priority,rate,sort,order,page);
 	}
 	
 	@PreAuthorize("@customRoleService.canCreate('task',principal)")
