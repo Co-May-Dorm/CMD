@@ -61,7 +61,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			for (Task task : taskList) {
 				PriorityQueue<Department> departmentList = new PriorityQueue<>(new TaskComparator());
 				TaskModel customTask = new TaskModel();
-				for(Department d : task.getCreator().getDepartments()) {
+				for (Department d : task.getCreator().getDepartments()) {
 					departmentList.add(d);
 				}
 				customTask.setId(task.getId());
@@ -93,11 +93,11 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStartDate(task.getStartDate());
 				customTask.setReceiver(receiverTemp);
-				
+
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setModifyDate(task.getModifyDate());
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-				for(Department department :task.getCreator().getDepartments()) {
+				for (Department department : task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
 					dModel.setCode(department.getCode());
 					dModel.setDescription(department.getDescription());
@@ -121,16 +121,17 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	public List<TaskModel> findAll(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate,String priority,String rate, String sort, String order, Integer offset, Integer limit) {
+			String createDate, String finishDate, String priority, String rate, String sort, String order,
+			Integer offset, Integer limit) {
 		Set<Task> taskSet = new LinkedHashSet<Task>();
 		List<TaskModel> customTaskList = new ArrayList<TaskModel>();
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
 		hql.append("INNER JOIN t.status as s ");
 		hql.append("INNER JOIN t.receiver as r ");
-		hql.append("INNER JOIN c.departments as dep ");
-		hql.append("WHERE dep.name LIKE CONCAT('%',:dep,'%') ");
-		hql.append("AND t.title LIKE CONCAT('%',:title,'%') ");
+//		hql.append("INNER JOIN c.departments as dep ");
+//		hql.append("WHERE dep.name LIKE CONCAT('%',:dep,'%') ");
+		hql.append("WHERE t.title LIKE CONCAT('%',:title,'%') ");
 		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
 		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
 		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
@@ -138,13 +139,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
 		hql.append("AND t.priority LIKE CONCAT('%',:priority,'%') ");
 		hql.append("AND t.rate LIKE CONCAT('%',:rate,'%') ");
-		hql.append("order by t." + sort + " " + order );
-		
+		hql.append("order by t." + sort + " " + order);
+
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
-			query.setParameter("dep", dep);
 			query.setParameter("title", title);
 			query.setParameter("status", status);
 			query.setParameter("creator", creator);
@@ -153,9 +153,11 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("finishDate", finishDate);
 			query.setParameter("priority", priority);
 			query.setParameter("rate", rate);
+			if(dep.trim().equals("")) {
+				query.setFirstResult(offset);
+				query.setMaxResults(limit);
+			}
 
-			query.setFirstResult(offset);
-			query.setMaxResults(limit);
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
@@ -165,7 +167,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				TaskModel customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				
+
 				EmployeeModel creatorTemp = new EmployeeModel();
 				creatorTemp.setId(task.getCreator().getId());
 				creatorTemp.setCode(task.getCreator().getCode());
@@ -191,14 +193,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setActive(task.getReceiver().isActive());
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
-				
+
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setModifyDate(task.getModifyDate());
 				customTask.setStartDate(task.getStartDate());
-				
+
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-				for(Department department :task.getCreator().getDepartments()) {
+				for (Department department : task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
 					dModel.setCode(department.getCode());
 					dModel.setDescription(department.getDescription());
@@ -212,19 +214,87 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
 				customTask.setPriority(task.getPriority());
-				customTaskList.add(customTask);
+				if (dep.trim().equals("")) {
+					customTaskList.add(customTask);
+				} else {
+					boolean addFlag = false;
+					for (DepartmentModel departmentModel : departmentModels) {
+
+						if (departmentModel.getName().contains(dep)) {
+							addFlag = true;
+						}
+					}
+					if (addFlag) {
+						customTaskList.add(customTask);
+					}
+				}
+
 			}
+
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in findAll() ", e);
 		}
 		return customTaskList;
 	}
-	
+
 	@Override
 	public Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate,String priority,String rate, String sort, String order) {
+			String createDate, String finishDate, String priority, String rate, String sort, String order) {
 		Integer count = 0;
-		Set<Task> taskSet = new LinkedHashSet<Task>();
+		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
+		hql.append("INNER JOIN t.creator as c ");
+		hql.append("INNER JOIN t.status as s ");
+		hql.append("INNER JOIN t.receiver as r ");
+		hql.append("WHERE t.title LIKE CONCAT('%',:title,'%') ");
+		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
+		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
+		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
+		hql.append("AND t.priority LIKE CONCAT('%',:priority,'%') ");
+		hql.append("AND t.rate LIKE CONCAT('%',:rate,'%') ");
+		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
+		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
+		hql.append("order by t." + sort + " " + order);
+
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			query.setParameter("title", title);
+			query.setParameter("status", status);
+			query.setParameter("creator", creator);
+			query.setParameter("receiver", receiver);
+			query.setParameter("createDate", createDate);
+			query.setParameter("finishDate", finishDate);
+			query.setParameter("priority", priority);
+			query.setParameter("rate", rate);
+
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] obj = (Object[]) it.next();
+				Task task = (Task) obj[0];
+				if (dep.trim().equals("")) {
+					count++;
+				} else {
+					boolean addFlag = false;
+					for (Department department : task.getCreator().getDepartments()) {
+
+						if (department.getName().contains(dep)) {
+							addFlag = true;
+						}
+					}
+					if (addFlag) {
+						count++;
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in countAll() ", e);
+		}
+		return count;
+	}
+
+	public Integer countAllPagingDuplicate(String dep, String title, String status, String creator, String receiver,
+			String createDate, String finishDate, String priority, String rate, String sort, String order) {
+		Integer count = 0;
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
 		hql.append("INNER JOIN t.status as s ");
@@ -239,8 +309,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		hql.append("AND t.rate LIKE CONCAT('%',:rate,'%') ");
 		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
 		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
-		hql.append("order by t." + sort + " " + order );
-		
+		hql.append("order by t." + sort + " " + order);
+
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
@@ -256,16 +326,15 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("rate", rate);
 
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-				Object[] obj = (Object[]) it.next();
-				Task task = (Task) obj[0];
-				taskSet.add(task);
+				it.next();
+				count++;
 			}
-			count = taskSet != null ? taskSet.size() : 0;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in countAll() ", e);
 		}
 		return count;
 	}
+
 	@Override
 	public List<TaskModel> findByStatusIds(List<Integer> statusIds, String sort, String order, Integer offset,
 			Integer limit) {
@@ -282,15 +351,15 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			tasks = query.getResultList();
-			for(Task task : tasks) {
+			for (Task task : tasks) {
 				PriorityQueue<Department> departmentQueue = new PriorityQueue<>(new TaskComparator());
-				for(Department d : task.getCreator().getDepartments()) {
+				for (Department d : task.getCreator().getDepartments()) {
 					departmentQueue.add(d);
 				}
 				TaskModel customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				
+
 				EmployeeModel creatorTemp = new EmployeeModel();
 				creatorTemp.setId(task.getCreator().getId());
 				creatorTemp.setCode(task.getCreator().getCode());
@@ -315,12 +384,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
 				receiverTemp.setActive(task.getReceiver().isActive());
 				customTask.setReceiver(receiverTemp);
-				
+
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
-				
+
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-				for(Department department :task.getCreator().getDepartments()) {
+				for (Department department : task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
 					dModel.setCode(department.getCode());
 					dModel.setDescription(department.getDescription());
@@ -345,6 +414,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 		return customTasks;
 	}
+
 	@Override
 	public Integer countFindByIds(List<Integer> ids) {
 		Integer count = null;
@@ -370,12 +440,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			LOGGER.info("SAVE TASK....");
 			Session session = sessionFactory.getCurrentSession();
 			TaskModel customTask = null;
-			Integer resultInteger =  Integer.parseInt(session.save(task).toString());
-			if( resultInteger > CMDConstrant.FAILED) {
-				customTask = new TaskModel(); 
+			Integer resultInteger = Integer.parseInt(session.save(task).toString());
+			if (resultInteger > CMDConstrant.FAILED) {
+				customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				
+
 				EmployeeModel creatorTemp = new EmployeeModel();
 				creatorTemp.setId(task.getCreator().getId());
 				creatorTemp.setCode(task.getCreator().getCode());
@@ -401,9 +471,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setActive(task.getReceiver().isActive());
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
-				
+
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-				for(Department department :task.getCreator().getDepartments()) {
+				for (Department department : task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
 					dModel.setCode(department.getCode());
 					dModel.setDescription(department.getDescription());
@@ -461,14 +531,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
-			query.setParameter("id",id);	
+			query.setParameter("id", id);
 			customTask = new TaskModel();
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-				
+
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
 				PriorityQueue<Department> departmentList = new PriorityQueue<>(new TaskComparator());
-				for(Department d : task.getCreator().getDepartments()) {
+				for (Department d : task.getCreator().getDepartments()) {
 					departmentList.add(d);
 				}
 				customTask.setId(task.getId());
@@ -498,9 +568,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setActive(task.getReceiver().isActive());
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
-				
+
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-				for(Department department : departmentList) {
+				for (Department department : departmentList) {
 					DepartmentModel dModel = new DepartmentModel();
 					dModel.setCode(department.getCode());
 					dModel.setDescription(department.getDescription());
@@ -519,12 +589,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setModifyDate(task.getModifyDate());
 				customTask.setPriority(task.getPriority());
 				List<TaskHis> taskHis = task.getTaskHis();
-				for(TaskHis itemHis : taskHis) {
-					for(Department itemDepartment : itemHis.getTask().getCreator().getDepartments()) {
+				for (TaskHis itemHis : taskHis) {
+					for (Department itemDepartment : itemHis.getTask().getCreator().getDepartments()) {
 						itemDepartment.getPositions().size();
-						for(Position itemPosition : itemDepartment.getPositions()) {
+						for (Position itemPosition : itemDepartment.getPositions()) {
 							itemPosition.getEmployees().size();
-							for(Employee em: itemPosition.getEmployees()) {
+							for (Employee em : itemPosition.getEmployees()) {
 								em.getDepartments().size();
 							}
 						}
@@ -532,7 +602,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					itemHis.getTask().getCreator().getProposalPermissions().size();
 					itemHis.getTask().getCreator().getTaskListCreated().size();
 				}
-				
+
 				customTask.setTaskHis(taskHis);
 			}
 		} catch (Exception e) {
@@ -540,38 +610,151 @@ public class TaskRepositoryImpl implements ITaskRepository {
 		}
 		return customTask;
 	}
-	
-	// delete	
-		public String deleteTaskById(Integer id) {
-			Session session = sessionFactory.getCurrentSession();
-			try {
-				Task task = new Task();
-				task = session.find(Task.class, id);
-				
-				TaskHis th = new TaskHis();
-				th = session.find(TaskHis.class, id);
-				if(th != null) {
-					session.remove(th);
-				}
-				if(task!=null) {
-					session.remove(task);
-				}
-				return "1";
-			} catch (Exception e) {
-				LOGGER.error("Error has occured in delete() ", e);
-				return "0";
+
+	// delete
+	public String deleteTaskById(Integer id) {
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			Task task = new Task();
+			task = session.find(Task.class, id);
+
+			TaskHis th = new TaskHis();
+			th = session.find(TaskHis.class, id);
+			if (th != null) {
+				session.remove(th);
 			}
+			if (task != null) {
+				session.remove(task);
+			}
+			return "1";
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in delete() ", e);
+			return "0";
 		}
-	//edit
-		@Override
-		public TaskModel edit(Task task) throws Exception {
-			try {
-				Session session = sessionFactory.getCurrentSession();
-				session.update(task);
+	}
+
+	// edit
+	@Override
+	public TaskModel edit(Task task) throws Exception {
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			session.update(task);
+			TaskModel customTask = new TaskModel();
+			customTask.setId(task.getId());
+			customTask.setTitle(task.getTitle());
+
+			EmployeeModel creatorTemp = new EmployeeModel();
+			creatorTemp.setId(task.getCreator().getId());
+			creatorTemp.setCode(task.getCreator().getCode());
+			creatorTemp.setName(task.getCreator().getName());
+			creatorTemp.setAvatar(task.getCreator().getAvatar());
+			creatorTemp.setGender(task.getCreator().getGender());
+			creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+			creatorTemp.setEmail(task.getCreator().getEmail());
+			creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+			creatorTemp.setActive(task.getCreator().isActive());
+			creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+			customTask.setCreator(creatorTemp);
+
+			EmployeeModel receiverTemp = new EmployeeModel();
+			receiverTemp.setId(task.getReceiver().getId());
+			receiverTemp.setCode(task.getReceiver().getCode());
+			receiverTemp.setName(task.getReceiver().getName());
+			receiverTemp.setAvatar(task.getReceiver().getAvatar());
+			receiverTemp.setGender(task.getReceiver().getGender());
+			receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+			receiverTemp.setEmail(task.getReceiver().getEmail());
+			receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+			receiverTemp.setActive(task.getReceiver().isActive());
+			receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+			customTask.setReceiver(receiverTemp);
+
+			List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+			for (Department department : task.getCreator().getDepartments()) {
+				DepartmentModel dModel = new DepartmentModel();
+				dModel.setCode(department.getCode());
+				dModel.setDescription(department.getDescription());
+				dModel.setId(department.getId());
+				dModel.setName(department.getName());
+				dModel.setLevel(department.getLevel());
+				departmentModels.add(dModel);
+			}
+			customTask.setDepartment(departmentModels);
+			customTask.setStatus(task.getStatus());
+			customTask.setDescription(task.getDescription());
+			customTask.setRate(task.getRate());
+			customTask.setCreateDate(task.getCreateDate());
+			customTask.setFinishDate(task.getFinishDate());
+			customTask.setStartDate(task.getStartDate());
+			customTask.setModifyDate(task.getModifyDate());
+			customTask.setPriority(task.getPriority());
+
+			return customTask;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in edit task ", e);
+		}
+		return null;
+	}
+
+	// filter
+	@Override
+	public List<TaskModel> filter(String createFrom, String createTo, String finishFrom, String finishTo, String title,
+			String creator, String receiver, String department, Integer limit, String order, String page, String sort) {
+		List<Task> tasks = new ArrayList<Task>();
+		List<TaskModel> customTasks = new ArrayList<TaskModel>();
+		StringBuilder hql = new StringBuilder("FROM tasks AS ta");
+		hql.append(" inner join ta.creator as em");
+		hql.append(" inner join em.departments as de");
+		hql.append(" inner join ta.receiver as em1");
+		hql.append(" where em.name LIKE CONCAT('%',:creator,'%')");
+		hql.append(" AND de.name LIKE CONCAT('%',:department,'%')");// department of creator
+		hql.append(" AND em1.name LIKE CONCAT('%',:receiver,'%')");
+		hql.append(" AND ta.title LIKE CONCAT('%',:title,'%')");
+		if (createFrom.toString().length() > 5) {
+			hql.append(" and ta.createDate>=:createFrom");
+		}
+		if (createTo.toString().length() > 5) {
+			hql.append(" and ta.createDate<=:createTo");
+		}
+		if (finishFrom.toString().length() > 5) {
+			hql.append(" and ta.finishDate>=:finishFrom");
+		}
+		if (finishTo.toString().length() > 5) {
+			hql.append(" and ta.finishDate<=:finishTo");
+		}
+		hql.append(" ORDER BY ta." + sort + " " + order);
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("creator", creator);
+			query.setParameter("receiver", receiver);
+			query.setParameter("department", department);
+			query.setParameter("title", title);
+			if (createFrom.toString().length() > 5) {
+				query.setParameter("createFrom", createFrom);
+			}
+			if (createTo.toString().length() > 5) {
+				query.setParameter("createTo", createTo);
+			}
+			if (finishFrom.toString().length() > 5) {
+				query.setParameter("finishFrom", finishFrom);
+			}
+			if (finishTo.toString().length() > 5) {
+				query.setParameter("finishTo", finishTo);
+			}
+			LOGGER.info(hql.toString());
+			int offset = (Integer.valueOf(page) - 1) * limit;
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] obj = (Object[]) it.next();
+				Task task = (Task) obj[0];
+				tasks.add(task);
+			}
+			for (Task task : tasks) {
 				TaskModel customTask = new TaskModel();
 				customTask.setId(task.getId());
 				customTask.setTitle(task.getTitle());
-				
 				EmployeeModel creatorTemp = new EmployeeModel();
 				creatorTemp.setId(task.getCreator().getId());
 				creatorTemp.setCode(task.getCreator().getCode());
@@ -597,233 +780,124 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setActive(task.getReceiver().isActive());
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
-				
+
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-				for(Department department :task.getCreator().getDepartments()) {
+				for (Department departmentTmp : task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
-					dModel.setCode(department.getCode());
-					dModel.setDescription(department.getDescription());
-					dModel.setId(department.getId());
-					dModel.setName(department.getName());
-					dModel.setLevel(department.getLevel());
+					dModel.setCode(departmentTmp.getCode());
+					dModel.setDescription(departmentTmp.getDescription());
+					dModel.setId(departmentTmp.getId());
+					dModel.setName(departmentTmp.getName());
+					dModel.setLevel(departmentTmp.getLevel());
 					departmentModels.add(dModel);
 				}
 				customTask.setDepartment(departmentModels);
 				customTask.setStatus(task.getStatus());
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStartDate(task.getStartDate());
 				customTask.setModifyDate(task.getModifyDate());
-				customTask.setPriority(task.getPriority());
-				
-				return customTask;
-			} catch (Exception e) {
-				LOGGER.error("Error has occured in edit task ", e);
+				customTasks.add(customTask);
 			}
-			return null;
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
 		}
-		// filter
-		@Override
-		public List<TaskModel> filter(String createFrom, String createTo, String finishFrom, String finishTo, String title,
-				String creator, String receiver, String department, Integer limit, String order, String page,String sort) {
-			List<Task> tasks = new ArrayList<Task>();
-			List<TaskModel> customTasks = new ArrayList<TaskModel>();
-			StringBuilder hql = new StringBuilder("FROM tasks AS ta");
-			hql.append(" inner join ta.creator as em");
-			hql.append(" inner join em.departments as de");
-			hql.append(" inner join ta.receiver as em1");
-			hql.append(" where em.name LIKE CONCAT('%',:creator,'%')");
-			hql.append(" AND de.name LIKE CONCAT('%',:department,'%')");//department of creator
-			hql.append(" AND em1.name LIKE CONCAT('%',:receiver,'%')");
-			hql.append(" AND ta.title LIKE CONCAT('%',:title,'%')");
-			if(createFrom.toString().length()>5) {
-				hql.append(" and ta.createDate>=:createFrom");
-			}
-			if(createTo.toString().length()>5) {
-				hql.append(" and ta.createDate<=:createTo");
-			}
-			if(finishFrom.toString().length()>5) {
-				hql.append(" and ta.finishDate>=:finishFrom");
-			}
-			if(finishTo.toString().length()>5) {
-				hql.append(" and ta.finishDate<=:finishTo");
-			}
-			hql.append(" ORDER BY ta."+sort+" "+order);
-			try {
-				Session session = sessionFactory.getCurrentSession();
-				Query query = session.createQuery(hql.toString());
-				query.setParameter("creator",creator);
-				query.setParameter("receiver",receiver);
-				query.setParameter("department",department);
-				query.setParameter("title",title);
-				if(createFrom.toString().length()>5) {
-					query.setParameter("createFrom",createFrom);
-				}
-				if(createTo.toString().length()>5) {
-					query.setParameter("createTo",createTo);
-				}
-				if(finishFrom.toString().length()>5) {
-					query.setParameter("finishFrom",finishFrom);
-				}
-				if(finishTo.toString().length()>5) {
-					query.setParameter("finishTo",finishTo);
-				}
-				LOGGER.info(hql.toString());
-				int offset = (Integer.valueOf(page) - 1) * limit;
-				query.setFirstResult(offset);
-				query.setMaxResults(limit);
-				for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
-					Object[] obj = (Object[]) it.next();
-					Task task = (Task) obj[0];
-					tasks.add(task);
-				}
-				for(Task task : tasks) {
-					TaskModel customTask = new TaskModel();
-					customTask.setId(task.getId());
-					customTask.setTitle(task.getTitle());
-					EmployeeModel creatorTemp = new EmployeeModel();
-					creatorTemp.setId(task.getCreator().getId());
-					creatorTemp.setCode(task.getCreator().getCode());
-					creatorTemp.setName(task.getCreator().getName());
-					creatorTemp.setAvatar(task.getCreator().getAvatar());
-					creatorTemp.setGender(task.getCreator().getGender());
-					creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
-					creatorTemp.setEmail(task.getCreator().getEmail());
-					creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
-					creatorTemp.setActive(task.getCreator().isActive());
-					creatorTemp.setCreateDate(task.getCreator().getCreateDate());
-					customTask.setCreator(creatorTemp);
+		return customTasks;
+	}
 
-					EmployeeModel receiverTemp = new EmployeeModel();
-					receiverTemp.setId(task.getReceiver().getId());
-					receiverTemp.setCode(task.getReceiver().getCode());
-					receiverTemp.setName(task.getReceiver().getName());
-					receiverTemp.setAvatar(task.getReceiver().getAvatar());
-					receiverTemp.setGender(task.getReceiver().getGender());
-					receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
-					receiverTemp.setEmail(task.getReceiver().getEmail());
-					receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
-					receiverTemp.setActive(task.getReceiver().isActive());
-					receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
-					customTask.setReceiver(receiverTemp);
-					
-					List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-					for(Department departmentTmp :task.getCreator().getDepartments()) {
-						DepartmentModel dModel = new DepartmentModel();
-						dModel.setCode(departmentTmp.getCode());
-						dModel.setDescription(departmentTmp.getDescription());
-						dModel.setId(departmentTmp.getId());
-						dModel.setName(departmentTmp.getName());
-						dModel.setLevel(departmentTmp.getLevel());
-						departmentModels.add(dModel);
-					}
-					customTask.setDepartment(departmentModels);
-					customTask.setStatus(task.getStatus());
-					customTask.setDescription(task.getDescription());
-					customTask.setRate(task.getRate());
-					customTask.setPriority(task.getPriority());
-					customTask.setCreateDate(task.getCreateDate());
-					customTask.setFinishDate(task.getFinishDate());
-					customTask.setStartDate(task.getStartDate());
-					customTask.setModifyDate(task.getModifyDate());
-					customTasks.add(customTask);
-				}
-			} catch (Exception e) {
-				LOGGER.error(e.getMessage());
-			}
-			return customTasks;
+	@Override
+	public Integer countFilter(String createFrom, String createTo, String finishFrom, String finishTo, String title,
+			String creator, String receiver, String department) {
+		StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS ta");
+		hql.append(" inner join ta.creator as em");
+		hql.append(" inner join em.departments as de");
+		hql.append(" inner join ta.receiver as em1");
+		hql.append(" where em.name LIKE CONCAT('%',:creator,'%')");
+		hql.append(" AND de.name LIKE CONCAT('%',:department,'%')");// department of creator
+		hql.append(" AND em1.name LIKE CONCAT('%',:receiver,'%')");
+		hql.append(" AND ta.title LIKE CONCAT('%',:title,'%')");
+		if (createFrom.toString().length() > 5) {
+			hql.append(" and ta.createDate>=:createFrom");
 		}
-		@Override
-		public Integer countFilter(String createFrom, String createTo, String finishFrom, String finishTo, String title,String creator, String receiver, String department) {
-			StringBuilder hql = new StringBuilder("SELECT COUNT(*) FROM tasks AS ta");
-			hql.append(" inner join ta.creator as em");
-			hql.append(" inner join em.departments as de");
-			hql.append(" inner join ta.receiver as em1");
-			hql.append(" where em.name LIKE CONCAT('%',:creator,'%')");
-			hql.append(" AND de.name LIKE CONCAT('%',:department,'%')");//department of creator
-			hql.append(" AND em1.name LIKE CONCAT('%',:receiver,'%')");
-			hql.append(" AND ta.title LIKE CONCAT('%',:title,'%')");
-			if(createFrom.toString().length()>5) {
-				hql.append(" and ta.createDate>=:createFrom");
-			}
-			if(createTo.toString().length()>5) {
-				hql.append(" and ta.createDate<=:createTo");
-			}
-			if(finishFrom.toString().length()>5) {
-				hql.append(" and ta.finishDate>=:finishFrom");
-			}
-			if(finishTo.toString().length()>5) {
-				hql.append(" and ta.finishDate<=:finishTo");
-			}
-			int count =0;
-			try {
-				Session session = sessionFactory.getCurrentSession();
-				Query query = session.createQuery(hql.toString());
-				query.setParameter("creator",creator);
-				query.setParameter("receiver",receiver);
-				query.setParameter("department",department);
-				query.setParameter("title",title);
-				if(createFrom.toString().length()>5) {
-					query.setParameter("createFrom",createFrom);
-				}
-				if(createTo.toString().length()>5) {
-					query.setParameter("createTo",createTo);
-				}
-				if(finishFrom.toString().length()>5) {
-					query.setParameter("finishFrom",finishFrom);
-				}
-				if(finishTo.toString().length()>5) {
-					query.setParameter("finishTo",finishTo);
-				}
-				LOGGER.info(hql.toString());
-				@SuppressWarnings("rawtypes")
-				List list = query.getResultList();
-				count = Integer.parseInt(list.get(0).toString());
-			} catch (Exception e) {
-				LOGGER.error(e.getMessage());
-			}
-			return count;
+		if (createTo.toString().length() > 5) {
+			hql.append(" and ta.createDate<=:createTo");
 		}
+		if (finishFrom.toString().length() > 5) {
+			hql.append(" and ta.finishDate>=:finishFrom");
+		}
+		if (finishTo.toString().length() > 5) {
+			hql.append(" and ta.finishDate<=:finishTo");
+		}
+		int count = 0;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("creator", creator);
+			query.setParameter("receiver", receiver);
+			query.setParameter("department", department);
+			query.setParameter("title", title);
+			if (createFrom.toString().length() > 5) {
+				query.setParameter("createFrom", createFrom);
+			}
+			if (createTo.toString().length() > 5) {
+				query.setParameter("createTo", createTo);
+			}
+			if (finishFrom.toString().length() > 5) {
+				query.setParameter("finishFrom", finishFrom);
+			}
+			if (finishTo.toString().length() > 5) {
+				query.setParameter("finishTo", finishTo);
+			}
+			LOGGER.info(hql.toString());
+			@SuppressWarnings("rawtypes")
+			List list = query.getResultList();
+			count = Integer.parseInt(list.get(0).toString());
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return count;
+	}
 
-		@Override
-		public List<TaskHis> findAllHistoryByTaskID(Integer taskId) {
-			List<TaskHis> taskHis = null;
-			StringBuilder hql = new StringBuilder("FROM task_his AS th ");
-			hql.append(" inner join th.task as ta");
-			hql.append(" inner join th.receiver as em1");
-			hql.append(" inner join th.status as st");
-			hql.append(" WHERE th.task.id = :taskId");
-			try {
-				Session session = sessionFactory.getCurrentSession();
-				LOGGER.info(hql.toString());
-				Query query = session.createQuery(hql.toString());
-				query.setParameter("taskId", taskId);
-				taskHis = new ArrayList<TaskHis>();
-				for(Iterator it = query.getResultList().iterator();it.hasNext();) {
-					TaskHis itemTaskHis = new TaskHis();
-					Object[] ob = (Object[]) it.next();
-					itemTaskHis = (TaskHis) ob[0];
-					taskHis.add(itemTaskHis);
-				}
-			} catch (Exception e) {
-				LOGGER.error(e.getMessage());
+	@Override
+	public List<TaskHis> findAllHistoryByTaskID(Integer taskId) {
+		List<TaskHis> taskHis = null;
+		StringBuilder hql = new StringBuilder("FROM task_his AS th ");
+		hql.append(" inner join th.task as ta");
+		hql.append(" inner join th.receiver as em1");
+		hql.append(" inner join th.status as st");
+		hql.append(" WHERE th.task.id = :taskId");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			LOGGER.info(hql.toString());
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("taskId", taskId);
+			taskHis = new ArrayList<TaskHis>();
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				TaskHis itemTaskHis = new TaskHis();
+				Object[] ob = (Object[]) it.next();
+				itemTaskHis = (TaskHis) ob[0];
+				taskHis.add(itemTaskHis);
 			}
-			return taskHis;
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
 		}
-	
+		return taskHis;
+	}
+
 }
 
-class TaskComparator implements Comparator<Department>{
-    // Overriding compare()method of Comparator 
-                // for descending order of cgpa
-    public int compare(Department d1, Department d2) {
-    	if(d1.getLevel() < d2.getLevel()) {
+class TaskComparator implements Comparator<Department> {
+	// Overriding compare()method of Comparator
+	// for descending order of cgpa
+	public int compare(Department d1, Department d2) {
+		if (d1.getLevel() < d2.getLevel()) {
 			return 1;
-		}else if(d1.getLevel() > d2.getLevel()) {
+		} else if (d1.getLevel() > d2.getLevel()) {
 			return -1;
 		}
 		return 0;
-    }
+	}
 }
