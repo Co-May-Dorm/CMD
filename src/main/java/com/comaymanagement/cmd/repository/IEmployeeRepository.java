@@ -49,5 +49,6 @@ public interface IEmployeeRepository {
 	public Employee findById(Integer id);
 	
 	public boolean add(Set<Employee> emps);
+	public Set<EmployeeModel> findByName(String name);
 	
 }

@@ -517,7 +517,7 @@ public class EmployeeService {
 		}
 
 	}
-	public EmployeeModel toEmployeeModel(Employee employee) {
+	public static EmployeeModel toEmployeeModel(Employee employee) {
 		EmployeeModel employeeModel = new EmployeeModel();
 		List<PositionModel> positionModelList = new ArrayList<>();
 		List<DepartmentModel> departmentModelList = new ArrayList<>();
@@ -582,5 +582,16 @@ public class EmployeeService {
 			return employeeModel;
 		}
 		return null;
+	}
+	public ResponseEntity<Object> findByName(String name){
+		Set<EmployeeModel> employeeModelSet = new LinkedHashSet<>();
+		employeeModelSet = employeeRepository.findByName(name);
+		Map<String, Object> result = new TreeMap<>();
+		result.put("employees", employeeModelSet);
+		if (employeeModelSet.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", result));
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", result));
+		}
 	}
 }
