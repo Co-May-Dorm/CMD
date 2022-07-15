@@ -18,6 +18,8 @@ All permission name
  	update_all
  	delete_all
  **/
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,7 @@ import com.comaymanagement.cmd.service.TaskService;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class TaskController {
 	
-	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+	private static Logger LOGGER  = LoggerFactory.getLogger(TaskController.class);
 	@Autowired
 	TaskService taskService;
 	
@@ -87,6 +89,7 @@ public class TaskController {
 			@RequestParam(value="order", required = false) String order
 			) {
 		LOGGER.info("Get task list");
+		LOGGER.debug("aaaaaaaaaaaa");
 		return taskService.findAll(dep,title,status,creator,receiver,createDate,finishDate,priority,rate,sort,order,page);
 	}
 	
