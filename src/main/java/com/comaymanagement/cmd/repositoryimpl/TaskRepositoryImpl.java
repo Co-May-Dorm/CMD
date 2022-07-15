@@ -547,6 +547,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			try {
 				Task task = new Task();
 				task = session.find(Task.class, id);
+				
 				TaskHis th = new TaskHis();
 				th = session.find(TaskHis.class, id);
 				if(th != null) {

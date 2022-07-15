@@ -80,7 +80,7 @@ public class TaskService {
 
 	}
 	
-	public ResponseEntity<Object> findAllTask(String dep, String title, String status, String creator, String receiver,
+	public ResponseEntity<Object> findAll(String dep, String title, String status, String creator, String receiver,
 			String createDate, String finishDate,String priority, String rate,String sort, String order, String page) {
 		dep = dep == null ? "" : dep.trim();
 		title = title == null ? "" : title.trim();
@@ -95,6 +95,7 @@ public class TaskService {
 		sort = sort == null || sort == "" ? "id" : sort;
 		page = page == null ? "1" : page.trim();
 		Integer limit = CMDConstrant.LIMIT;
+		Integer limitTemp = CMDConstrant.LIMIT;
 		// Caculator offset
 		int offset = (Integer.parseInt(page) - 1) * limit;
 		Set<TaskModel> taskModelSet = new LinkedHashSet<TaskModel>();
@@ -102,13 +103,17 @@ public class TaskService {
 		try {
 			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order);
 			Integer numberOfItemNeeded = 0;
+
 			numberOfItemNeeded = totalItem < limit ? totalItem : limit; 
 			Integer numberDuplicate = numberOfItemNeeded;
 			while (taskModelSet.size() < numberOfItemNeeded) {
+				if(offset >= totalItem) {
+					break;
+				}
 				numberDuplicate -= taskModelSet.size();  
 				offset = taskModelSet.size() == 0 ? offset : (offset + taskModelSet.size() + numberDuplicate);
-				limit = numberOfItemNeeded - taskModelSet.size();
-				taskModelListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order, offset, limit);
+				limitTemp = numberOfItemNeeded - taskModelSet.size();
+				taskModelListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order, offset, limitTemp);
 				for(TaskModel taskModel : taskModelListTMP) {
 					taskModelSet.add(taskModel);
 				}
