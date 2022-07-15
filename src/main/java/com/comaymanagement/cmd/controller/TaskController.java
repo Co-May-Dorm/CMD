@@ -159,6 +159,10 @@ public class TaskController {
 		LOGGER.info("Filter tasks!");
 		return taskService.filter(createFrom, createTo, finishFrom, finishTo, title, creator, receiver, department, order, page, sort);
 	}
-	
+	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@GetMapping(value= "/taskHis/{taskId}",produces = "application/json")
+	public ResponseEntity<Object> findAll(@PathVariable(value="taskId",required = false) Integer taskId){
+		return taskService.findAllHistoryByTaskID(taskId);
+	}
 }
 

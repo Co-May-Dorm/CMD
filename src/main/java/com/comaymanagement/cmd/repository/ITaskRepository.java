@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.repository.query.Param;
 
 import com.comaymanagement.cmd.entity.Task;
+import com.comaymanagement.cmd.entity.TaskHis;
 import com.comaymanagement.cmd.model.TaskModel;
 
 
@@ -69,4 +70,5 @@ public interface ITaskRepository {
 			@Param("receicer") String receiver,
 			@Param("department") String department
 	);
+	List<TaskHis> findAllHistoryByTaskID(Integer taskId);
 }

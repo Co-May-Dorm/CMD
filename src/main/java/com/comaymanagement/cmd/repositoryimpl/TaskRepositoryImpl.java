@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.entity.Employee;
+import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.entity.TaskHis;
 import com.comaymanagement.cmd.model.DepartmentModel;
@@ -88,10 +90,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
 				receiverTemp.setActive(task.getReceiver().isActive());
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setStartDate(task.getStartDate());
 				customTask.setReceiver(receiverTemp);
 				
 				customTask.setCreateDate(task.getCreateDate());
-				customTask.setFinishDate(task.getFinishDate());
+				customTask.setModifyDate(task.getModifyDate());
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
 				for(Department department :task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
@@ -190,6 +194,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				
 				customTask.setCreateDate(task.getCreateDate());
 				customTask.setFinishDate(task.getFinishDate());
+				customTask.setModifyDate(task.getModifyDate());
+				customTask.setStartDate(task.getStartDate());
 				
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
 				for(Department department :task.getCreator().getDepartments()) {
@@ -308,7 +314,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setEmail(task.getReceiver().getEmail());
 				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
 				receiverTemp.setActive(task.getReceiver().isActive());
-				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
 				
 				customTask.setCreateDate(task.getCreateDate());
@@ -329,6 +334,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
 				customTask.setPriority(task.getPriority());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setStartDate(task.getStartDate());
+				customTask.setModifyDate(task.getModifyDate());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTasks.add(customTask);
 			}
 		} catch (Exception e) {
@@ -393,9 +402,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
 				
-				customTask.setCreateDate(task.getCreateDate());
-				customTask.setFinishDate(task.getFinishDate());
-				
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
 				for(Department department :task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
@@ -411,6 +417,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
 				customTask.setPriority(task.getPriority());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setStartDate(task.getStartDate());
+				customTask.setModifyDate(task.getModifyDate());
 				return customTask;
 			}
 		} catch (Exception e) {
@@ -441,7 +451,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Override
 	public TaskModel findById(Integer id) {
-		TaskModel customTask = new TaskModel();
+		TaskModel customTask = null;
 		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
 		hql.append(" inner join ta.creator as em");
 		hql.append(" inner join ta.receiver as em1");
@@ -451,7 +461,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
-			query.setParameter("id",id);			
+			query.setParameter("id",id);	
+			customTask = new TaskModel();
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				
 				Object[] obj = (Object[]) it.next();
@@ -488,9 +499,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
 				
-				customTask.setCreateDate(task.getCreateDate());
-				customTask.setFinishDate(task.getFinishDate());
-				
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
 				for(Department department : departmentList) {
 					DepartmentModel dModel = new DepartmentModel();
@@ -505,7 +513,27 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setStatus(task.getStatus());
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setStartDate(task.getStartDate());
+				customTask.setModifyDate(task.getModifyDate());
 				customTask.setPriority(task.getPriority());
+				List<TaskHis> taskHis = task.getTaskHis();
+				for(TaskHis itemHis : taskHis) {
+					for(Department itemDepartment : itemHis.getTask().getCreator().getDepartments()) {
+						itemDepartment.getPositions().size();
+						for(Position itemPosition : itemDepartment.getPositions()) {
+							itemPosition.getEmployees().size();
+							for(Employee em: itemPosition.getEmployees()) {
+								em.getDepartments().size();
+							}
+						}
+					}
+					itemHis.getTask().getCreator().getProposalPermissions().size();
+					itemHis.getTask().getCreator().getTaskListCreated().size();
+				}
+				
+				customTask.setTaskHis(taskHis);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
@@ -569,9 +597,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 				customTask.setReceiver(receiverTemp);
 				
-				customTask.setCreateDate(task.getCreateDate());
-				customTask.setFinishDate(task.getFinishDate());
-				
 				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
 				for(Department department :task.getCreator().getDepartments()) {
 					DepartmentModel dModel = new DepartmentModel();
@@ -586,6 +611,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setStatus(task.getStatus());
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setStartDate(task.getStartDate());
+				customTask.setModifyDate(task.getModifyDate());
 				customTask.setPriority(task.getPriority());
 				
 				return customTask;
@@ -679,9 +708,6 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
 					customTask.setReceiver(receiverTemp);
 					
-					customTask.setCreateDate(task.getCreateDate());
-					customTask.setFinishDate(task.getFinishDate());
-					
 					List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
 					for(Department departmentTmp :task.getCreator().getDepartments()) {
 						DepartmentModel dModel = new DepartmentModel();
@@ -697,6 +723,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					customTask.setDescription(task.getDescription());
 					customTask.setRate(task.getRate());
 					customTask.setPriority(task.getPriority());
+					customTask.setCreateDate(task.getCreateDate());
+					customTask.setFinishDate(task.getFinishDate());
+					customTask.setStartDate(task.getStartDate());
+					customTask.setModifyDate(task.getModifyDate());
 					customTasks.add(customTask);
 				}
 			} catch (Exception e) {
@@ -754,6 +784,32 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				LOGGER.error(e.getMessage());
 			}
 			return count;
+		}
+
+		@Override
+		public List<TaskHis> findAllHistoryByTaskID(Integer taskId) {
+			List<TaskHis> taskHis = null;
+			StringBuilder hql = new StringBuilder("FROM task_his AS th ");
+			hql.append(" inner join th.task as ta");
+			hql.append(" inner join th.receiver as em1");
+			hql.append(" inner join th.status as st");
+			hql.append(" WHERE th.task.id = :taskId");
+			try {
+				Session session = sessionFactory.getCurrentSession();
+				LOGGER.info(hql.toString());
+				Query query = session.createQuery(hql.toString());
+				query.setParameter("taskId", taskId);
+				taskHis = new ArrayList<TaskHis>();
+				for(Iterator it = query.getResultList().iterator();it.hasNext();) {
+					TaskHis itemTaskHis = new TaskHis();
+					Object[] ob = (Object[]) it.next();
+					itemTaskHis = (TaskHis) ob[0];
+					taskHis.add(itemTaskHis);
+				}
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+			}
+			return taskHis;
 		}
 	
 }

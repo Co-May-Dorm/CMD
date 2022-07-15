@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -7,8 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -33,7 +37,10 @@ public class Task{
 	private String createDate;
 	@Column(name= "finish_date")
 	private String finishDate;
-	
+	@Column(name= "start_date")
+	private String startDate;
+	@Column(name= "modify_date")
+	private String modifyDate;
 	@OneToOne()
 	@JoinColumn(name = "creator_id")
 	private Employee creator;
@@ -46,6 +53,11 @@ public class Task{
 	@JoinColumn(name = "status_id")
 	private Status status;
 	
+	@OneToMany()
+	@JsonIgnore
+	@JoinColumn(name = "task_id")
+	private List<TaskHis> taskHis;
+
 	private Integer rate;
 	private Integer priority;
 

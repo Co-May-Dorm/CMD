@@ -24,6 +24,7 @@ import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Status;
 import com.comaymanagement.cmd.entity.Task;
+import com.comaymanagement.cmd.entity.TaskHis;
 import com.comaymanagement.cmd.model.TaskModel;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.StatusRepositotyImpl;
@@ -191,20 +192,28 @@ public class TaskService {
 			Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
 			String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
 			String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
-			String createDate = jsonObjectTask.get("createDate") != null ? jsonObjectTask.get("createDate").asText() : "";;
+			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 			String modifyDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 			String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : "";
 			Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
 			Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;
+			String startDate = jsonObjectTask.get("startDate") != null ? jsonObjectTask.get("startDate").asText() : "";
 			
-			Employee creator = new Employee();
-			creator = employeeRepositoryImpl.findById(creatorId);
-			
-			Employee receiver = new Employee();
-			receiver = employeeRepositoryImpl.findById(receiverId);
-
-			Status status = new Status();
-			status = statusRepositotyImpl.findById(statusId);
+			Employee creator = employeeRepositoryImpl.findById(creatorId);
+			if(creator == null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("EMPE8"), ""));
+			}
+			Employee receiver= employeeRepositoryImpl.findById(receiverId);
+			if(receiver == null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("EMPE8"), ""));
+			}
+			Status status = statusRepositotyImpl.findById(statusId);
+			if(status == null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("STAE1"), ""));
+			}
 			
 			task.setCreator(creator);
 			task.setReceiver(receiver);
@@ -213,6 +222,8 @@ public class TaskService {
 			task.setDescription(description);
 			task.setCreateDate(createDate);
 			task.setFinishDate(finishDate);
+			task.setModifyDate(modifyDate);
+			task.setStartDate(startDate);
 			task.setRate(rate);
 			task.setPriority(priority);
 			
@@ -227,7 +238,7 @@ public class TaskService {
 
 		} catch (Exception e) {
 			LOGGER.debug("ERROR",e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("ERROR", e.getMessage() , ""));
 		}
 	}
@@ -313,15 +324,23 @@ public class TaskService {
 				String finishDate = jsonObjectTask.get("finishDate") != null ? jsonObjectTask.get("finishDate").asText() : "";
 				Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
 				Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;
+				String startDate = jsonObjectTask.get("startDate") != null ? jsonObjectTask.get("startDate").asText() : "";
 				
-				Employee creator = new Employee();
-				creator = employeeRepositoryImpl.findById(creatorId);
-				
-				Employee receiver = new Employee();
-				receiver = employeeRepositoryImpl.findById(receiverId);
-
-				Status status = new Status();
-				status = statusRepositotyImpl.findById(statusId);
+				Employee creator = employeeRepositoryImpl.findById(creatorId);
+				if(creator == null) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("EMPE8"), ""));
+				}
+				Employee receiver= employeeRepositoryImpl.findById(receiverId);
+				if(receiver == null) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("EMPE8"), ""));
+				}
+				Status status = statusRepositotyImpl.findById(statusId);
+				if(status == null) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("STAE1"), ""));
+				}
 				
 				// statusId 3 = Đã hủy
 				if(statusId==3) {
@@ -329,6 +348,7 @@ public class TaskService {
 				}else {
 					messageCode = "TASKS2";
 				}
+				
 				task.setId(id);
 				task.setCreator(creator);
 				task.setReceiver(receiver);
@@ -337,8 +357,10 @@ public class TaskService {
 				task.setDescription(description);
 				task.setCreateDate(createDate);
 				task.setFinishDate(finishDate);
+				task.setModifyDate(modifyDate);
 				task.setRate(rate);
 				task.setPriority(priority);
+				task.setStartDate(startDate);
 				TaskModel taskModel = taskRepository.edit(task);
 				if (null != taskModel) {
 					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode(messageCode), taskModel));
@@ -390,6 +412,16 @@ public class TaskService {
 			}
 
 		}
-
+		public  ResponseEntity<Object> findAllHistoryByTaskID(Integer taskId){
+			List<TaskHis> taskHis = new ArrayList<TaskHis>();
+			taskHis = taskRepository.findAllHistoryByTaskID(taskId);
+			if(taskHis == null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("Not found ", "Can not find task list ", taskHis));
+			}else {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", "Query produce successfully ", taskHis));	
+			}
+		}
 }
 
