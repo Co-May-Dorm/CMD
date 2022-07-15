@@ -412,4 +412,79 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 		return proposalModel;
 	}
 
+	@Override
+	public ProposalModel add(Proposal proposal, List<ProposalDetail> proposalDetails) {
+		ProposalModel proposalModel = null;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Integer resultAddProposal = (Integer) session.save(proposal);
+			if(resultAddProposal == -1) {
+				return proposalModel;
+			}
+			
+			for(ProposalDetail proposalDetail : proposalDetails) {
+				proposal.setId(resultAddProposal);
+				proposalDetail.setProposalId(proposal);
+				Integer resultAddProposalDetail = (Integer) session.save(proposalDetail);
+				if(resultAddProposalDetail == -1) {
+					return proposalModel;
+				}
+			}
+			LOGGER.info("Add proposal successfully");
+			proposalModel = new ProposalModel();
+			proposalModel.setId(resultAddProposal);
+			
+			EmployeeModel creator = new EmployeeModel();
+			creator.setId(proposal.getEmployee().getId());
+			creator.setName(proposal.getEmployee().getName());
+			creator.setCode(proposal.getEmployee().getCode());
+			creator.setAvatar(proposal.getEmployee().getAvatar());
+			creator.setGender(proposal.getEmployee().getGender());
+			creator.setDateOfBirth(proposal.getEmployee().getDateOfBirth());
+			creator.setEmail(proposal.getEmployee().getEmail());
+			creator.setPhoneNumber(proposal.getEmployee().getPhoneNumber());
+			creator.setActive(proposal.getEmployee().isActive());
+			creator.setCreateDate(proposal.getEmployee().getCreateDate());
+			creator.setCreateDate(proposal.getEmployee().getCreateDate());
+			creator.setModifyDate(proposal.getEmployee().getModifyDate());
+			creator.setCreateBy(proposal.getEmployee().getCreateBy());
+			creator.setModifyBy(proposal.getEmployee().getModifyBy());
+			proposalModel.setCreator(creator);
+			
+			EmployeeModel receiver = new EmployeeModel();
+			receiver.setId(proposal.getReceiver().getId());
+			receiver.setName(proposal.getReceiver().getName());
+			receiver.setCode(proposal.getReceiver().getCode());
+			receiver.setAvatar(proposal.getReceiver().getAvatar());
+			receiver.setGender(proposal.getReceiver().getGender());
+			receiver.setDateOfBirth(proposal.getReceiver().getDateOfBirth());
+			receiver.setEmail(proposal.getReceiver().getEmail());
+			receiver.setPhoneNumber(proposal.getReceiver().getPhoneNumber());
+			receiver.setActive(proposal.getReceiver().isActive());
+			receiver.setCreateDate(proposal.getReceiver().getCreateDate());
+			receiver.setCreateDate(proposal.getReceiver().getCreateDate());
+			receiver.setModifyDate(proposal.getReceiver().getModifyDate());
+			receiver.setCreateBy(proposal.getReceiver().getCreateBy());
+			receiver.setModifyBy(proposal.getReceiver().getModifyBy());
+			proposalModel.setReceiver(receiver);
+			proposalModel.setProposal(proposal.getProposalType());
+			
+			List<ContentModel> contentModels = new ArrayList<ContentModel>();
+			for(ProposalDetail proposalDetail : proposalDetails) {
+				ContentModel contentModel = new ContentModel();
+				contentModel.setFieldId(proposalDetail.getFieldId());
+				contentModel.setFieldName(proposalDetail.getFieldName());
+				contentModel.setContent(proposalDetail.getContent());
+				contentModels.add(contentModel);
+			}
+			proposalModel.setContents(contentModels);
+			proposalModel.setCreatedDate(proposal.getCreateDate());
+			proposalModel.setStatus(proposal.getStatus());
+			
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return proposalModel;
+	}
+
 }
