@@ -70,7 +70,7 @@ public class EmployeeService {
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
 			String dep, String pos, String sort, String order) {
-		Integer limit = new Integer(CMDConstrant.LIMIT);
+		Integer limit = CMDConstrant.LIMIT;
 		Set<EmployeeModel> employeeModelSetTMP = new LinkedHashSet<>();
 		Set<EmployeeModel> employeeModelSet = new LinkedHashSet<>();
 		name = name == null ? "" : name.trim();
@@ -156,6 +156,10 @@ public class EmployeeService {
 			jsonLoginAccount = jsonObjectEmployee.get("user");
 //			Check employee code existed
 			String code = jsonObjectEmployee.get("code").asText();
+			if(code.length() > 10) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE9") , ""));
+			}
 			String avatar = jsonObjectEmployee.get("avatar") != null ? jsonObjectEmployee.get("avatar").asText() : "";
 			String gender = jsonObjectEmployee.get("gender") != null ? jsonObjectEmployee.get("gender").asText() : "";
 			String dateOfBirth = jsonObjectEmployee.get("dateOfBirth") == null ? ""
