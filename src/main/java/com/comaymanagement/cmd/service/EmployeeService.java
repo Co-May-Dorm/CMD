@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -80,9 +81,6 @@ public class EmployeeService {
 		dep = dep == null ? "" : dep.trim();
 		pos = pos == null ? "" : pos.trim();
 		page = page == null ? "1" : page.trim();
-		// Caculator offset
-		int offset = (Integer.parseInt(page) - 1) * limit;
-
 		// Order by defaut
 		if (sort == null || sort == "") {
 			sort = "emp.id";
@@ -90,26 +88,29 @@ public class EmployeeService {
 		if (order == null || order == "") {
 			order = "desc";
 		}
-		try {
-			Integer totalItem = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order);
-			Integer numberOfItemNeeded = 0;
-			numberOfItemNeeded = totalItem < limit ? totalItem : limit;
-			Integer numberDuplicate = numberOfItemNeeded;
-			while (employeeModelSet.size() < numberOfItemNeeded) {
-				if(offset >= totalItem) {
-					break;
-				}
-				offset = employeeModelSet.size() == 0 ? offset : (offset + employeeModelSet.size() + numberDuplicate);
-				limit = numberOfItemNeeded - employeeModelSet.size();
-				employeeModelSetTMP = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limit,
-						offset);
-				for (EmployeeModel employeeModel : employeeModelSetTMP) {
-					employeeModelSet.add(employeeModel);
-				}
-				employeeModelSetTMP.clear();
+		int count = Integer.parseInt(page);
+		int offset = 0;
+		int limitCaculated = 0;
+		Integer totalItemEmployee = employeeRepository.countAllPagingIncludeDuplicate(name, dob, email, phone, dep, pos, sort, order,-1,-1);
+		Map<String, Integer> caculatorOffset = new LinkedHashMap<>();
+		while(count>0) {
+			if((offset + limit) > totalItemEmployee) {
+				limit = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order,offset	,-1);;
 			}
-			Integer totalItemEmployee = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort,
-					order);
+			caculatorOffset = caculatorOffset(name, dob, email, phone, dep, pos, sort, order, limit,offset);
+			if(count>1) {
+				offset = caculatorOffset.get("offset");
+			}
+			limitCaculated = caculatorOffset.get("limit");
+			count--;
+		}
+		try {
+			
+			employeeModelSetTMP = employeeRepository.findAll(name, dob, email, phone, dep, pos, sort, order, limitCaculated,
+					offset);
+			for (EmployeeModel employeeModel : employeeModelSetTMP) {
+				employeeModelSet.add(employeeModel);
+			}
 			Pagination pagination = new Pagination();
 			Map<String, Object> result = new TreeMap<>();
 			pagination.setLimit(CMDConstrant.LIMIT);
@@ -130,7 +131,39 @@ public class EmployeeService {
 		}
 
 	}
+	public Map<String, Integer> caculatorOffset(String name, String dob, String email, String phone,
+			String dep, String pos, String sort, String order,Integer limit, Integer offset) {
+		int quantityDifference =0;
+		int newOffset = offset;
+		int newLimit = limit;
+		int total = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order, -1, -1); //10, 3
+		Map<String, Integer> result = new LinkedHashMap<>();
+			do {
+				
+				int countPaging = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order, newOffset, newLimit); //10, 3
+//				int countPagingDuplicate = employeeRepository.countAllPagingIncludeDuplicate(name, dob, email, phone, dep, pos, sort, order, newOffset, newLimit);
 
+				quantityDifference = newLimit - countPaging; // , , 0
+				//store old offset
+//				newOffset = offset;
+				newLimit = quantityDifference; //5 //2 //0
+				//expect offset
+				newOffset = newOffset + countPaging + quantityDifference; // 15 // 15+3+2 // 20+2+0
+				
+				
+				
+				limit = limit + newLimit; // 15 +5 , 20 + 2 //22+0
+//				offset = newOffset ;
+			} while (quantityDifference>0 );
+				result.put("offset", newOffset); //22+0
+				result.put("limit", limit); //22+0
+			
+			
+//		if(count>0) {
+//			caculatorOffset((count-1) +"" ,name,  dob,  email,  phone, dep,  pos,  sort,  order, limit);
+//		}
+	return result;
+	}
 	// Add and edit employee
 	public ResponseEntity<Object> addEmployee(String json) {
 		Employee emp = new Employee();

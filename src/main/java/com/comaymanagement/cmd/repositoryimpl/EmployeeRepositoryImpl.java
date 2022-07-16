@@ -209,10 +209,10 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 	 	
 	@Override
 	public Integer countAllPaging(String name, String dob, String email, String phone, String dep,
-			String pos, String sort, String order) {
+			String pos, String sort, String order,Integer offset, Integer limit) {
 		Set<Employee> employeeSet = new LinkedHashSet<>();
 		StringBuilder hql = new StringBuilder();
-		hql.append("select count(*) from ");
+		hql.append("from ");
 		hql.append("employees emp ");
 		hql.append("inner join emp.positions as pos inner join emp.departments as dep ");
 		hql.append("where emp.name like CONCAT('%',:name,'%') ");
@@ -235,11 +235,65 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			query.setParameter("phone", phone);
 			query.setParameter("dep", dep);
 			query.setParameter("pos", pos);
+			if(offset>0) {
+				query.setFirstResult(offset);
+				
+			}
+			if(limit>0) {
+				query.setMaxResults(limit);
+			}
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] ob = (Object[]) it.next();
+				employeeSet.add((Employee) ob[0]);
+			}
+			Integer countResult = employeeSet.size();
+			return countResult;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in employeePaging() ", e);
+			
+		}
+		
+		return 0;
+	}
+	public Integer countAllPagingIncludeDuplicate(String name, String dob, String email, String phone, String dep,
+			String pos, String sort, String order,Integer offset, Integer limit) {
+		Set<Employee> employeeSet = new LinkedHashSet<>();
+		StringBuilder hql = new StringBuilder();
+		hql.append("from ");
+		hql.append("employees emp ");
+		hql.append("inner join emp.positions as pos inner join emp.departments as dep ");
+		hql.append("where emp.name like CONCAT('%',:name,'%') ");
+		hql.append("and emp.dateOfBirth like CONCAT('%',:dob,'%') ");
+		hql.append("and emp.email like CONCAT('%',:email,'%') ");
+		hql.append("and emp.phoneNumber like CONCAT('%',:phone,'%') ");
+		hql.append("and dep.name like CONCAT('%',:dep,'%') ");
+		hql.append("and pos.name like CONCAT('%',:pos,'%') ");
+		hql.append("and pos.team.id is null ");
+		hql.append("and pos.department.id is not null ");
+		hql.append("and emp.activeFlag = true ");
+		hql.append("order by " + sort + " " + order);
+		Session session = this.sessionFactory.getCurrentSession();
+		List<EmployeeModel> employeeModelList = new ArrayList();
+		try {
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("name", name);
+			query.setParameter("dob", dob);
+			query.setParameter("email", email);
+			query.setParameter("phone", phone);
+			query.setParameter("dep", dep);
+			query.setParameter("pos", pos);
+			if(offset>0) {
+				query.setFirstResult(offset);
+				
+			}
+			if(limit>0) {
+				query.setMaxResults(limit);
+			}
 //			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 //				Object[] ob = (Object[]) it.next();
 //				employeeSet.add((Employee) ob[0]);
 //			}
-			Integer countResult = Integer.valueOf(query.uniqueResult().toString() );
+			Integer countResult = query.getResultList().size();
 			return countResult;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in employeePaging() ", e);
