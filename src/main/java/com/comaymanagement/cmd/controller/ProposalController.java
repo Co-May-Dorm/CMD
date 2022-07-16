@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,7 @@ All permission name
  	delete_all
  **/
 @RestController
-@RequestMapping("/proposals/approveByMe")
+@RequestMapping("/proposals")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ProposalController {
 	
@@ -48,21 +49,15 @@ public class ProposalController {
 	ProposalService proposalService;
 	
 	@PreAuthorize("@customRoleService.canViewAll('proposal',principal) or @customRoleService.canView('proposal',principal)")
-	@GetMapping(value= "",produces = "application/json")
+	@PostMapping(value= "/approveByMe",produces = "application/json")
 	public ResponseEntity<Object> findAllApproveByMe(
-				@PathVariable(value = "proposal", required = false) Integer proposalTypeId,
-				@PathVariable(value = "content", required = false) String content, 
-				@PathVariable(value = "status", required = false) String status,
-				@PathVariable(value = "creator", required = false) String creator,
-				@PathVariable(value = "createDate", required = false) String createDate,
-				@PathVariable(value = "finishDate", required = false) String finishDate,
-				@PathVariable(value = "sort", required = false) String sort,
-				@PathVariable(value = "order", required = false) String order,
-				@PathVariable(value = "limit", required = false) Integer limit,
-				@PathVariable(value = "page", required = false) String page){
+				@RequestBody String json,
+				@RequestParam(value = "sort", required = false) String sort,
+				@RequestParam(value = "order", required = false) String order,
+				@RequestParam(value = "page", required = false) String page){
 		LOGGER.info("Find all proposals");
 		
-		return proposalService.findAllApproveByMe(proposalTypeId, content, status, creator, createDate, finishDate, sort, order, limit, page);
+		return proposalService.findAllApproveByMe(json,sort,order,page);
 		
 	}
 	
