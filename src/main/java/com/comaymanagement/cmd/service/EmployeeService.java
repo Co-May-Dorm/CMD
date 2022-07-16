@@ -91,10 +91,11 @@ public class EmployeeService {
 		int count = Integer.parseInt(page);
 		int offset = 0;
 		int limitCaculated = 0;
-		Integer totalItemEmployee = employeeRepository.countAllPagingIncludeDuplicate(name, dob, email, phone, dep, pos, sort, order,-1,-1);
+		Integer totalItemEmployeeDup = employeeRepository.countAllPagingIncludeDuplicate(name, dob, email, phone, dep, pos, sort, order,-1,-1);
+		Integer totalItemEmployee = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order,-1,-1);
 		Map<String, Integer> caculatorOffset = new LinkedHashMap<>();
 		while(count>0) {
-			if((offset + limit) > totalItemEmployee) {
+			if((offset + limit) > totalItemEmployeeDup) {
 				limit = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order,offset	,-1);;
 			}
 			caculatorOffset = caculatorOffset(name, dob, email, phone, dep, pos, sort, order, limit,offset);
@@ -141,17 +142,12 @@ public class EmployeeService {
 			do {
 				
 				int countPaging = employeeRepository.countAllPaging(name, dob, email, phone, dep, pos, sort, order, newOffset, newLimit); //10, 3
-//				int countPagingDuplicate = employeeRepository.countAllPagingIncludeDuplicate(name, dob, email, phone, dep, pos, sort, order, newOffset, newLimit);
-
 				quantityDifference = newLimit - countPaging; // , , 0
 				//store old offset
 //				newOffset = offset;
 				newLimit = quantityDifference; //5 //2 //0
 				//expect offset
 				newOffset = newOffset + countPaging + quantityDifference; // 15 // 15+3+2 // 20+2+0
-				
-				
-				
 				limit = limit + newLimit; // 15 +5 , 20 + 2 //22+0
 //				offset = newOffset ;
 			} while (quantityDifference>0 );
