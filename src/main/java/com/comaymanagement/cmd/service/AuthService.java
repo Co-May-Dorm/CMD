@@ -1,11 +1,9 @@
 package com.comaymanagement.cmd.service;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.ResponseObject;
-import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.EmployeeModel;
 import com.comaymanagement.cmd.model.LoginRequest;
 import com.comaymanagement.cmd.model.RoleDetailModel;
