@@ -38,7 +38,7 @@ public class Proposal {
 
 	@OneToOne()
 	@JoinColumn(name = "creator_id")
-	private Employee employee;
+	private Employee creator;
 	
 	@OneToOne()
 	@JoinColumn(name = "receiver_id")

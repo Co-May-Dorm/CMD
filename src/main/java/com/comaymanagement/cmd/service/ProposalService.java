@@ -29,6 +29,8 @@ import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.ProposalRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.ProposalTypeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.StatusRepositotyImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -36,63 +38,82 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 public class ProposalService {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	ProposalRepositoryImpl proposalRepositoryImpl;
-	
 
 	@Autowired
 	Message message;
-	
+
 	@Autowired
 	ProposalTypeRepositoryImpl proposalTypeRepositoryImpl;
-	
+
 	@Autowired
 	EmployeeRepositoryImpl employeeRepositoryImpl;
-	
+
 	@Autowired
 	StatusRepositotyImpl statusRepositotyImpl;
-	
 
-	public ResponseEntity<Object> findAllApproveByMe(Integer proposal, String content, String status, String creator,
-			String createDate, String finishDate, String sort, String order, Integer limit, String page) {
+	public ResponseEntity<Object> findAllApproveByMe(String json, String sort, String order, String page) {
 		List<ProposalModel> proposalModels = new ArrayList<>();
-		content = content == null ? "" : content.trim();
-		status = status == null ? "" : status.trim();
-		creator = creator == null ? "" : creator.trim();
-		proposal = proposal == null ? 0 : proposal;
-		createDate = createDate == null ? "" : createDate.trim();
-		finishDate = finishDate == null ? "" : finishDate.trim();
-		page = page == null ? "1" : page.trim();
-		limit = CMDConstrant.LIMIT;
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObject;
+		String content = null;
+		Integer creator = null;
+		String createDateFrom = null;
+		String createDateTo = null;
+		Integer proposalTypeId = null;
+		
+		
 		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		int offset = (Integer.parseInt(page) - 1) * limit;
+		
 
-		// Order by defaut
-		if (sort == null || sort == "") {
-			sort = "pro.createDate";
-		}
-		if (order == null || order == "") {
-			order = "desc";
-		}
+	
 		try {
-			proposalModels = proposalRepositoryImpl.findAllProposalApproveByMe(userDetail.getId(),proposal, content, status, creator, createDate, finishDate, sort, order, offset, limit);
-			
-			
-			Integer totalProposal  = 0;
-			totalProposal = proposalRepositoryImpl.countAllPaging(userDetail.getId(), proposal, content, status, creator, createDate, finishDate, sort, order, offset, limit);
-			
+			jsonObject = jsonMapper.readTree(json);
+			JsonNode jsonStatusObject = jsonObject.get("statusIds");
+			creator = jsonObject.get("creator").asInt();
+			createDateFrom = jsonObject.get("createDateFrom").asText();
+			createDateTo = jsonObject.get("createDateTo").asText();
+			proposalTypeId = jsonObject.get("proposalTypeId").asInt();
+			page = page == null ? "1" : page.trim();
+			int limit = CMDConstrant.LIMIT;
+			int offset = (Integer.parseInt(page) - 1) * limit;
+			List<Integer> statusIds = new ArrayList<Integer>();
+			for (JsonNode statusId : jsonStatusObject) {
+				System.out.println(statusId.toString());
+				statusIds.add(Integer.valueOf(statusId.toString()));
+			}
+			if(statusIds.size()==0) {
+				List<Status> statuses =  statusRepositotyImpl.findAll();
+				for (Status status : statuses) {
+					statusIds.add(status.getId());
+				}
+			}
+			// Order by defaut
+			if (sort == null || sort == "") {
+				sort = "createDate";
+			}
+			if (order == null || order == "") {
+				order = "desc";
+			}
+			proposalModels = proposalRepositoryImpl.findAllProposalApproveByMe(userDetail.getId(), proposalTypeId,
+					statusIds, creator, createDateFrom, createDateTo, sort, order, offset, limit);
+
+//			Integer totalProposal  = 0;
+//			totalProposal = proposalRepositoryImpl.countAllPaging(userDetail.getId(), proposal, content, status, creator, createDate, finishDate, sort, order, offset, limit);
+//			
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
-			pagination.setPage( Integer.valueOf(page));
-			pagination.setTotalItem(totalProposal);
-			
+			pagination.setPage(Integer.valueOf(page));
+			pagination.setTotalItem(proposalModels.size());
+
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("proposals", proposalModels);
-			
-			if (results.size() >  0) {
+
+			if (results.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
 			} else {
@@ -102,10 +123,12 @@ public class ProposalService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
-	public ResponseEntity<Object> findById(Integer id){
+
+	public ResponseEntity<Object> findById(Integer id) {
 		ProposalModel proposalModel = null;
 		try {
 			proposalModel = proposalRepositoryImpl.findById(id);
@@ -117,9 +140,11 @@ public class ProposalService {
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
+
 	public ResponseEntity<Object> add(String json) {
 		ProposalModel proposalModel = null;
 		List<ProposalDetail> proposalDetails = null;
@@ -129,11 +154,18 @@ public class ProposalService {
 			JsonNode jsonObjectProposalDetails;
 			jsonObjectProposal = jsonMapper.readTree(json);
 			jsonObjectProposalDetails = jsonObjectProposal.get("proposalDetails");
-			String proposalTypeId = jsonObjectProposal.get("proposalTypeId") != null ? jsonObjectProposal.get("proposalTypeId").asText() : "-1";
-			String creatorId = jsonObjectProposal.get("creatorId") != null ? jsonObjectProposal.get("creatorId").asText() : "-1";
-			String receiverId = jsonObjectProposal.get("receiverId") != null ? jsonObjectProposal.get("receiverId").asText() : "-1";
-			String statusId = jsonObjectProposal.get("statusId") != null ? jsonObjectProposal.get("statusId").asText() : "-1";
-			
+			String proposalTypeId = jsonObjectProposal.get("proposalTypeId") != null
+					? jsonObjectProposal.get("proposalTypeId").asText()
+					: "-1";
+			String creatorId = jsonObjectProposal.get("creatorId") != null
+					? jsonObjectProposal.get("creatorId").asText()
+					: "-1";
+			String receiverId = jsonObjectProposal.get("receiverId") != null
+					? jsonObjectProposal.get("receiverId").asText()
+					: "-1";
+			String statusId = jsonObjectProposal.get("statusId") != null ? jsonObjectProposal.get("statusId").asText()
+					: "-1";
+
 			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 			Proposal proposal = new Proposal();
 			proposal.setCreateDate(createDate);
@@ -141,20 +173,20 @@ public class ProposalService {
 			proposal.setValidFlag(true);
 			proposal.setCurrentStep("1");
 			proposal.setModifyBy("-1");
-			
+
 			ProposalType proposalType = proposalTypeRepositoryImpl.findById(proposalTypeId);
 			proposal.setProposalType(proposalType);
-			
+
 			Employee creator = employeeRepositoryImpl.findById(Integer.valueOf(creatorId));
-			proposal.setEmployee(creator);
-			
+			proposal.setCreator(creator);
+
 			Employee receiver = employeeRepositoryImpl.findById(Integer.valueOf(receiverId));
 			proposal.setReceiver(receiver);
-			
+
 			Status status = statusRepositotyImpl.findById(Integer.valueOf(statusId));
 			proposal.setStatus(status);
 			proposalDetails = new ArrayList<ProposalDetail>();
-			for(JsonNode jsonObject : jsonObjectProposalDetails) {
+			for (JsonNode jsonObject : jsonObjectProposalDetails) {
 				ProposalDetail proposalDetail = new ProposalDetail();
 				String fieldId = jsonObject.get("fieldId") != null ? jsonObject.get("fieldId").asText() : "-1";
 				String fieldName = jsonObject.get("fieldName") != null ? jsonObject.get("fieldName").asText() : "-1";
@@ -165,17 +197,18 @@ public class ProposalService {
 				proposalDetails.add(proposalDetail);
 			}
 			proposalModel = proposalRepositoryImpl.add(proposal, proposalDetails);
-			
-			
+
 			if (null != proposalModel) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", proposalModel));
 			} else {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE3"), proposalModel));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE3"), proposalModel));
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
 }
