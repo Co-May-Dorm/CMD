@@ -60,6 +60,17 @@ public class ProposalController {
 		return proposalService.findAllApproveByMe(json,sort,order,page);
 		
 	}
+	@PreAuthorize("@customRoleService.canViewAll('proposal',principal) or @customRoleService.canView('proposal',principal)")
+	@PostMapping(value= "/createdByMe",produces = "application/json")
+	public ResponseEntity<Object> findAllProposalCratedByMe(
+			@RequestBody String json,
+			@RequestParam(value = "sort", required = false) String sort,
+			@RequestParam(value = "order", required = false) String order,
+			@RequestParam(value = "page", required = false) String page){
+		LOGGER.info("Find all proposals");
+		return proposalService.findAllCreatedByMe(json,sort,order,page);
+		
+	}
 	
 	@PreAuthorize("@customRoleService.canViewAll('proposal',principal) or @customRoleService.canView('proposal',principal)")
 	@GetMapping(value= "/{id}",produces = "application/json")
