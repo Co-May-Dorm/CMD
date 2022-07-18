@@ -3,10 +3,10 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-				sh 'sudo systemctl enable cmd-fe.service'
-				sh 'sudo systemctl stop cmd-fe'
-				sh 'sudo systemctl start cmd-fe'
-				sh 'sudo systemctl status cmd-fe'
+				sh 'sudo systemctl enable cmd.service'
+				sh 'sudo systemctl stop cmd'
+				sh 'sudo systemctl start cmd'
+				sh 'sudo systemctl status cmd'
             }
         }
     }
