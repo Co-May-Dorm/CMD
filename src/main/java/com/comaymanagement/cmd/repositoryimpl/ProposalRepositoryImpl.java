@@ -48,8 +48,31 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 	PositionRepositoryImpl positionRepository;
 
 	private final Logger LOGGER = LoggerFactory.getLogger(This.class);
-
+	
 	// proposals
+
+	public List<ProposalModel> findAllProposalForAll(Integer proposalTypeId, 
+			List<Integer> statusIds, Integer creator, String createDateFrom, String createDateTo, String sort, String order,
+			Integer offset, Integer limit) {
+		List<Proposal> proposals = new ArrayList<>();
+		List<ProposalModel> proposalModelResult = new ArrayList<>();
+		Set<Proposal> proposalsTMP = new LinkedHashSet();
+		proposalsTMP = findAllForAll(proposalTypeId, statusIds, creator, createDateFrom,
+				createDateTo, sort, order);
+		// store proposal of each proposalType and step
+		if (proposalsTMP != null && proposalsTMP.size() > 0) {
+			for (Proposal pro : proposalsTMP) {
+				proposals.add(pro);
+			}
+		}
+		// paging
+		for (int i = offset; i < proposals.size() && proposalModelResult.size() < limit; i++) {
+			ProposalModel proposalModel = this.findById(proposals.get(i).getId());
+			proposalModelResult.add(proposalModel);
+		}
+		return proposalModelResult;
+	}
+	
 	@Override
 	public List<ProposalModel> findAllProposalApproveByMe(Integer employeeId, Integer proposalTypeId, 
 			List<Integer> statusIds, Integer creator, String createDateFrom, String createDateTo, String sort, String order,
@@ -94,7 +117,7 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 
 		}
 		// paging
-		for (int i = offset; i < proposals.size() && proposalModelResult.size() <= limit; i++) {
+		for (int i = offset; i < proposals.size() && proposalModelResult.size() < limit; i++) {
 			ProposalModel proposalModel = this.findById(proposals.get(i).getId());
 			proposalModelResult.add(proposalModel);
 		}
@@ -115,7 +138,7 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 			}
 		}
 		// paging
-		for (int i = offset; i < proposals.size() && proposalModelResult.size() <= limit; i++) {
+		for (int i = offset; i < proposals.size() && proposalModelResult.size() < limit; i++) {
 			ProposalModel proposalModel = this.findById(proposals.get(i).getId());
 			proposalModelResult.add(proposalModel);
 		}
@@ -222,6 +245,68 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 
 			}
 			if ((createDateFrom != null && !createDateFrom.equals("")) && (createDateTo != null && !createDateTo.equals(""))) {
+				query.setParameter("createDateFrom", createDateFrom);
+				query.setParameter("createDateTo", createDateTo);
+
+			}
+//			query.setFirstResult(offset);
+//			query.setMaxResults(limit);
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] objects = (Object[]) it.next();
+				Proposal proposalTemp = (Proposal) objects[0];
+				proposals.add(proposalTemp);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+		return proposals;
+	}
+	public Set<Proposal> findAllForAll(Integer  proposalTypeId, List<Integer> statusIds,
+			Integer creator, String createDateFrom, String createDateTo, String sort, String order){
+		Set<Proposal> proposals = new LinkedHashSet();
+		StringBuilder hql = new StringBuilder("FROM proposals AS pro ");
+		hql.append("INNER JOIN pro.creator AS em ");
+		hql.append("INNER JOIN pro.proposalType AS pt ");
+		hql.append("INNER JOIN pro.status AS st ");
+		hql.append("INNER JOIN pro.proposalDetails AS pd ");
+		
+//		hql.append("WHERE pd.fieldId = 1 ");
+//		hql.append("AND pt.name LIKE CONCAT('%',:proposalType,'%') ");
+		hql.append("WHERE st.id IN (:statusIds) ");
+//		hql.append("AND em.name LIKE CONCAT('%',:creator,'%') ");
+//		hql.append("AND pd.content LIKE CONCAT('%',:content,'%') ");
+//		hql.append("AND pro.createDate LIKE CONCAT('%',:createDate,'%') ");
+//		hql.append("AND pt.id LIKE CONCAT('%',:proposalTypeId,'%') ");
+		if(proposalTypeId!=null) {
+			hql.append("AND pt.id = :proposalTypeId ");
+		}
+		if (creator != null) {
+			hql.append("AND em.id = :creator ");
+		}
+		if (createDateFrom != null && createDateTo == null) {
+			hql.append("AND pro.createDate = :createDateFrom ");
+		}
+		if (createDateFrom != null && createDateTo != null) {
+			hql.append("AND pro.createDate BETWEEN :createDateFrom AND :createDateTo ");
+		}
+		hql.append("ORDER BY " + sort + " " + order);
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			LOGGER.info(hql.toString());
+			Query query = session.createQuery(hql.toString());
+			if(proposalTypeId!=null) {
+				query.setParameter("proposalTypeId", proposalTypeId);
+			}
+			query.setParameter("statusIds", statusIds);
+			if (creator != null ) {
+				query.setParameter("creator", creator);
+			}
+			if (createDateFrom != null && createDateTo == null) {
+				query.setParameter("createDateFrom", createDateFrom);
+			}
+			if (createDateFrom != null && createDateTo != null) {
 				query.setParameter("createDateFrom", createDateFrom);
 				query.setParameter("createDateTo", createDateTo);
 
