@@ -23,7 +23,7 @@ pipeline {
         always {
                 script {
 						constants = load "life-env.groovy"
-						emailList = "${constants.emailList}"
+						emailList = "nguyenminhdungtd98@gmail.com"
 						emailFunction = load "emailFunction.groovy"
                         emailFunction.emailSendingnoattachment ("${emailList}")
 
