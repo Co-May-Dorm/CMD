@@ -70,7 +70,6 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 			query.setParameter("phone", phone);
 			query.setParameter("dep", dep);
 			query.setParameter("pos", pos);
-			query.getResultList().iterator();
 			query.setFirstResult(offset);
 			query.setMaxResults(limit);
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
