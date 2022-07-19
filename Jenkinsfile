@@ -1,7 +1,7 @@
 pipeline {
 	agent any
 	environment {
-        report = '/var/lib/jenkins/workspace/CMD-BE/email-template.html'
+        report = '/var/lib/jenkins/workspace/CMD-BE/Email/email-template.html'
     }
     stages {
         stage('Build') { 
