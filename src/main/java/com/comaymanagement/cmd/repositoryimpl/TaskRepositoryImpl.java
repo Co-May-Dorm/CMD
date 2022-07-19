@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
+import static org.mockito.ArgumentMatchers.nullable;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -37,6 +39,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	TaskHistoryRepositoryImpl taskHistoryRepositoryImpl;
 
 	@Override
 	public List<TaskModel> findByStatusId(String statusId, String sort, String order, Integer offset, Integer limit) {
@@ -491,7 +496,18 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStartDate(task.getStartDate());
 				customTask.setModifyDate(task.getModifyDate());
-				return customTask;
+				
+				TaskHis taskHistory = new TaskHis();
+				taskHistory.setTask(task);
+				taskHistory.setStatus(task.getStatus());
+				taskHistory.setReceiver(taskHistory.getReceiver());
+				TaskHis resultAddTaskHis = taskHistoryRepositoryImpl.add(taskHistory);
+				if(null != resultAddTaskHis) {
+					List<TaskHis> taskHis = new ArrayList<TaskHis>();
+					taskHis.add(resultAddTaskHis);
+					customTask.setTaskHis(taskHis);
+					return customTask;
+				}
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee() ", e);
