@@ -16,11 +16,8 @@ import org.springframework.context.annotation.ComponentScan;
         DataSourceAutoConfiguration.class, //
         DataSourceTransactionManagerAutoConfiguration.class, //
         HibernateJpaAutoConfiguration.class })
-public class CmdApplication extends SpringBootServletInitializer {
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(CmdApplication.class);
-    }
+public class CmdApplication {
+
 	public static void main(String[] args) {
         SpringApplication.run(CmdApplication.class, args);
 	}
