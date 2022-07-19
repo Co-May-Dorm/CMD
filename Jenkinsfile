@@ -18,7 +18,8 @@ pipeline {
 				sh 'sudo systemctl status cmd'
             }
         }
-		post ('Send e-mail') {      // Stage for send an email
+	}
+	post ('Send e-mail') {      // Stage for send an email
         always {
                 script {
 						constants = load "life-env.groovy"
@@ -29,5 +30,4 @@ pipeline {
                 }   
 			}
 		}
-	}
 }
