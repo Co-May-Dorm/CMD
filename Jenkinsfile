@@ -19,26 +19,16 @@ pipeline {
             }
         }
 	}
-	environment {
-        EMAIL_TO = 'nguyenminhdungtd98@gmail'
-    }
-	post {
-        failure {
-            emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}', 
-                    to: "${EMAIL_TO}", 
-                    subject: 'Build failed in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
-        }
-        unstable {
-            emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}', 
-                    to: "${EMAIL_TO}", 
-                    subject: 'Unstable build in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
-        }
+	post ('Send e-mail') {      // Stage for send an email
         always {
-            emailext body: 'Check console output at $BUILD_URL to view the results.', 
-                    to: "${EMAIL_TO}", 
-                    subject: 'Jenkins build is back to normal: $PROJECT_NAME - #$BUILD_NUMBER'
-        }
-    }
+                script {
+						emailList = "nguyenminhdungtd98@gmail.com"
+						emailFunction = load "emailFunction.groovy"
+                        emailFunction.emailSendingnoattachment ("${emailList}")
+
+                }   
+			}
+	}
 
 }
 
