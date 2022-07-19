@@ -49,12 +49,24 @@ public class ProposalController {
 	ProposalService proposalService;
 	
 	@PreAuthorize("@customRoleService.canViewAll('proposal',principal) or @customRoleService.canView('proposal',principal)")
-	@PostMapping(value= "/approveByMe",produces = "application/json")
-	public ResponseEntity<Object> findAllApproveByMe(
+	@PostMapping(value= "",produces = "application/json")
+	public ResponseEntity<Object> findAllForAll(
 				@RequestBody String json,
 				@RequestParam(value = "sort", required = false) String sort,
 				@RequestParam(value = "order", required = false) String order,
 				@RequestParam(value = "page", required = false) String page){
+		LOGGER.info("Find all proposals");
+		
+		return proposalService.findAllForAll(json,sort,order,page);
+		
+	}
+	@PreAuthorize("@customRoleService.canViewAll('proposal',principal) or @customRoleService.canView('proposal',principal)")
+	@PostMapping(value= "/approveByMe",produces = "application/json")
+	public ResponseEntity<Object> findAllApproveByMe(
+			@RequestBody String json,
+			@RequestParam(value = "sort", required = false) String sort,
+			@RequestParam(value = "order", required = false) String order,
+			@RequestParam(value = "page", required = false) String page){
 		LOGGER.info("Find all proposals");
 		
 		return proposalService.findAllApproveByMe(json,sort,order,page);

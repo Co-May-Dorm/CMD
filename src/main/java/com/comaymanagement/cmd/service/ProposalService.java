@@ -54,6 +54,87 @@ public class ProposalService {
 	@Autowired
 	StatusRepositotyImpl statusRepositotyImpl;
 
+	public ResponseEntity<Object> findAllForAll(String json, String sort, String order, String page) {
+		List<ProposalModel> proposalModels = new ArrayList<>();
+		JsonMapper jsonMapper = new JsonMapper();
+		JsonNode jsonObject;
+		String content = null;
+		Integer creator = null;
+		String createDateFrom = null;
+		String createDateTo = null;
+		Integer proposalTypeId = null;
+
+		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+
+		try {
+			jsonObject = jsonMapper.readTree(json);
+			JsonNode jsonStatusObject = jsonObject.get("statusIds");
+			creator = (jsonObject.get("creator") != null && !jsonObject.get("creator").asText().equals("null")
+					&& jsonObject.get("creator").asInt() != 0) ? jsonObject.get("creator").asInt() : null;
+			createDateFrom = (jsonObject.get("createDateFrom") != null
+					&& !jsonObject.get("createDateFrom").asText().equals("null")
+					&& !jsonObject.get("createDateFrom").asText().equals(""))
+							? jsonObject.get("createDateFrom").asText()
+							: null;
+			createDateTo = (jsonObject.get("createDateTo") != null
+					&& !jsonObject.get("createDateTo").asText().equals("null")
+					&& !jsonObject.get("createDateTo").asText().equals("")) ? jsonObject.get("createDateTo").asText()
+							: null;
+			proposalTypeId = (jsonObject.get("proposalTypeId") != null
+					&& !jsonObject.get("proposalTypeId").asText().equals("null")
+					&& jsonObject.get("proposalTypeId").asInt() != 0) ? jsonObject.get("proposalTypeId").asInt() : null;
+			page = page == null ? "1" : page.trim();
+			int limit = CMDConstrant.LIMIT;
+			int offset = (Integer.parseInt(page) - 1) * limit;
+			List<Integer> statusIds = new ArrayList<Integer>();
+			for (JsonNode statusId : jsonStatusObject) {
+				System.out.println(statusId.toString());
+				statusIds.add(Integer.valueOf(statusId.toString()));
+			}
+			if (statusIds.size() == 0) {
+				List<Status> statuses = statusRepositotyImpl.findAll();
+				for (Status status : statuses) {
+					statusIds.add(status.getId());
+				}
+			}
+			// Order by defaut
+			if (sort == null || sort == "") {
+				sort = "pro.createDate";
+			}
+			if (order == null || order == "") {
+				order = "desc";
+			}
+			proposalModels = proposalRepositoryImpl.findAllProposalForAll(proposalTypeId,
+					statusIds, creator, createDateFrom, createDateTo, sort, order, offset, limit);
+
+//			Integer totalProposal  = 0;
+//			totalProposal = proposalRepositoryImpl.countAllPaging(userDetail.getId(), proposal, content, status, creator, createDate, finishDate, sort, order, offset, limit);
+//			
+			Pagination pagination = new Pagination();
+			pagination.setLimit(limit);
+			pagination.setPage(Integer.valueOf(page));
+			pagination.setTotalItem(proposalModels.size());
+
+			Map<String, Object> results = new TreeMap<String, Object>();
+			results.put("pagination", pagination);
+			results.put("proposals", proposalModels);
+
+			if (results.size() > 0) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", "Query produce successfully: ", results));
+			} else {
+				pagination.setPage(1);
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", results));
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
+		}
+	}
+
 	public ResponseEntity<Object> findAllApproveByMe(String json, String sort, String order, String page) {
 		List<ProposalModel> proposalModels = new ArrayList<>();
 		JsonMapper jsonMapper = new JsonMapper();
@@ -63,20 +144,27 @@ public class ProposalService {
 		String createDateFrom = null;
 		String createDateTo = null;
 		Integer proposalTypeId = null;
-		
-		
+
 		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		
 
-	
 		try {
 			jsonObject = jsonMapper.readTree(json);
 			JsonNode jsonStatusObject = jsonObject.get("statusIds");
-			creator = jsonObject.get("creator").asInt();
-			createDateFrom = jsonObject.get("createDateFrom").asText();
-			createDateTo = jsonObject.get("createDateTo").asText();
-			proposalTypeId = jsonObject.get("proposalTypeId").asInt();
+			creator = (jsonObject.get("creator") != null && !jsonObject.get("creator").asText().equals("null")
+					&& jsonObject.get("creator").asInt() != 0) ? jsonObject.get("creator").asInt() : null;
+			createDateFrom = (jsonObject.get("createDateFrom") != null
+					&& !jsonObject.get("createDateFrom").asText().equals("null")
+					&& !jsonObject.get("createDateFrom").asText().equals(""))
+							? jsonObject.get("createDateFrom").asText()
+							: null;
+			createDateTo = (jsonObject.get("createDateTo") != null
+					&& !jsonObject.get("createDateTo").asText().equals("null")
+					&& !jsonObject.get("createDateTo").asText().equals("")) ? jsonObject.get("createDateTo").asText()
+							: null;
+			proposalTypeId = (jsonObject.get("proposalTypeId") != null
+					&& !jsonObject.get("proposalTypeId").asText().equals("null")
+					&& jsonObject.get("proposalTypeId").asInt() != 0) ? jsonObject.get("proposalTypeId").asInt() : null;
 			page = page == null ? "1" : page.trim();
 			int limit = CMDConstrant.LIMIT;
 			int offset = (Integer.parseInt(page) - 1) * limit;
@@ -85,15 +173,15 @@ public class ProposalService {
 				System.out.println(statusId.toString());
 				statusIds.add(Integer.valueOf(statusId.toString()));
 			}
-			if(statusIds.size()==0) {
-				List<Status> statuses =  statusRepositotyImpl.findAll();
+			if (statusIds.size() == 0) {
+				List<Status> statuses = statusRepositotyImpl.findAll();
 				for (Status status : statuses) {
 					statusIds.add(status.getId());
 				}
 			}
 			// Order by defaut
 			if (sort == null || sort == "") {
-				sort = "createDate";
+				sort = "pro.createDate";
 			}
 			if (order == null || order == "") {
 				order = "desc";
@@ -127,6 +215,7 @@ public class ProposalService {
 					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
 	}
+
 	public ResponseEntity<Object> findAllCreatedByMe(String json, String sort, String order, String page) {
 		List<ProposalModel> proposalModels = new ArrayList<>();
 		JsonMapper jsonMapper = new JsonMapper();
@@ -136,32 +225,27 @@ public class ProposalService {
 		String createDateFrom = null;
 		String createDateTo = null;
 		Integer proposalTypeId = null;
-		
-		
+
 		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		
-		
-		
+
 		try {
 			jsonObject = jsonMapper.readTree(json);
 			JsonNode jsonStatusObject = jsonObject.get("statusIds");
-			creator = (jsonObject.get("creator")!=null 
-							&& !jsonObject.get("creator").asText().equals("null") 
-							&& jsonObject.get("creator").asInt()!=0) ? 
-						jsonObject.get("creator").asInt():null;
-			createDateFrom = (jsonObject.get("createDateFrom")!=null 
-									&& !jsonObject.get("createDateFrom").asText().equals("null") 
-									&& !jsonObject.get("createDateFrom").asText().equals("")) ?  
-							 jsonObject.get("createDateFrom").asText() : null;
-			createDateTo = (jsonObject.get("createDateTo")!=null 
-									&& !jsonObject.get("createDateTo").asText().equals("null")  
-									&& !jsonObject.get("createDateTo").asText().equals("") ) ? 
-							jsonObject.get("createDateTo").asText() : null;
-			proposalTypeId = (jsonObject.get("proposalTypeId")!=null 
-								&& !jsonObject.get("proposalTypeId").asText().equals("null")
-								&& jsonObject.get("proposalTypeId").asInt()!=0) ? 
-							jsonObject.get("proposalTypeId").asInt() : null;
+			creator = (jsonObject.get("creator") != null && !jsonObject.get("creator").asText().equals("null")
+					&& jsonObject.get("creator").asInt() != 0) ? jsonObject.get("creator").asInt() : null;
+			createDateFrom = (jsonObject.get("createDateFrom") != null
+					&& !jsonObject.get("createDateFrom").asText().equals("null")
+					&& !jsonObject.get("createDateFrom").asText().equals(""))
+							? jsonObject.get("createDateFrom").asText()
+							: null;
+			createDateTo = (jsonObject.get("createDateTo") != null
+					&& !jsonObject.get("createDateTo").asText().equals("null")
+					&& !jsonObject.get("createDateTo").asText().equals("")) ? jsonObject.get("createDateTo").asText()
+							: null;
+			proposalTypeId = (jsonObject.get("proposalTypeId") != null
+					&& !jsonObject.get("proposalTypeId").asText().equals("null")
+					&& jsonObject.get("proposalTypeId").asInt() != 0) ? jsonObject.get("proposalTypeId").asInt() : null;
 			page = page == null ? "1" : page.trim();
 			int limit = CMDConstrant.LIMIT;
 			int offset = (Integer.parseInt(page) - 1) * limit;
@@ -170,22 +254,22 @@ public class ProposalService {
 				System.out.println(statusId.toString());
 				statusIds.add(Integer.valueOf(statusId.toString()));
 			}
-			if(statusIds.size()==0) {
-				List<Status> statuses =  statusRepositotyImpl.findAll();
+			if (statusIds.size() == 0) {
+				List<Status> statuses = statusRepositotyImpl.findAll();
 				for (Status status : statuses) {
 					statusIds.add(status.getId());
 				}
 			}
 			// Order by defaut
 			if (sort == null || sort == "") {
-				sort = "createDate";
+				sort = "pro.createDate";
 			}
 			if (order == null || order == "") {
 				order = "desc";
 			}
 			proposalModels = proposalRepositoryImpl.findAllProposalCratedByMe(userDetail.getId(), proposalTypeId,
 					statusIds, creator, createDateFrom, createDateTo, sort, order, offset, limit);
-			
+
 //			Integer totalProposal  = 0;
 //			totalProposal = proposalRepositoryImpl.countAllPaging(userDetail.getId(), proposal, content, status, creator, createDate, finishDate, sort, order, offset, limit);
 //			
@@ -193,18 +277,18 @@ public class ProposalService {
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
 			pagination.setTotalItem(proposalModels.size());
-			
+
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("proposals", proposalModels);
-			
+
 			if (results.size() > 0) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully: ", results));
 			} else {
 				pagination.setPage(1);
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", results));
-				
+
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
