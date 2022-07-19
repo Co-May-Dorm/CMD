@@ -22,7 +22,6 @@ pipeline {
 	post ('Send e-mail') {      // Stage for send an email
         always {
                 script {
-						constants = load "life-env.groovy"
 						emailList = "nguyenminhdungtd98@gmail.com"
 						emailFunction = load "emailFunction.groovy"
                         emailFunction.emailSendingnoattachment ("${emailList}")
