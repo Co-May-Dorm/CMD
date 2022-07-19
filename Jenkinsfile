@@ -18,5 +18,16 @@ pipeline {
 				sh 'sudo systemctl status cmd'
             }
         }
+		post ('Send e-mail') {      // Stage for send an email
+        always {
+                script {
+						constants = load "life-env.groovy"
+						emailList = "${constants.emailList}"
+						emailFunction = load "emailFunction.groovy"
+                        emailFunction.emailSendingnoattachment ("${emailList}")
+
+                }   
+			}
+		}
 	}
 }
