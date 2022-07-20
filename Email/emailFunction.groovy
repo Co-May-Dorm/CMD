@@ -16,9 +16,9 @@ def emailSendingnoattachment (String recipients) {
                              withEnv(["buildStatus=${currentBuild.currentResult}"]) { 
                              sh '''
                                
-                                     chmod +x ${WORKSPACE}/emailTemplate.sh
+                                     chmod +x ${WORKSPACE}/Email/email-template.sh
                                      echo ${currentDate}
-                                     bash ${WORKSPACE}/emailTemplate.sh ${buildStatus} ${buildVersion} ${currentDate}
+                                     bash ${WORKSPACE}/Email/email-template.sh ${buildStatus} ${buildVersion} ${currentDate}
                                 
                                 
                              ''' 
