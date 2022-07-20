@@ -2,9 +2,9 @@ package com.comaymanagement.cmd.entity;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,12 +53,13 @@ public class Task{
 	@JoinColumn(name = "status_id")
 	private Status status;
 	
-	@OneToMany()
+	@OneToMany(cascade = CascadeType.ALL)
 	@JsonIgnore
 	@JoinColumn(name = "task_id")
 	private List<TaskHis> taskHis;
 
 	private Integer rate;
 	private Integer priority;
+	
 
 }

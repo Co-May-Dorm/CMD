@@ -306,7 +306,8 @@ public class TaskService {
 			}
 		//   
 		public ResponseEntity<Object> edit(String json) {
-			Task task = new Task();
+			Task task = null;
+			TaskModel taskModel = new TaskModel();
 			JsonMapper jsonMapper = new JsonMapper();
 			JsonNode jsonObjectTask;
 			String messageCode = "";
@@ -347,7 +348,11 @@ public class TaskService {
 				}else {
 					messageCode = "TASKS2";
 				}
-				
+				task = taskRepository.findByIdToEdit(id);
+				if(task == null) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("Error", message.getMessageByItemCode("TASKE3"), taskModel));
+				}
 				task.setId(id);
 				task.setCreator(creator);
 				task.setReceiver(receiver);
@@ -360,7 +365,7 @@ public class TaskService {
 				task.setRate(rate);
 				task.setPriority(priority);
 				task.setStartDate(startDate);
-				TaskModel taskModel = taskRepository.edit(task);
+				taskModel = taskRepository.edit(task);
 				if (null != taskModel) {
 					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode(messageCode), taskModel));
 				} else {
