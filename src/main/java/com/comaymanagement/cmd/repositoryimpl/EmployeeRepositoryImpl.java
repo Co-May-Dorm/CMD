@@ -343,6 +343,7 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		Set<EmployeeModel> empModelSet = new LinkedHashSet<>();
 		hql.append("from employees emp ");
 		hql.append("where emp.name like CONCAT('%',:name,'%') ");
+		hql.append("order by emp.name asc");
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("name", name);

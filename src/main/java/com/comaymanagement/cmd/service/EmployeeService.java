@@ -620,6 +620,7 @@ public class EmployeeService {
 		return null;
 	}
 	public ResponseEntity<Object> findByName(String name){
+		name = ((name != null) && name!="") ? name : "";
 		Set<EmployeeModel> employeeModelSet = new LinkedHashSet<>();
 		employeeModelSet = employeeRepository.findByName(name);
 		Map<String, Object> result = new TreeMap<>();

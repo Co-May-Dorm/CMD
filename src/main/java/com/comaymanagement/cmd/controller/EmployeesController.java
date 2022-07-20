@@ -87,10 +87,10 @@ public class EmployeesController {
 		return employeeService.delete(id);
 	}
 	@PreAuthorize("@customRoleService.canView('employee',principal)")
-	@GetMapping(value = "/name/{name}")
+	@GetMapping(value = "/name")
 	@ResponseBody
 	public ResponseEntity<Object> findByName(
-			@PathVariable String name) {
+			@RequestParam(value = "name", required = false) String name) {
 		return employeeService.findByName(name);
 	}
 
