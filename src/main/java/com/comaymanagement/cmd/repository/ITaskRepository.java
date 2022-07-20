@@ -44,6 +44,7 @@ public interface ITaskRepository {
 	TaskModel add(Task task) throws Exception;
 	Integer getMaxId();
 	TaskModel findById(Integer id);
+	Task findByIdToEdit(Integer id);
 	String deleteTaskById(Integer id);
 	TaskModel edit(Task task) throws Exception;
 	List<TaskModel> filter(

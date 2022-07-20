@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,7 +30,7 @@ public class TaskHis {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "task_id")
 	private Task task;
 	
@@ -39,5 +41,8 @@ public class TaskHis {
 	@OneToOne
 	@JoinColumn(name = "status_id")
 	private Status status;
+	
+	@Column(name= "modify_date")
+	private String modifyDate;
 	
 }

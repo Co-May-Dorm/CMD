@@ -1,5 +1,10 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.hibernate.Session;
@@ -24,14 +29,36 @@ public class TaskHistoryRepositoryImpl implements ITaskHistory {
 	SessionFactory sessionFactory;
 	
 	@Override
-	public TaskHis add(TaskHis taskHis) {
+	public List<TaskHis> add(List<TaskHis> taskHis) {
 		try {
 			Session session = sessionFactory.getCurrentSession();
+			String modifyDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
+			taskHis.get(0).setModifyDate(modifyDate);;
 			Integer id =(Integer) session.save(taskHis);
 			if(id != -1) {
-				taskHis.setId(id);
+				taskHis.get(0).setId(id);
 				return taskHis;
 			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<TaskHis> findById(Integer id) {
+		List<TaskHis> taskHis = null;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			String hql = "FROM task_his AS th WHERE th.id = " + id;
+			Query query = session.createQuery(hql);
+			taskHis = (List<TaskHis>) query.getResultList();
+			if(null != taskHis) {
+				return taskHis;
+			}
+
+			
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 		}

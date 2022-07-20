@@ -1,7 +1,7 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -38,7 +38,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 
 	@Autowired
 	private SessionFactory sessionFactory;
-	
+
 	@Autowired
 	TaskHistoryRepositoryImpl taskHistoryRepositoryImpl;
 
@@ -157,7 +157,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			query.setParameter("finishDate", finishDate);
 			query.setParameter("priority", priority);
 			query.setParameter("rate", rate);
-			if(dep.trim().equals("")) {
+			if (dep.trim().equals("")) {
 				query.setFirstResult(offset);
 				query.setMaxResults(limit);
 			}
@@ -495,18 +495,18 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStartDate(task.getStartDate());
 				customTask.setModifyDate(task.getModifyDate());
-				
+				List<TaskHis> taskHis = new ArrayList<TaskHis>();
+
 				TaskHis taskHistory = new TaskHis();
 				taskHistory.setTask(task);
 				taskHistory.setStatus(task.getStatus());
-				taskHistory.setReceiver(taskHistory.getReceiver());
-				TaskHis resultAddTaskHis = taskHistoryRepositoryImpl.add(taskHistory);
-				if(null != resultAddTaskHis) {
-					List<TaskHis> taskHis = new ArrayList<TaskHis>();
-					taskHis.add(resultAddTaskHis);
-					customTask.setTaskHis(taskHis);
-					return customTask;
-				}
+				taskHistory.setReceiver(task.getReceiver());
+				taskHistory.setModifyDate(task.getCreateDate());
+				taskHis.add(taskHistory);
+				task.setTaskHis(taskHis);
+				session.update(task);
+				customTask.setTaskHis(taskHis);
+				return customTask;
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in addEmployee() ", e);
@@ -604,6 +604,12 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setModifyDate(task.getModifyDate());
 				customTask.setPriority(task.getPriority());
 				List<TaskHis> taskHis = task.getTaskHis();
+				Collections.sort(taskHis, new Comparator<TaskHis>() {
+					@Override
+					public int compare(TaskHis o1, TaskHis o2) {
+						return o1.getId().compareTo(o2.getId());
+					}
+				});
 				for (TaskHis itemHis : taskHis) {
 					for (Department itemDepartment : itemHis.getTask().getCreator().getDepartments()) {
 						itemDepartment.getPositions().size();
@@ -703,8 +709,18 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			customTask.setStartDate(task.getStartDate());
 			customTask.setModifyDate(task.getModifyDate());
 			customTask.setPriority(task.getPriority());
-
+			List<TaskHis> taskHis = task.getTaskHis();
+			TaskHis taskHistory = new TaskHis();
+			taskHistory.setTask(task);
+			taskHistory.setStatus(task.getStatus());
+			taskHistory.setReceiver(task.getReceiver());
+			taskHistory.setModifyDate(task.getModifyDate());
+			taskHis.add(taskHistory);
+			task.setTaskHis(taskHis);
+			session.update(task);
+			customTask.setTaskHis(taskHis);
 			return customTask;
+
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in edit task ", e);
 		}
@@ -900,6 +916,30 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			LOGGER.error(e.getMessage());
 		}
 		return taskHis;
+	}
+
+	@Override
+	public Task findByIdToEdit(Integer id) {
+		Task task = null;
+		StringBuilder hql = new StringBuilder("FROM tasks AS ta ");
+		hql.append(" inner join ta.creator as em");
+		hql.append(" inner join ta.receiver as em1");
+		hql.append(" inner join ta.status as st");
+		hql.append(" WHERE ta.id = :id");
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			Query query = session.createQuery(hql.toString());
+			LOGGER.info(hql.toString());
+			query.setParameter("id", id);
+			task = new Task();
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] obj = (Object[]) it.next();
+				task = (Task) obj[0];
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return task;
 	}
 
 }
