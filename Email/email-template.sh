@@ -39,7 +39,7 @@ th, td {
 
 <p>Enviroment: <span style="color:rgba(29, 0, 192, 0.87)">CI/CD Ubuntu Server</span></p>
 
-<p>Project Name: <span style="color:rgb(29, 0, 192, 0.87)">$PROJECT_NAME</span></p>
+<p>Project Name: <span style="color:rgb(29, 0, 192, 0.87)">Co May Dorm Management</span></p>
 
 <p><b>Build Status: </b><span style="color:$COLOR"><b>$BUILD_STATUS</b></span></p>
 
