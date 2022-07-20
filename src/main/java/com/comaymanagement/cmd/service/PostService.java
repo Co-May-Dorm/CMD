@@ -16,10 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Post;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.model.DepartmentModel;
+import com.comaymanagement.cmd.model.EmployeeModel;
+import com.comaymanagement.cmd.repository.IEmployeeRepository;
 import com.comaymanagement.cmd.repository.IPostRepository;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +34,10 @@ public class PostService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	IPostRepository postRepositoryImpl;
+	
+	@Autowired
+	EmployeeRepositoryImpl employeeRepositoryImpl;
+	
 	@Autowired
 	Message message;
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
@@ -71,9 +78,11 @@ public class PostService {
 			post.setTitle(title);
 			post.setContent(content);
 			post.setPulished(isPulished);
-			post.setCreateBy(createBy);
+			Employee creator = employeeRepositoryImpl.findById(createBy);
+			post.setCreator(creator);
 			post.setCreateDate(createDate);
-			post.setModifyBy(modifyBy);
+			Employee editor = employeeRepositoryImpl.findById(modifyBy);
+			post.setEditor(editor);
 			post.setModifyDate(modifyDate);
 			Integer status =  postRepositoryImpl.add(post);
 			if (status != -1) {
@@ -118,7 +127,8 @@ public class PostService {
 			post.setTitle(title);
 			post.setContent(content);
 			post.setPulished(isPulished);
-			post.setModifyBy(modifyBy);
+			Employee editor = employeeRepositoryImpl.findById(modifyBy);
+			post.setEditor(editor);
 			post.setModifyDate(modifyDate);
 			Integer status =  postRepositoryImpl.edit(post);
 			if (status != -1) {
