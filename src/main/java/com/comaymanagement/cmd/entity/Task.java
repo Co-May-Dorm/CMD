@@ -1,9 +1,20 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,16 +26,23 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "tasks")
-public class Task {
+@JsonInclude(Include.NON_NULL)
+public class Task{
 	@Id
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 	private String title;
 	private String description;
+	@Column(name= "create_date")
 	private String createDate;
+	@Column(name= "finish_date")
 	private String finishDate;
-	
+	@Column(name= "start_date")
+	private String startDate;
+	@Column(name= "modify_date")
+	private String modifyDate;
 	@OneToOne()
-	@JoinColumn(name = "creator_id", nullable = false)
+	@JoinColumn(name = "creator_id")
 	private Employee creator;
 
 	@OneToOne()
@@ -32,7 +50,16 @@ public class Task {
 	private Employee receiver;
 
 	@OneToOne()
-	@JoinColumn(name = "status_id", nullable = false)
+	@JoinColumn(name = "status_id")
 	private Status status;
+	
+	@OneToMany(cascade = CascadeType.ALL)
+	@JsonIgnore
+	@JoinColumn(name = "task_id")
+	private List<TaskHis> taskHis;
+
+	private Integer rate;
+	private Integer priority;
+	
 
 }

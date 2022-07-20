@@ -1,13 +1,25 @@
 package com.comaymanagement.cmd.entity;
 
-import java.util.Set;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,36 +31,46 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(Include.NON_NULL)
 public class Department {
-
+	
 	@Id
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private String code;
 	private String name;
-	private String fatherDepartmentId;
-	private String managerId;
-	private String createBy;
+	@Column(name="farther_department_id")
+	private Integer fatherDepartmentId;
+	@Column(name="head_position")
+	private Integer headPosition;
+	@Column(name="create_by")
+	private Integer createBy;
+	@Column(name="create_date")
 	private String createDate;
-	private String modifyBy;
+	@Column(name="modify_by")
+	private Integer modifyBy;
+	@Column(name="modify_date")
 	private String modifyDate;
+	@Column(name="description")
+	private String description;
+	private Integer level;
+	
+	@OneToMany()
+	@JoinColumn(name = "department_id")
+	private List<Position> positions;
 
 	@OneToMany
 	@JoinColumn(name = "department_id")
-	@JsonBackReference
-	private Set<Position> positionList;
+	private List<ProposalPermission> proposalPermissions;
 
 	@OneToMany
 	@JoinColumn(name = "department_id")
-	@JsonBackReference
-	private Set<ProposalPermission> proposalPermissionList;
-
-	@OneToMany
-	@JoinColumn(name = "department_id")
-	@JsonBackReference
-	private Set<ApprovalStepDetail> approvalStepDetailList;
-
-	@OneToMany
-	@JoinColumn(name = "department_id")
-	@JsonBackReference
-	private Set<Employee> employeeList;
+	private List<ApprovalStepDetail> approvalStepDetails;
+	
+	@ManyToMany()
+	@JoinTable(name = "departments_employees", joinColumns = {
+			@JoinColumn(name = "department_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
+	private List<Employee> employees;
 
 }

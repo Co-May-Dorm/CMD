@@ -1,9 +1,17 @@
 package com.comaymanagement.cmd.entity;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,12 +23,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity(name = "task_his")
+@JsonInclude(Include.NON_NULL)
 public class TaskHis {
 	
 	@Id
-	private int uniqueNumber;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "task_id")
 	private Task task;
 	
@@ -31,5 +41,8 @@ public class TaskHis {
 	@OneToOne
 	@JoinColumn(name = "status_id")
 	private Status status;
+	
+	@Column(name= "modify_date")
+	private String modifyDate;
 	
 }

@@ -2,35 +2,23 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import com.comaymanagement.cmd.entity.Task;
+import com.comaymanagement.cmd.entity.TaskHis;
+import com.comaymanagement.cmd.model.TaskModel;
 
-@Repository
-public interface ITaskRepository extends JpaRepository<Task, String> {
+
+public interface ITaskRepository {
 	
-	@Query( value = "Select * FROM tasks WHERE tasks.status_id = :status_id", nativeQuery = true)
-	List<Task> findByStatusId(@Param("status_id") String statusId);
+	List<TaskModel> findByStatusId(
+			@Param("status_id") String statusId,
+			@Param("sort") String sort,
+			@Param("order") String order,
+			@Param("offset") Integer offset,
+			@Param("limit") Integer limit);
 	
-	@Query(value = "Select * FROM tasks t "
-			+ "inner join employees e on t.creator_id = e.id "
-			+ "inner join departments d on e.department_id = d.id "
-			+ "inner join statuses s on t.status_id = s.id "
-			+ "inner join (Select e1.unique_number,e1.id,e1.name  FROM tasks t "
-			+ "inner join employees e1 on t.receiver_id = e1.id) r on t.receiver_id = r.id "
-			+ "Where d.name LIKE CONCAT('%',:dep,'%') "
-			+ "AND t.title LIKE CONCAT('%',:title,'%') "
-			+ "AND s.name LIKE CONCAT('%',:status,'%') "
-			+ "AND e.name LIKE CONCAT('%',:creator,'%') "
-			+ "AND r.name LIKE CONCAT('%',:receiver,'%') "
-			+ "AND t.create_date LIKE CONCAT('%',:createDate,'%')"
-			+ "AND t.finish_date LIKE CONCAT('%',:finishDate,'%')"
-			+ "order by :sort :order "
-			+ "limit :limit offset :offset", nativeQuery = true)
-	List<Task> findAllTask( 
+	List<TaskModel> findAll( 
 			@Param("dep") String dep, 
 			@Param("title") String title, 
 			@Param("status") String status, 
@@ -38,8 +26,50 @@ public interface ITaskRepository extends JpaRepository<Task, String> {
 			@Param("receiver") String receiver,
 			@Param("createDate") String createDate,
 			@Param("finishDate") String finishDate,
+			@Param("priority") String priority,
+			@Param("rate") String rate,
 			@Param("sort") String sort,
 			@Param("order") String order,
+			@Param("offset") Integer offset,
+			@Param("limit") Integer limit);
+	Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
+			String createDate, String finishDate,String priority, String rate, String sort, String order);
+	Integer countFindByIds(List<Integer> ids);
+	List<TaskModel> findByStatusIds(
+			@Param("status_id") List<Integer> statusIds,
+			@Param("sort") String sort,
+			@Param("order") String order,
+			@Param("offset") Integer offset,
+			@Param("limit") Integer limit);
+	TaskModel add(Task task) throws Exception;
+	Integer getMaxId();
+	TaskModel findById(Integer id);
+	Task findByIdToEdit(Integer id);
+	String deleteTaskById(Integer id);
+	TaskModel edit(Task task) throws Exception;
+	List<TaskModel> filter(
+			@Param("createFrom") String createFrom,
+			@Param("createTo") String createTo,
+			@Param("finishFrom") String finishFrom,
+			@Param("finishTo") String finishTo,
+			@Param("title") String title,
+			@Param("creator") String creator,
+			@Param("receicer") String receiver,
+			@Param("department") String department,
 			@Param("limit") Integer limit,
-			@Param("offset") Integer offset);
+			@Param("order") String order,
+			@Param("page") String page,
+			@Param("sort") String sort
+	);
+	Integer countFilter(
+			@Param("createFrom") String createFrom,
+			@Param("createTo") String createTo,
+			@Param("finishFrom") String finishFrom,
+			@Param("finishTo") String finishTo,
+			@Param("title") String title,
+			@Param("creator") String creator,
+			@Param("receicer") String receiver,
+			@Param("department") String department
+	);
+	List<TaskHis> findAllHistoryByTaskID(Integer taskId);
 }

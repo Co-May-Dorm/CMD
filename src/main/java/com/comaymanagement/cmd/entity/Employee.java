@@ -1,16 +1,20 @@
 package com.comaymanagement.cmd.entity;
 
-import java.util.Set;
+import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,61 +26,82 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "employees")
-public class Employee {
+@JsonInclude(Include.NON_NULL)
+public class Employee{
 	@Id
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	private String code;
 	private String name;
+	@Column(name="date_of_birth")
 	private String dateOfBirth;
 	private String email;
+	@Column(name="phone_number")
 	private String phoneNumber;
+	@Column(name="active_flag")
 	private boolean activeFlag;
-	private String managerId;
-	private String createBy;
-	private String modifyBy;
+	@Column(name="create_by")
+	private Integer createBy;
+	@Column(name="modify_by")
+	private Integer modifyBy;
+	@Column(name="create_date")
 	private String createDate;
+	@Column(name="modify_date")
 	private String modifyDate;
+	private String avatar;
+	private String gender;
+	private String username;
+	private String password;
+	@Column(name="enable_login")
+	private boolean enableLogin;
+	@Column(name="is_active")
+	private boolean active;
 	
-	@OneToOne()
-	@JoinColumn(name = "department_id")
-	private Department departmentId;
-
-	@ManyToMany
+	@ManyToMany()
+	@JsonIgnore
+	@JoinTable(name = "departments_employees", joinColumns = {
+			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "department_id", referencedColumnName = "id") })
+	private List<Department> departments;
+	
+	@ManyToMany()
+	@JsonIgnore
 	@JoinTable(name = "positions_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "position_id", referencedColumnName = "id") })
-	@JsonBackReference
-	private Set<Position> positionList;
+	private List<Position> positions;
 
-	@OneToMany
+	@OneToMany()
+	@JsonIgnore
 	@JoinColumn(name = "employee_id")
-	@JsonBackReference
-	private Set<ProposalPermission> proposalPermissionList;
+	private List<ProposalPermission> proposalPermissions;
 
-	@OneToMany
+	@OneToMany()
+	@JsonIgnore
 	@JoinColumn(name = "creator_id")
-	@JsonBackReference
-	private Set<Task> taskListCreated;
+	private List<Task> taskListCreated;
 	
-	@OneToMany
+	@OneToMany()
+	@JsonIgnore
 	@JoinColumn(name = "receiver_id")
-	@JsonBackReference
-	private Set<Task> taskListReceived;
+	private List<Task> taskListReceived;
 
-	@OneToMany
+	@OneToMany()
+	@JsonIgnore
 	@JoinColumn(name = "creator_id")
-	@JsonBackReference
-	private Set<Proposal> proposalList;
+	private List<Proposal> proposals;
 
-	@OneToMany
+	@OneToMany()
+	@JsonIgnore
 	@JoinColumn(name = "employee_id")
-	@JsonBackReference
-	private Set<ApprovalStepDetail> approvalStepDetailList;
-
+	private List<ApprovalStepDetail> approvalStepDetails;
+	
 	@ManyToMany
+	@JsonIgnore
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "employee_id", referencedColumnName = "id") }, inverseJoinColumns = {
 					@JoinColumn(name = "team_id", referencedColumnName = "id") })
-	@JsonBackReference
-	private Set<Team> teamList;
+	private List<Team> teams;
+
 
 }
