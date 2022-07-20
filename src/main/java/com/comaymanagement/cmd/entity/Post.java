@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -28,10 +30,13 @@ public class Post {
 	private String content;
 	@Column(name="is_pulished")
 	private boolean isPulished;
-	@Column(name="create_by")
-	private Integer createBy;
-	@Column(name="modify_by")
-	private Integer modifyBy;
+
+	@OneToOne
+	@JoinColumn(name="create_by")
+	private Employee creator;
+	@OneToOne
+	@JoinColumn(name="modify_by")
+	private Employee editor;
 	@Column(name="create_date")
 	private String createDate;
 	@Column(name="modify_date")
