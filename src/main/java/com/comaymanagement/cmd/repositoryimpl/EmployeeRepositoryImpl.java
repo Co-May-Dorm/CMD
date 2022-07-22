@@ -306,15 +306,15 @@ public class EmployeeRepositoryImpl implements IEmployeeRepository {
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from employees emp ");
-		hql.append("INNER JOIN emp.positions as pos ");
+//		hql.append("INNER JOIN emp.positions as pos ");
 		hql.append("where emp.id = :id");
 		Employee employee = null;
 		try {
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("id", id);
 			Iterator it = query.getResultList().iterator();
-			Object[] ob = (Object[]) it.next();
-			employee = (Employee) ob[0];
+			Object ob = (Object) it.next();
+			employee = (Employee) ob;
 			// Please don't delete this line, this fix lazy load error when load position
 			employee.getPositions().size();
 			employee.getDepartments().size();
