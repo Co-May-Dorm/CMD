@@ -462,10 +462,10 @@ public class EmployeeService {
 			String updateStatus = employeeRepository.delete(emp);
 
 			if (updateStatus.equals("1")) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("EMPE7"), ""));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("EMPS4"), id));
 			} else {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE7") + "", ""));
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("EMPE7") + "", id));
 
 			}
 		} catch (Exception e) {

@@ -293,10 +293,10 @@ public class TaskService {
 			String updateStatus = taskRepository.deleteTaskById(id);
 			try {
 				if (updateStatus.equals("1")) {
-					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TASKS4"), ""));
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TASKS4"), id));
 			} else {
 					return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TASKE2"), ""));
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TASKE2"), id));
 
 				}
 			} catch (Exception e) {
