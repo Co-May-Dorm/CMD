@@ -29,8 +29,6 @@ import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.ProposalRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.ProposalTypeRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.StatusRepositotyImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -38,12 +36,12 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 public class ProposalService {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	Message message;
 
 	@Autowired
 	ProposalRepositoryImpl proposalRepositoryImpl;
 
-	@Autowired
-	Message message;
 
 	@Autowired
 	ProposalTypeRepositoryImpl proposalTypeRepositoryImpl;

@@ -2,7 +2,6 @@ package com.comaymanagement.cmd.repositoryimpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.Query;
 
@@ -18,7 +17,6 @@ import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.RoleDetailModel;
-import com.comaymanagement.cmd.model.RoleModel;
 import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repository.UserRepository;
 @Repository

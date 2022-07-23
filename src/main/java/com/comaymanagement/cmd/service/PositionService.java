@@ -11,16 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.constant.CMDConstrant;
-import com.comaymanagement.cmd.entity.Department;
+import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
-import com.comaymanagement.cmd.entity.Role;
-import com.comaymanagement.cmd.entity.Team;
 import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -28,7 +23,8 @@ public class PositionService{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	PositionRepositoryImpl positionRepository;
-
+	@Autowired
+	Message message;
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	public ResponseEntity<Object> findAllByRoleId(Integer roleId) {
@@ -103,47 +99,47 @@ public class PositionService{
 		}
 	}
 
-	public ResponseEntity<Object> add(String json) {
-		JsonMapper jsonMapper = new JsonMapper();
-		JsonNode jsonObjectPosition;
-		Position p = new Position();
-		Department dep = new Department();
-		Role role = new Role();
-		Team team = new Team();
-		Integer id = -1;
-		try {
-			
-			jsonObjectPosition = jsonMapper.readTree(json);
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
-//			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+//	public ResponseEntity<Object> add(String json) {
+//		JsonMapper jsonMapper = new JsonMapper();
+//		JsonNode jsonObjectPosition;
+//		Position p = new Position();
+//		Department dep = new Department();
+//		Role role = new Role();
+//		Team team = new Team();
+//		Integer id = -1;
+//		try {
 //			
-			
-			p.setName(jsonObjectPosition.get("name").asText());
-			p.setIsManager(jsonObjectPosition.get("isManager").asBoolean());
-			team.setId(jsonObjectPosition.get("teamId").asInt());
-			dep.setId(jsonObjectPosition.get("departmentId").asInt());
-			role.setId(jsonObjectPosition.get("roleId").asInt());
-			p.setTeam(team);
-			p.setDepartment(dep);
-			p.setRole(role);
-			PositionModel positionModel = positionRepository.add(p);
-			if (null != positionModel && positionModel.getId() != CMDConstrant.FAILED) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", positionModel.getId() + "", "employee" + positionModel));
-			} else {
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("Error", positionModel.getId() + "", positionModel));
-			}
-		} catch (Exception e) {
-			logger.error("Error has occured in PositionService at save()", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
-		}
-	}
+//			jsonObjectPosition = jsonMapper.readTree(json);
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			String name = jsonObjectPosition.get("name") != null ? jsonObjectPosition.get("name").asText() : "";
+////			
+//			
+//			p.setName(jsonObjectPosition.get("name").asText());
+//			p.setIsManager(jsonObjectPosition.get("isManager").asBoolean());
+//			team.setId(jsonObjectPosition.get("teamId").asInt());
+//			dep.setId(jsonObjectPosition.get("departmentId").asInt());
+//			role.setId(jsonObjectPosition.get("roleId").asInt());
+//			p.setTeam(team);
+//			p.setDepartment(dep);
+//			p.setRole(role);
+//			if (positionRepository.add(p)>0) {
+//				PositionModel positionModel = positionRepository.toModel(p);
+//				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK","", positionModel));
+//			} else {
+//				return ResponseEntity.status(HttpStatus.OK)
+//						.body(new ResponseObject("Error", "", p));
+//			}
+//		} catch (Exception e) {
+//			logger.error("Error has occured in PositionService at save()", e);
+//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
+//		}
+//	}
 	public ResponseEntity<Object> delete(String id) {
 		try {
 			String updateStatus = positionRepository.delete(Integer.valueOf(id));
@@ -162,12 +158,12 @@ public class PositionService{
 
 	}
 	public ResponseEntity<Object> add(Position p) {
-		PositionModel positionModel = positionRepository.add(p);
-		if (null != positionModel && positionModel.getId() != CMDConstrant.FAILED) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", positionModel.getId() + "", "employee" + positionModel));
+		if ( positionRepository.add(p)>0) {
+			PositionModel positionModel = positionRepository.toModel(p);
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK",message.getMessageByItemCode("POSS1"), positionModel));
 		} else {
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseObject("Error", positionModel.getId() + "", positionModel));
+					.body(new ResponseObject("Error",message.getMessageByItemCode("POSE1"), p));
 		}
 	}
 

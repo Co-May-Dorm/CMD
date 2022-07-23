@@ -2,7 +2,6 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
-import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Post;
 
 public interface IPostRepository {

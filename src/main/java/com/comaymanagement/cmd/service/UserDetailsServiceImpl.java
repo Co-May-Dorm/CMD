@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.model.UserModel;
 import com.comaymanagement.cmd.repository.UserRepository;
-import com.comaymanagement.cmd.repositoryimpl.RoleRepositoryImpl;
 
 
 @Service

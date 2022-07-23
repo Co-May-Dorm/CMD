@@ -11,12 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
-import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
@@ -28,6 +27,7 @@ import com.comaymanagement.cmd.repositoryimpl.PositionRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.TeamRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class TeamService {
@@ -35,7 +35,7 @@ public class TeamService {
 	TeamRepositoryImpl teamRepository;
 	@Autowired
 	PositionRepositoryImpl positionRepository;
-	
+
 	@Autowired
 	Message message;
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
@@ -43,7 +43,7 @@ public class TeamService {
 	public ResponseEntity<Object> findAll(String name) {
 		name = name == null ? "" : name.trim();
 		Set<TeamModel> teamModelSet = teamRepository.findAll(name);
-		
+
 		if (teamModelSet.size() > 0) {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "SUCCESSFULLY", teamModelSet));
 		} else {
@@ -53,32 +53,39 @@ public class TeamService {
 	}
 
 	public ResponseEntity<Object> add(String json) {
+		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
 		List<Position> positionList = new ArrayList<>();
 		Team team = new Team();
 		JsonMapper jsonMapper = new JsonMapper();
-		JsonNode jsonObjectDepartment;
+		JsonNode jsonObjectTeam;
 		JsonNode jsonObjectPosition;
 		try {
-			jsonObjectDepartment = jsonMapper.readTree(json);
-			jsonObjectPosition = jsonObjectDepartment.get("positions");
+			jsonObjectTeam = jsonMapper.readTree(json);
+			jsonObjectPosition = jsonObjectTeam.get("positions");
 			// Get data
-			String code = jsonObjectDepartment.get("code").asText();
-			String name = jsonObjectDepartment.get("name") != null ? jsonObjectDepartment.get("name").asText() : "";
-			String description = jsonObjectDepartment.get("description") != null ? jsonObjectDepartment.get("description").asText() : "";
-			Integer createBy = jsonObjectDepartment.get("createBy") != null ? jsonObjectDepartment.get("createBy").asInt() : -1;
+			String code = jsonObjectTeam.get("code").asText();
+			if (code.length() > 10) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME4"), ""));
+			}
+			String name = jsonObjectTeam.get("name") != null ? jsonObjectTeam.get("name").asText() : "";
+			String description = jsonObjectTeam.get("description") != null ? jsonObjectTeam.get("description").asText()
+					: "";
+			Integer createBy = userDetail.getId();
 			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
-			Integer modifyBy = -1;
+			Integer modifyBy = userDetail.getId();
 			String modifyDate = "";
 			Integer headPosition = -1;
-			
-//			Check department code existed
+
+//			Check team code existed
 			boolean isExisted = teamRepository.isExisted(-1, code);
 
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
-						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME1") , ""));
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME1"), ""));
 			}
-			
+
 			team.setCode(code);
 			team.setName(name);
 			team.setDescription(description);
@@ -89,6 +96,10 @@ public class TeamService {
 			team.setHeadPosition(headPosition);
 			// save team..............
 			Integer idTeamAdded = teamRepository.add(team);
+			if (idTeamAdded == -1) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME2"), ""));
+			}
 			Team teamUpdate = teamRepository.findById(idTeamAdded);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
@@ -104,59 +115,65 @@ public class TeamService {
 				pos.setTeam(team);
 				positionList.add(pos);
 			}
-
+			team.setPositions(positionList);
 			for (Position p : positionList) {
-				PositionModel positionModel = positionRepository.add(p);
-				if (positionModel == null || positionModel.getId() == CMDConstrant.FAILED) {
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1") , ""));
+				if (positionRepository.add(p)<0) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1"), ""));
 				}
-				if(p.getIsManager()) {
-					teamUpdate.setHeadPosition(positionModel.getId());
+				if (p.getIsManager()) {
+					teamUpdate.setHeadPosition(p.getId());
+					team.setHeadPosition(p.getId());
 					teamRepository.edit(teamUpdate);
 				}
 			}
-			
+
 			if (idTeamAdded != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS4"), teamUpdate));
+				TeamModel teamModel = toTeamModel(team);
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS4"), teamModel));
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR",message.getMessageByItemCode("TEAME2"), teamUpdate));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME2"), team));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured at add() ", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 
 		}
 	}
-	
+
 	public ResponseEntity<Object> edit(String json) {
 		List<Position> positionEdits = new ArrayList<>();
 		List<Position> positionAdds = new ArrayList<>();
 		Team team = new Team();
 		JsonMapper jsonMapper = new JsonMapper();
-		JsonNode jsonObjectDepartment;
+		JsonNode jsonObjectTeam;
 		JsonNode jsonObjectPosition;
-		
+
 		try {
-			jsonObjectDepartment = jsonMapper.readTree(json);
-			jsonObjectPosition = jsonObjectDepartment.get("positions");
+			jsonObjectTeam = jsonMapper.readTree(json);
+			jsonObjectPosition = jsonObjectTeam.get("positions");
 			// Get data
-			String code = jsonObjectDepartment.get("code").asText();
-			String name = jsonObjectDepartment.get("name") != null ? jsonObjectDepartment.get("name").asText() : "";
-			String description = jsonObjectDepartment.get("description") != null ? jsonObjectDepartment.get("description").asText() : "";
-			Integer createBy = jsonObjectDepartment.get("createBy") != null ? jsonObjectDepartment.get("createBy").asInt() : -1;
-			String createDate = jsonObjectDepartment.get("createDate") != null ? jsonObjectDepartment.get("createDate").asText() : "";
-			Integer modifyBy = jsonObjectDepartment.get("modifyBy") != null ? jsonObjectDepartment.get("modifyBy").asInt() : -1;
+			String code = jsonObjectTeam.get("code").asText();
+			String name = jsonObjectTeam.get("name") != null ? jsonObjectTeam.get("name").asText() : "";
+			String description = jsonObjectTeam.get("description") != null ? jsonObjectTeam.get("description").asText()
+					: "";
+			Integer createBy = jsonObjectTeam.get("createBy") != null ? jsonObjectTeam.get("createBy").asInt() : -1;
+			String createDate = jsonObjectTeam.get("createDate") != null ? jsonObjectTeam.get("createDate").asText()
+					: "";
+			Integer modifyBy = jsonObjectTeam.get("modifyBy") != null ? jsonObjectTeam.get("modifyBy").asInt() : -1;
 			String modifyDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
 			Integer headPosition = -1;
 //			Check department code existed
-			Integer id = jsonObjectDepartment.get("id").asInt();
+			Integer id = jsonObjectTeam.get("id").asInt();
+			team = teamRepository.findById(id);
 			boolean isExisted = teamRepository.isExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME3"), ""));
 			}
-			team.setId(id);
 			team.setCode(code);
 			team.setName(name);
 			team.setDescription(description);
@@ -165,7 +182,6 @@ public class TeamService {
 			team.setModifyBy(modifyBy);
 			team.setModifyDate(modifyDate);
 			team.setHeadPosition(headPosition);
-			Team teamUpdate = teamRepository.findById(id);
 			// save department..............
 			Integer messageEdit = teamRepository.edit(team);
 			for (JsonNode p : jsonObjectPosition) {
@@ -173,7 +189,7 @@ public class TeamService {
 				Position pos = new Position();
 				// If don't have id => go to save, else => go to edit
 				Integer posId = p.get("id") != null ? p.get("id").asInt() : -1;
-				if(posId != -1) {
+				if (posId != -1) {
 					role.setId(p.get("role").get("id").asInt());
 					pos.setId(posId);
 					pos.setName(p.get("name").asText());
@@ -185,8 +201,8 @@ public class TeamService {
 					pos.setCreateDate(createDate);
 					pos.setModifyDate(modifyDate);
 					positionEdits.add(pos);
-				}else {
-					
+				} else {
+
 					role.setId(p.get("role").get("id").asInt());
 					pos.setName(p.get("name").asText());
 					pos.setIsManager(p.get("isManager").asBoolean());
@@ -198,66 +214,94 @@ public class TeamService {
 					pos.setModifyDate(modifyDate);
 					positionAdds.add(pos);
 				}
-				
-				
+
 			}
 			// Add position
+			team.setPositions(new ArrayList<Position>());
 			for (Position p : positionAdds) {
-				PositionModel positionModel = positionRepository.add(p);
-				if (positionModel == null && positionModel.getId() == CMDConstrant.FAILED) {
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-							.body(new ResponseObject("Error",message.getMessageByItemCode("POSE1"), ""));
+				if (positionRepository.add(p)<0) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("Error", message.getMessageByItemCode("POSE1"), ""));
+				} else if (p.getIsManager()) {
+					team.setHeadPosition(p.getId());
+					teamRepository.edit(team);
 				}
-				else if(p.getIsManager()) {
-					teamUpdate = teamRepository.findById(id);
-					teamUpdate.setHeadPosition(positionModel.getId());
-					teamRepository.edit(teamUpdate);
-				}
+				team.getPositions().add(p);
 			}
 			// Edit position
 			for (Position p : positionEdits) {
-				PositionModel positionModel = positionRepository.edit(p);
-				if (positionModel == null && positionModel.getId() == CMDConstrant.FAILED) {
+				if (positionRepository.edit(p)<0) {
 					LOGGER.error("Error has occured at edit():");
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE2"), ""));
+				} else if (p.getIsManager()) {
+					team.setHeadPosition(p.getId());
+					teamRepository.edit(team);
 				}
-				else if (p.getIsManager()) {
-					teamUpdate.setHeadPosition(p.getId());
-					teamRepository.edit(teamUpdate);
-				}
+				team.getPositions().add(p);
 			}
-			
+
 			if (messageEdit != -1) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS5"), teamUpdate));
+				TeamModel teamModel = toTeamModel(team);
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS5"), teamModel));
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", "", teamUpdate));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Error", "", team));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error has occured at add() ", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("Error", e.getMessage(), ""));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("Error", e.getMessage(), ""));
 
 		}
 	}
-	
-	public ResponseEntity<Object> delete(Integer id){
+
+	public ResponseEntity<Object> delete(Integer id) {
 		Team teamDelete = teamRepository.findById(id);
-		if(teamDelete.getEmployees().size()>0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("TEAME2") , ""));
+		if (teamDelete.getEmployees().size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new ResponseObject("ERROR", message.getMessageByItemCode("TEAME2"), ""));
 		}
 		String deleteStatus = teamRepository.delete(id);
 		try {
 			if (deleteStatus.equals("1")) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS6"), ""));
-		} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ResponseObject("ERROR", deleteStatus + "", ""));
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", message.getMessageByItemCode("TEAMS6"), ""));
+			} else {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", deleteStatus + "", ""));
 
 			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ResponseObject("ERROR", e.getMessage(),""));
-			}
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
 		}
+	}
+	public TeamModel toTeamModel(Team t) {
+		try {
+				TeamModel toTeamModel = new TeamModel();
+				List<PositionModel> positionModelList = new ArrayList<>();
+				toTeamModel.setId(t.getId());
+				toTeamModel.setCode(t.getCode());
+				toTeamModel.setName(t.getName());
+				toTeamModel.setDescription(t.getDescription());
+				for (Position pos : t.getPositions()) {
+					PositionModel positionModel = new PositionModel();
+					Role role = new Role();
+					role.setId(pos.getRole().getId());
+					role.setName(pos.getRole().getName());
+					positionModel.setId(pos.getId());
+					positionModel.setName(pos.getName());
+					positionModel.setIsManager(pos.getIsManager());
+					positionModel.setRole(role);
+					positionModelList.add(positionModel);
+				}
+				toTeamModel.setPositions(positionModelList);
+				toTeamModel.setHeadPosition(t.getHeadPosition());
+				return toTeamModel;
+		} catch (Exception e) {
+			LOGGER.error("Error has occured in DepartmentRepositoryImpl at findAll() ", e);
+			return null;
+		}
+	}
 
 }

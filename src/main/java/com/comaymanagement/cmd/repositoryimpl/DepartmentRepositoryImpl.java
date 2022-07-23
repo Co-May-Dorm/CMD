@@ -6,9 +6,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +135,6 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 	@Override
 	@javax.transaction.Transactional
 	public Department findById(Integer id) {
-		List<Position> positions = new ArrayList<Position>();
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hql = new StringBuilder();
 		hql.append("from departments dep ");
@@ -149,23 +148,6 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 			return null;
 		}
 		
-	}
-	public Department findByIdToEdit(Integer id) {
-
-		Session session = sessionFactory.getCurrentSession();
-		StringBuilder hql = new StringBuilder();
-		Department department = null;
-		hql.append("from departments dep ");
-		hql.append("where dep.id = " + id);
-		try {
-			LOGGER.info(hql.toString());
-			Query query = session.createQuery(hql.toString());
-			department = (Department) query.getSingleResult();
-		} catch (Exception e) {
-			LOGGER.error("Error has occured in findByIdToEdit() ", e);
-		} 
-		
-		return department;
 	}
 	@Override
 	public Department findByName(String name) {

@@ -4,22 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.comaymanagement.cmd.entity.Employee;
-import com.comaymanagement.cmd.entity.Option;
-import com.comaymanagement.cmd.entity.ResponseObject;
-import com.comaymanagement.cmd.entity.Role;
-import com.comaymanagement.cmd.entity.Status;
-import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.model.OptionModel;
 import com.comaymanagement.cmd.model.RoleDetailModel;
 import com.comaymanagement.cmd.model.UserModel;

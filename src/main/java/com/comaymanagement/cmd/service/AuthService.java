@@ -112,7 +112,7 @@ public class AuthService {
 			newPassword = jsonObject.get("newPassword").asText();
 		} catch (Exception e) {
 			LOGGER.error("Have error at changePassword();", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("ERROR", "Cập nhật mật khẩu thất bại", ""));
 		}
 		// check if matches user id
@@ -125,11 +125,11 @@ public class AuthService {
 				employeeRepository.edit(employee);
 
 			}else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", "Cập nhật mật khẩu thất bại", ""));
 			}
 		} else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("ERROR", "Cập nhật mật khẩu thất bại", ""));
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "Cập nhật mật khẩu thành công",""));

@@ -3,12 +3,8 @@ package com.comaymanagement.cmd.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Department;
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
@@ -106,7 +100,7 @@ public class DepartmentService {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("ERROR", message.getMessageByItemCode("DEPE3") , ""));
 			}
-			Department depUpdate =  departmentRepository.findByIdToEdit(idDepAdded);
+			Department depUpdate =  departmentRepository.findById(idDepAdded);
 			for (JsonNode p : jsonObjectPosition) {
 				Role role = new Role();
 				Position pos = new Position();
@@ -123,23 +117,22 @@ public class DepartmentService {
 			}
 			dep.setPositions(positionList);
 			for (Position p : positionList) {
-				PositionModel positionModel = positionRepository.add(p);
 				
-				if (null == positionModel || positionModel.getId() == CMDConstrant.FAILED) {
+				if (positionRepository.add(p)<0) {
 					LOGGER.error("Error has occured in DepartmentService at save():");
 					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1") , ""));
 				}
 				if(p.getIsManager()) {
-					depUpdate.setHeadPosition(positionModel.getId());
-					dep.setHeadPosition(positionModel.getId());
+					depUpdate.setHeadPosition(p.getId());
+					dep.setHeadPosition(p.getId());
 					departmentRepository.edit(depUpdate);
 				}
 			}
 			
 			if (idDepAdded != -1) {
 				DepartmentModel departmentModel = toDepartmentModel(dep);
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", idDepAdded + "", departmentModel));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("DEPS1"), departmentModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE3"), dep));
 			}
@@ -175,7 +168,7 @@ public class DepartmentService {
 			Integer headPosition = -1;
 //			Check department code existed
 			Integer id = jsonObjectDepartment.get("id").asInt();
-			dep = departmentRepository.findByIdToEdit(id);
+			dep = departmentRepository.findById(id);
 			boolean isExisted = departmentRepository.isExisted(id, code);
 			if (isExisted) {
 				return ResponseEntity.status(HttpStatus.OK)
@@ -228,39 +221,37 @@ public class DepartmentService {
 				
 			}
 			dep.setPositions(new ArrayList<Position>());
-			// Edit position
+			// Add position
 			for (Position p : positionEdits) {
-				PositionModel positionEdit = positionRepository.edit(p);
-				if (positionEdit == null || positionEdit.getId() == CMDConstrant.FAILED) {
+				if (positionRepository.edit(p)<0) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
 					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE2"), ""));
 				}
 				else if (p.getIsManager()) {
-					dep.setHeadPosition(positionEdit.getId());
+					dep.setHeadPosition(p.getId());
 					departmentRepository.edit(dep);
 				}
 				dep.getPositions().add(p);
 			}
-			// Add position
+			// Edit position
 			for (Position p : positionAdds) {
-				PositionModel positionAdd = positionRepository.add(p);
 				
-				if (positionAdd == null || positionAdd.getId() == CMDConstrant.FAILED) {
+				if (positionRepository.add(p)<0) {
 					LOGGER.error("Error has occured in DepartmentService at edit():");
 					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSE1"), ""));
 				}
 				else if(p.getIsManager()) {
 					
-					dep.setHeadPosition(positionAdd.getId());
+					dep.setHeadPosition(p.getId());
 					departmentRepository.edit(dep);
 				}
 				dep.getPositions().add(p);
 			}
 			if (messageEdit != -1) {
 				DepartmentModel departmentModel = toDepartmentModel(dep);
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageEdit  + "", departmentModel));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("DEPS2"), departmentModel));
 			} else {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",message.getMessageByItemCode("DEPE4"), dep));
 			}
