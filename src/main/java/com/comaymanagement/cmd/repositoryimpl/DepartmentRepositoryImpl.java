@@ -189,5 +189,28 @@ public class DepartmentRepositoryImpl implements IDepartmentRepository {
 			return null;
 		}
 	}
-	
+	public DepartmentModel toModel(Department d) {
+		DepartmentModel departmentModel = new DepartmentModel();
+		List<PositionModel> positionModelList = new ArrayList<>();
+		departmentModel.setId(d.getId());
+		departmentModel.setCode(d.getCode());
+		departmentModel.setName(d.getName());
+		departmentModel.setDescription(d.getDescription());
+		departmentModel.setFatherDepartmentId(d.getFatherDepartmentId());
+		departmentModel.setLevel(d.getLevel());
+		for (Position pos : d.getPositions()) {
+			PositionModel positionModel = new PositionModel();
+			Role role = new Role();
+			role.setId(pos.getRole().getId());
+			role.setName(pos.getRole().getName());
+			positionModel.setId(pos.getId());
+			positionModel.setName(pos.getName());
+			positionModel.setIsManager(pos.getIsManager());
+			positionModel.setRole(role);
+			positionModelList.add(positionModel);
+		}
+		departmentModel.setPositions(positionModelList);
+		departmentModel.setHeadPosition(d.getHeadPosition());
+		return departmentModel;
+	}
 }

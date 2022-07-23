@@ -167,4 +167,26 @@ public class TeamRepositoryImpl implements ITeamRepository {
 		}
 		return team;
 	}
+	public TeamModel toModel(Team t) {
+		TeamModel teamModel = new TeamModel();
+		List<PositionModel> positionModelList = new ArrayList<>();
+		teamModel.setId(t.getId());
+		teamModel.setCode(t.getCode());
+		teamModel.setName(t.getName());
+		teamModel.setDescription(t.getDescription());
+		for (Position pos : t.getPositions()) {
+			PositionModel positionModel = new PositionModel();
+			Role role = new Role();
+			role.setId(pos.getRole().getId());
+			role.setName(pos.getRole().getName());
+			positionModel.setId(pos.getId());
+			positionModel.setName(pos.getName());
+			positionModel.setIsManager(pos.getIsManager());
+			positionModel.setRole(role);
+			positionModelList.add(positionModel);
+		}
+		teamModel.setPositions(positionModelList);
+		teamModel.setHeadPosition(t.getHeadPosition());
+		return teamModel;
+	}
 }

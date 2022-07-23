@@ -16,10 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.Message;
+import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.Team;
+import com.comaymanagement.cmd.model.DepartmentModel;
 import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.model.TeamModel;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
@@ -303,5 +305,15 @@ public class TeamService {
 			return null;
 		}
 	}
-
+	public ResponseEntity<Object> findById (Integer id) {
+		try {
+			Team team = teamRepository.findById(id);
+			TeamModel teamModel = teamRepository.toModel(team);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("OK","", teamModel));
+		} catch (Exception e) {
+			LOGGER.error("Error has occured at findById() ", e);
+			return null;
+		}
+	}
 }

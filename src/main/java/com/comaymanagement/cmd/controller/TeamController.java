@@ -66,4 +66,9 @@ public class TeamController {
 	public ResponseEntity<Object> delete(@PathVariable Integer id){
 		return teamService.delete(id);
 	}
+	@PreAuthorize("@customRoleService.canView('team', principal) or @customRoleService.canViewAll('team', principal)")
+	@GetMapping("/{id}")
+	public ResponseEntity<Object> findById(@PathVariable Integer id) {
+		return teamService.findById(id);
+	}
 }

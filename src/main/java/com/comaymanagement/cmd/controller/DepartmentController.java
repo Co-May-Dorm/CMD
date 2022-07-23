@@ -62,21 +62,7 @@ public class DepartmentController {
 
 	@PreAuthorize("@customRoleService.canView('department', principal) or @customRoleService.canViewAll('department', principal)")
 	@GetMapping("")
-	public ResponseEntity<Object> findAll(HttpServletRequest request, @RequestParam(value = "name", required = false) String name) {
-		 String token = CustomRoleService.getTokenFromRequest(request);
-         UserDetails userDetails = null;
-         if (token != null && jwtUtils.validateJwtToken(token)) {
-             String username = jwtUtils.getUserNameFromJwtToken(token);
-             try {
-             	userDetails = userDetailsService.loadUserByUsername(username);
-				} catch (Exception e) {
-					logger.error("",e);
-				}
-             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                     userDetails, null, userDetails.getAuthorities());
-             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-             SecurityContextHolder.getContext().setAuthentication(authentication);
-         }
+	public ResponseEntity<Object> findAll(@RequestParam(value = "name", required = false) String name) {
 		return departmentService.findAll(name);
 	}
 //	@PreAuthorize("@customRoleService.canView('department',principal)")
@@ -102,4 +88,10 @@ public class DepartmentController {
 	public ResponseEntity<Object> delete(@PathVariable Integer id){
 		return departmentService.delete(id);
 	}
+	@PreAuthorize("@customRoleService.canView('department', principal) or @customRoleService.canViewAll('department', principal)")
+	@GetMapping("/{id}")
+	public ResponseEntity<Object> findById(@PathVariable Integer id) {
+		return departmentService.findById(id);
+	}
+	
 }
