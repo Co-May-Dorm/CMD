@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.ProposalTypeDetail;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.model.ProposalTypeDetailModel;
 import com.comaymanagement.cmd.repositoryimpl.ProposalTypeDetailRepositoryImpl;
 
 @Service
@@ -26,8 +27,9 @@ public class ProposalTypeDetailService {
 	public ResponseEntity<Object> findById(Integer id){
 		List<ProposalTypeDetail> proposalTypeDetails= new ArrayList<>();
 		proposalTypeDetails = proposalTypeDetailReposiotory.findById(id);
+		List<ProposalTypeDetailModel> proposalTypeDetailModels = new ArrayList<>();
 		if (proposalTypeDetails.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", proposalTypeDetails));
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", proposalTypeDetailReposiotory.toModel(proposalTypeDetails)));
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", proposalTypeDetails));
 		}
