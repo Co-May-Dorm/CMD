@@ -471,7 +471,7 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 				if (null == proposalModel.getProposal()) {
 					proposalModel.setProposal(proposalType);
 				}
-				if (null == status) {
+				if (null == proposalModel.getStatus()) {
 					proposalModel.setStatus(status);
 				}
 
@@ -516,49 +516,6 @@ public class ProposalRepositoryImpl implements IProposalRepository {
 					employeeModel.setCreateBy(e.getCreateBy());
 					employeeModel.setModifyBy(e.getModifyBy());
 					proposalModel.setCreator(employeeModel);
-				}
-
-				if (null == proposalModel.getReceiver()) {
-					EmployeeModel employeeModel = new EmployeeModel();
-					employeeModel.setId(r.getId());
-					employeeModel.setCode(r.getCode());
-					employeeModel.setName(r.getName());
-					employeeModel.setAvatar(r.getAvatar());
-					employeeModel.setGender(r.getGender());
-					employeeModel.setDateOfBirth(r.getDateOfBirth());
-					employeeModel.setEmail(r.getEmail());
-					employeeModel.setPhoneNumber(r.getPhoneNumber());
-					employeeModel.setActive(r.isActive());
-					employeeModel.setCreateDate(r.getCreateDate());
-
-					List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
-					for (Department department : r.getDepartments()) {
-						DepartmentModel dModel = new DepartmentModel();
-						dModel.setCode(department.getCode());
-						dModel.setDescription(department.getDescription());
-						dModel.setId(department.getId());
-						dModel.setName(department.getName());
-						dModel.setLevel(department.getLevel());
-						departmentModels.add(dModel);
-					}
-					employeeModel.setDepartments(departmentModels);
-					;
-
-					List<PositionModel> positionModels = new ArrayList<PositionModel>();
-					for (Position po : r.getPositions()) {
-						PositionModel positionModel = new PositionModel();
-						positionModel.setId(po.getId());
-						positionModel.setName(po.getName());
-						positionModel.setRole(po.getRole());
-						positionModel.setIsManager(po.getIsManager());
-						positionModels.add(positionModel);
-					}
-					employeeModel.setPositions(positionModels);
-					employeeModel.setCreateDate(r.getCreateDate());
-					employeeModel.setModifyDate(r.getModifyDate());
-					employeeModel.setCreateBy(r.getCreateBy());
-					employeeModel.setModifyBy(r.getModifyBy());
-					proposalModel.setReceiver(employeeModel);
 				}
 
 				if (null == proposalModel.getCreatedDate()) {

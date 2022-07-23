@@ -316,4 +316,15 @@ public class DepartmentService {
 			return null;
 		}
 	}
+	public ResponseEntity<Object> findById (Integer id) {
+		try {
+			Department dep = departmentRepository.findById(id);
+			DepartmentModel departmentModel = departmentRepository.toModel(dep);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("OK","", departmentModel));
+		} catch (Exception e) {
+			LOGGER.error("Error has occured at findById() ", e);
+			return null;
+		}
+	}
 }
