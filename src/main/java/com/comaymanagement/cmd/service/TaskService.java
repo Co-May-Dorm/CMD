@@ -209,7 +209,6 @@ public class TaskService {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("STAE1"), ""));
 			}
-			
 			task.setCreator(creator);
 			task.setReceiver(receiver);
 			task.setStatus(status);
