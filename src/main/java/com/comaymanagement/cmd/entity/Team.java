@@ -1,5 +1,6 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -11,9 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -48,7 +46,6 @@ public class Team {
 	private String modifyDate;
 	@Column(name="description")
 	private String description;
-	
 	@ManyToMany
 	@JoinTable(name = "teams_employees", joinColumns = {
 			@JoinColumn(name = "team_id", referencedColumnName = "id") }, inverseJoinColumns = {
@@ -59,5 +56,5 @@ public class Team {
 	@OneToMany
 	@JoinColumn(name = "team_id")
 	@JsonBackReference
-	private Set<Position> positions;
+	private List<Position> positions;
 }

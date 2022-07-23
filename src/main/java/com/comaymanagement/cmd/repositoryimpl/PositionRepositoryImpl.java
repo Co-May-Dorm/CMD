@@ -83,59 +83,27 @@ public class PositionRepositoryImpl implements IPositionRepository {
 	}
 
 	@Override
-	public PositionModel add(Position p) {
+	public Integer add(Position p) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
-			PositionModel positionModel = null;
 			Integer id = (Integer) session.save(p);
-			positionModel = new PositionModel();
-			positionModel.setId(id);
-			positionModel.setIsManager(p.getIsManager());
-			positionModel.setName(p.getName());
-			
-			DepartmentModel departmentModel = new DepartmentModel();
-			departmentModel.setId(p.getDepartment().getId());
-			departmentModel.setCode(p.getDepartment().getCode());
-			departmentModel.setName(p.getDepartment().getName());
-			departmentModel.setLevel(p.getDepartment().getLevel());
-			departmentModel.setHeadPosition(p.getDepartment().getHeadPosition());
-			departmentModel.setDescription(p.getDepartment().getDescription());
-			
-			positionModel.setDepartment(departmentModel);
-			positionModel.setRole(p.getRole());
-			return positionModel;
+			return id;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in PositionRepositoryImpl at save() ", e);
+			return -1;
 		}
-		return null;
+		
 	}
 	@Override
-	public PositionModel edit(Position p) {
+	public Integer edit(Position p) {
 		Session session = sessionFactory.getCurrentSession();
 		try {
-
-			PositionModel positionModel = null;
 			session.update(p);
-			positionModel = new PositionModel();
-			positionModel.setId(p.getId());
-			positionModel.setIsManager(p.getIsManager());
-			positionModel.setName(p.getName());
-			
-			DepartmentModel departmentModel = new DepartmentModel();
-			departmentModel.setId(p.getDepartment().getId());
-			departmentModel.setCode(p.getDepartment().getCode());
-			departmentModel.setName(p.getDepartment().getName());
-			departmentModel.setLevel(p.getDepartment().getLevel());
-			departmentModel.setHeadPosition(p.getDepartment().getHeadPosition());
-			departmentModel.setDescription(p.getDepartment().getDescription());
-			
-			positionModel.setDepartment(departmentModel);
-			positionModel.setRole(p.getRole());
-			return positionModel;
+			return 1;
 		} catch (Exception e) {
 			LOGGER.error("Error has occured in DepartmentRepositoryImpl at edit() ", e);
+			return 0;
 		}
-		return null;
 	}
 	
 	@Override
@@ -270,5 +238,17 @@ public class PositionRepositoryImpl implements IPositionRepository {
 			return null;
 		}
 	}
-	
+	public PositionModel toModel(Position position) {
+		PositionModel positionModel = new PositionModel();
+		positionModel.setId(position.getId());
+		positionModel.setName(position.getName());
+		positionModel.setIsManager(position.getIsManager());
+		Department department = position.getDepartment();
+		DepartmentModel departmentModel = new DepartmentModel();
+		departmentModel.setId(department.getId());
+		departmentModel.setName(department.getName());
+		positionModel.setDepartment(departmentModel);
+//		positionModel.setRole(po.getRole());
+		return positionModel;
+	}
 }

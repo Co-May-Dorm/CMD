@@ -51,4 +51,5 @@ public class PostController {
 			@PathVariable Integer id) {
 		return postService.delete(id);
 	}
+	
 }

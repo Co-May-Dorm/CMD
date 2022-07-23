@@ -19,9 +19,8 @@ public class TeamModel{
 	private String code;
 	private String name;
 	private Integer headPosition;
-	private List<PositionModel> positions;
 	private String description;
+	private List<PositionModel> positions;
 	private List<EmployeeModel> employees;
-	private Integer level;
 	private PositionModel position;
 }

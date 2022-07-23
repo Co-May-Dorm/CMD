@@ -145,7 +145,7 @@ public class TeamRepositoryImpl implements ITeamRepository {
 			team = (Team) query.getSingleResult();
 			return team;
 		} catch (Exception e) {
-			LOGGER.error("Error has occured at delete() ", e);
+			LOGGER.error("Error has occured at findById() ", e);
 			return null;
 		}
 	}

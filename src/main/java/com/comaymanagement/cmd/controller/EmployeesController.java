@@ -1,25 +1,4 @@
 package com.comaymanagement.cmd.controller;
-/**
-All option name
-	todolist
-	request
-	type
-	employee
-	department
-	position
-	inventory
-	team
-All permission name
- 	view
- 	create
- 	update
- 	detele
- 	view_all
- 	update_all
- 	delete_all
- **/
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

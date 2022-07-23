@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.comaymanagement.cmd.constant.CrossOriginConstant;
 import com.comaymanagement.cmd.security.jwt.AuthenticationFilter;
 import com.comaymanagement.cmd.security.jwt.JwtUtils;
 import com.comaymanagement.cmd.service.CustomRoleService;

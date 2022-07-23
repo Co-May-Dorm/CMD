@@ -2,12 +2,9 @@ package com.comaymanagement.cmd.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.comaymanagement.cmd.entity.Permission;
-import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.model.OptionModel;
 import com.comaymanagement.cmd.model.PermissionModel;
 import com.comaymanagement.cmd.model.RoleDetailModel;

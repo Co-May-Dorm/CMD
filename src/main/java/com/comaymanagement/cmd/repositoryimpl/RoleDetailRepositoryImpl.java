@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.RoleDetail;
 import com.comaymanagement.cmd.repository.IRoleDetailRepository;
 @Repository

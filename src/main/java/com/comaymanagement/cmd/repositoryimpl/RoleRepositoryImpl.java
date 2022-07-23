@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -16,10 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Option;
 import com.comaymanagement.cmd.entity.Permission;
-import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.RoleDetail;
 import com.comaymanagement.cmd.model.OptionModel;

@@ -1,6 +1,5 @@
 package com.comaymanagement.cmd.service;
 
-import java.net.Inet4Address;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,12 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.CMDConstrant;
 import com.comaymanagement.cmd.constant.Message;
-import com.comaymanagement.cmd.entity.Option;
 import com.comaymanagement.cmd.entity.Pagination;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.entity.Role;
 import com.comaymanagement.cmd.entity.RoleDetail;
-import com.comaymanagement.cmd.model.PermissionModel;
 import com.comaymanagement.cmd.model.PositionModel;
 import com.comaymanagement.cmd.model.RoleDetailModel;
 import com.comaymanagement.cmd.model.RoleModel;
@@ -134,7 +131,7 @@ public class RoleService {
 			if (idAdded != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("ROLES1"), role));
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("Error",  message.getMessageByItemCode("ROLEE1") , role));
 
 			}
@@ -189,7 +186,7 @@ public class RoleService {
 			if (editSatatus != -1) {
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("ROLES3"), role));
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("Error",  message.getMessageByItemCode("ROLEE4") , role));
 				
 			}
@@ -204,7 +201,7 @@ public class RoleService {
 	public ResponseEntity<Object> delete(Integer id){
 		List<PositionModel> positions = positionRepository.findAllByRoleId(id);
 		if(positions!=null && positions.size()>0) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("ERROR",  message.getMessageByItemCode("ROLEE2") , ""));
 		}
 		try {
@@ -214,10 +211,10 @@ public class RoleService {
 			}
 			Integer roleDeleteStatus = roleRepository.delete(id);
 			if(roleDeleteStatus != -1 ) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK",  message.getMessageByItemCode("ROLES2") , id));
 			}else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("Error",  message.getMessageByItemCode("ROLEE3") , id));
 			}
 		} catch (Exception e) {

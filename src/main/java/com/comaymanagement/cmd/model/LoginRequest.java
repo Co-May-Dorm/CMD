@@ -1,7 +1,5 @@
 package com.comaymanagement.cmd.model;
 
-import java.util.Set;
-
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 

@@ -15,14 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.constant.Message;
-import com.comaymanagement.cmd.entity.Department;
 import com.comaymanagement.cmd.entity.Employee;
-import com.comaymanagement.cmd.entity.Position;
 import com.comaymanagement.cmd.entity.Post;
 import com.comaymanagement.cmd.entity.ResponseObject;
-import com.comaymanagement.cmd.model.DepartmentModel;
-import com.comaymanagement.cmd.model.EmployeeModel;
-import com.comaymanagement.cmd.repository.IEmployeeRepository;
 import com.comaymanagement.cmd.repository.IPostRepository;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;

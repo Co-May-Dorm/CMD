@@ -1,6 +1,5 @@
 package com.comaymanagement.cmd.model;
 
-import com.comaymanagement.cmd.entity.Option;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 

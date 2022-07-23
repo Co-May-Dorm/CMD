@@ -21,6 +21,6 @@ public class PositionModel {
 	private Boolean isManager;
 	private Role role;
 	private DepartmentModel department;
-	
+	private TeamModel team;
 	
 }
