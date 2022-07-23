@@ -27,6 +27,7 @@ import com.comaymanagement.cmd.entity.Task;
 import com.comaymanagement.cmd.entity.TaskHis;
 import com.comaymanagement.cmd.model.DepartmentModel;
 import com.comaymanagement.cmd.model.EmployeeModel;
+import com.comaymanagement.cmd.model.TaskHisModel;
 import com.comaymanagement.cmd.model.TaskModel;
 import com.comaymanagement.cmd.repository.ITaskRepository;
 
@@ -495,8 +496,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStartDate(task.getStartDate());
 				customTask.setModifyDate(task.getModifyDate());
+				
 				List<TaskHis> taskHis = new ArrayList<TaskHis>();
-
 				TaskHis taskHistory = new TaskHis();
 				taskHistory.setTask(task);
 				taskHistory.setStatus(task.getStatus());
@@ -505,7 +506,16 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				taskHis.add(taskHistory);
 				task.setTaskHis(taskHis);
 				session.update(task);
-				customTask.setTaskHis(taskHis);
+
+				List<TaskHisModel> taskHisModels = new ArrayList<TaskHisModel>();
+				TaskHisModel taskHistoryModel = new TaskHisModel();
+				taskHistoryModel.setTask(customTask);
+				taskHistoryModel.setStatus(task.getStatus());
+				taskHistoryModel.setReceiver(receiverTemp);
+				taskHistoryModel.setModifyDate(task.getCreateDate());
+				taskHisModels.add(taskHistoryModel);
+				
+				customTask.setTaskHisModel(taskHisModels);
 				return customTask;
 			}
 		} catch (Exception e) {
@@ -623,8 +633,43 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					itemHis.getTask().getCreator().getProposalPermissions().size();
 					itemHis.getTask().getCreator().getTaskListCreated().size();
 				}
-
-				customTask.setTaskHis(taskHis);
+				
+				List<TaskHisModel> taskHisModels = new ArrayList<TaskHisModel>();
+				for(TaskHis itemTaskHis : taskHis) {
+					TaskHisModel taskHisModel = new TaskHisModel();
+					taskHisModel.setId(itemTaskHis.getId());
+					taskHisModel.setModifyDate(itemTaskHis.getModifyDate());
+					taskHisModel.setStatus(itemTaskHis.getStatus());
+					
+					EmployeeModel receiverHis = new EmployeeModel();
+					receiverHis.setId(itemTaskHis.getReceiver().getId());
+					receiverHis.setCode(itemTaskHis.getReceiver().getCode());
+					receiverHis.setName(itemTaskHis.getReceiver().getName());
+					receiverHis.setAvatar(itemTaskHis.getReceiver().getAvatar());
+					receiverHis.setGender(itemTaskHis.getReceiver().getGender());
+					receiverHis.setDateOfBirth(itemTaskHis.getReceiver().getDateOfBirth());
+					receiverHis.setEmail(itemTaskHis.getReceiver().getEmail());
+					receiverHis.setPhoneNumber(itemTaskHis.getReceiver().getPhoneNumber());
+					receiverHis.setActive(itemTaskHis.getReceiver().isActive());
+					receiverHis.setCreateDate(itemTaskHis.getReceiver().getCreateDate());
+					taskHisModel.setReceiver(receiverHis);
+					
+					TaskModel customTaskHis = new TaskModel();
+					customTaskHis.setId(itemTaskHis.getTask().getId());
+					customTaskHis.setTitle(itemTaskHis.getTask().getTitle());
+					customTaskHis.setDescription(itemTaskHis.getTask().getDescription());
+					customTaskHis.setRate(itemTaskHis.getTask().getRate());
+					customTaskHis.setCreateDate(itemTaskHis.getTask().getCreateDate());
+					customTaskHis.setFinishDate(itemTaskHis.getTask().getFinishDate());
+					customTaskHis.setStartDate(itemTaskHis.getTask().getStartDate());
+					customTaskHis.setModifyDate(itemTaskHis.getTask().getModifyDate());
+					customTaskHis.setPriority(itemTaskHis.getTask().getPriority());
+					taskHisModel.setTask(customTaskHis);
+					
+					taskHisModels.add(taskHisModel);
+				}
+				
+				customTask.setTaskHisModel(taskHisModels);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
@@ -718,7 +763,16 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			taskHis.add(taskHistory);
 			task.setTaskHis(taskHis);
 			session.update(task);
-			customTask.setTaskHis(taskHis);
+			
+			List<TaskHisModel> taskHisModels = new ArrayList<TaskHisModel>();
+			TaskHisModel taskHistoryModel = new TaskHisModel();
+			taskHistoryModel.setTask(customTask);
+			taskHistoryModel.setStatus(task.getStatus());
+			taskHistoryModel.setReceiver(receiverTemp);
+			taskHistoryModel.setModifyDate(task.getCreateDate());
+			taskHisModels.add(taskHistoryModel);
+			
+			customTask.setTaskHisModel(taskHisModels);
 			return customTask;
 
 		} catch (Exception e) {
