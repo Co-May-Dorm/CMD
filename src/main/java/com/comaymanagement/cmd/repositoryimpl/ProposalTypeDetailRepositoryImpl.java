@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.entity.ProposalType;
 import com.comaymanagement.cmd.entity.ProposalTypeDetail;
+import com.comaymanagement.cmd.model.ProposalTypeDetailModel;
+import com.comaymanagement.cmd.model.ProposalTypeModel;
 import com.comaymanagement.cmd.repository.IProposalTypeDetailRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -49,5 +52,20 @@ private static final Logger LOGGER = LoggerFactory.getLogger(PositionRepositoryI
 			return null;
 		}
 	}
-
+	public List<ProposalTypeDetailModel> toModel(List<ProposalTypeDetail> proposalTypeDetails) {
+		List<ProposalTypeDetailModel> proDetailModels = new ArrayList<>();
+//		ProposalTypeModel proposalTypeModel = new ProposalTypeModel();
+//		ProposalType proposalType = proposalTypeDetails.get(0).getProposalType();
+//		proposalTypeModel.setId(proposalType.getId());
+//		proposalTypeModel.setName(proposalType.getName());
+		
+		for(ProposalTypeDetail proDetail : proposalTypeDetails) {
+			ProposalTypeDetailModel proDetailModel = new ProposalTypeDetailModel();
+			proDetailModel.setId(proDetail.getId());
+			proDetailModel.setFieldName(proDetail.getFieldName());
+			proDetailModel.setDataType(proDetail.getDataType());
+			proDetailModels.add(proDetailModel);
+		}
+		return proDetailModels;
+	}
 }

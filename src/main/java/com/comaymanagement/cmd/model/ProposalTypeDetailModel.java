@@ -23,23 +23,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "proposal_type_details")
 @JsonInclude(Include.NON_NULL)
 public class ProposalTypeDetailModel {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	@Column(name="field_id")
-	private String fieldId;
-	@Column(name="field_name")
+//	private ProposalType proposalType;
+	// Array of field
+	private Integer id; // field id
 	private String fieldName;
-	@OneToOne()
-	@JoinColumn(name = "proposal_type_id")
-	private ProposalType proposalType;
-	@OneToOne()
-	@JoinColumn(name = "data_type_id")
 	private DataType dataType;
-	
-	List<ApprovalStepModel> approvalStepModels; 
+//	List<ApprovalStepModel> approvalStepModels; 
 }
 
