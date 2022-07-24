@@ -34,6 +34,6 @@ public class TaskModel {
 	private String description;
 	private Integer rate;
 	private Integer priority;
-	List<TaskHisModel> taskHisModel;
+	List<TaskHisModel> taskHis;
 
 }
