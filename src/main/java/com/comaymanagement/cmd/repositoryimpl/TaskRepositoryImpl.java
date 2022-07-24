@@ -515,7 +515,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				taskHistoryModel.setModifyDate(task.getCreateDate());
 				taskHisModels.add(taskHistoryModel);
 				
-				customTask.setTaskHisModel(taskHisModels);
+				customTask.setTaskHis(taskHisModels);
 				return customTask;
 			}
 		} catch (Exception e) {
@@ -669,7 +669,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					taskHisModels.add(taskHisModel);
 				}
 				
-				customTask.setTaskHisModel(taskHisModels);
+				customTask.setTaskHis(taskHisModels);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
@@ -772,7 +772,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			taskHistoryModel.setModifyDate(task.getCreateDate());
 			taskHisModels.add(taskHistoryModel);
 			
-			customTask.setTaskHisModel(taskHisModels);
+			customTask.setTaskHis(taskHisModels);
 			return customTask;
 
 		} catch (Exception e) {
