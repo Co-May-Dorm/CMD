@@ -20,6 +20,8 @@ All permission name
  **/
 
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +167,14 @@ public class TaskController {
 	@GetMapping(value= "/taskHis/{taskId}",produces = "application/json")
 	public ResponseEntity<Object> findAll(@PathVariable(value="taskId",required = false) Integer taskId){
 		return taskService.findAllHistoryByTaskID(taskId);
+	}
+	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@PostMapping(value= "/AssigeToMe",produces = "application/json")
+	public ResponseEntity<Object> findAllTaskAssigeToMe(@RequestBody String json,
+			@RequestParam(value="page",required = false) String page, 
+			@RequestParam(value="sort", required = false) String sort,
+			@RequestParam(value="order", required = false) String order){
+		return taskService.findAllTaskAssigeToMe(json, sort, order, page);
 	}
 }
 
