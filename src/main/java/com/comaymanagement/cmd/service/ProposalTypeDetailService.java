@@ -2,6 +2,8 @@ package com.comaymanagement.cmd.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +26,16 @@ public class ProposalTypeDetailService {
 	
 	@Autowired
 	ProposalTypeDetailRepositoryImpl proposalTypeDetailReposiotory;
-	public ResponseEntity<Object> findById(Integer id){
-		List<ProposalTypeDetail> proposalTypeDetails= new ArrayList<>();
-		proposalTypeDetails = proposalTypeDetailReposiotory.findById(id);
-		List<ProposalTypeDetailModel> proposalTypeDetailModels = new ArrayList<>();
-		if (proposalTypeDetails.size() > 0) {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", proposalTypeDetailReposiotory.toModel(proposalTypeDetails)));
-		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", proposalTypeDetails));
-		}
-	}
+//	public ResponseEntity<Object> findById(Integer id){
+//		List<ProposalTypeDetail> proposalTypeDetails= new ArrayList<>();
+//		proposalTypeDetails = proposalTypeDetailReposiotory.findById(id);
+//		List<ProposalTypeDetailModel> proposalTypeDetailModels = new ArrayList<>();
+//		if (proposalTypeDetails.size() > 0) {
+//			List<ProposalTypeDetailModel> proposalTypeDetailModel = proposalTypeDetailReposiotory.toModel(proposalTypeDetails);
+//			Map<String, Object> result = new TreeMap<>();
+//			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", ));
+//		} else {
+//			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", proposalTypeDetails));
+//		}
+//	}
 }
