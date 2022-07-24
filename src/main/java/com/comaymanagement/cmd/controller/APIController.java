@@ -33,7 +33,7 @@ import com.comaymanagement.cmd.entity.ResponseObject;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = CrossOriginConstant.REACT_ORIGIN)
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class APIController {
 	@Autowired
 	ServletContext context;
