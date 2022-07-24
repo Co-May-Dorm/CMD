@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.comaymanagement.cmd.entity.ApprovalStep;
+import com.comaymanagement.cmd.model.ApprovalStepModel;
 import com.comaymanagement.cmd.repository.IApprovalStepRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -45,5 +46,8 @@ public class ApprovalStepRepositoryImpl implements IApprovalStepRepository{
 	
 	}
 	
-	
+//	public List<ApprovalStepModel> toModel(List<ApprovalStep> approvalSteps){
+//		List<ApprovalStepModel> approvalStepModel = new ArrayList<>();
+////		 3 
+//	}
 }
