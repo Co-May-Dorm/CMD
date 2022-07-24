@@ -20,11 +20,7 @@ import lombok.Setter;
 @Entity
 @JsonInclude(Include.NON_NULL)
 public class ApprovalStepModel {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	@Column(name="approval_step_index")
-	private String approvalStepIndex;
-	@Column(name="approval_step_name")
-	private String approvalStepName;
+//	private Integer id;
+	private String index;
+	private String name;
 }

@@ -53,19 +53,14 @@ private static final Logger LOGGER = LoggerFactory.getLogger(PositionRepositoryI
 		}
 	}
 	public List<ProposalTypeDetailModel> toModel(List<ProposalTypeDetail> proposalTypeDetails) {
-		List<ProposalTypeDetailModel> proDetailModels = new ArrayList<>();
-//		ProposalTypeModel proposalTypeModel = new ProposalTypeModel();
-//		ProposalType proposalType = proposalTypeDetails.get(0).getProposalType();
-//		proposalTypeModel.setId(proposalType.getId());
-//		proposalTypeModel.setName(proposalType.getName());
-		
-		for(ProposalTypeDetail proDetail : proposalTypeDetails) {
-			ProposalTypeDetailModel proDetailModel = new ProposalTypeDetailModel();
-			proDetailModel.setId(proDetail.getId());
-			proDetailModel.setFieldName(proDetail.getFieldName());
-			proDetailModel.setDataType(proDetail.getDataType());
-			proDetailModels.add(proDetailModel);
+		List<ProposalTypeDetailModel> proTypeDetailModels = new ArrayList<>();
+		for(ProposalTypeDetail proTypeDetail : proposalTypeDetails) {
+			ProposalTypeDetailModel proTypeDetailModel = new ProposalTypeDetailModel();
+			proTypeDetailModel.setId(proTypeDetail.getId());
+			proTypeDetailModel.setFieldName(proTypeDetail.getFieldName());
+			proTypeDetailModel.setDataType(proTypeDetail.getDataType());
+			proTypeDetailModels.add(proTypeDetailModel);
 		}
-		return proDetailModels;
+		return proTypeDetailModels;
 	}
 }
