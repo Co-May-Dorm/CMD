@@ -2,6 +2,8 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder.In;
+
 import org.springframework.data.repository.query.Param;
 
 import com.comaymanagement.cmd.entity.Task;
@@ -72,4 +74,10 @@ public interface ITaskRepository {
 			@Param("department") String department
 	);
 	List<TaskHis> findAllHistoryByTaskID(Integer taskId);
+	List<TaskModel> findAllTaskAssigeToMe(Integer employeeId,List<Integer> creatorIds,
+			List<Integer> departmentIds, List<Integer> statusIds,Integer rate,String startDate,
+			String finishDate, String sort, String order, Integer offset, Integer limit);
+	Integer countAllTaskAssigeToMe(Integer employeeId,List<Integer> creatorIds,
+			List<Integer> departmentIds, List<Integer> statusIds,Integer rate,String startDate,
+			String finishDate, String sort, String order, Integer offset, Integer limit);
 }

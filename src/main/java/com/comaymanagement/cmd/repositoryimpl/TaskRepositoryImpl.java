@@ -13,6 +13,7 @@ import javax.persistence.Query;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.hql.internal.antlr.HqlBaseParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -496,7 +497,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setFinishDate(task.getFinishDate());
 				customTask.setStartDate(task.getStartDate());
 				customTask.setModifyDate(task.getModifyDate());
-				
+
 				List<TaskHis> taskHis = new ArrayList<TaskHis>();
 				TaskHis taskHistory = new TaskHis();
 				taskHistory.setTask(task);
@@ -514,7 +515,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				taskHistoryModel.setReceiver(receiverTemp);
 				taskHistoryModel.setModifyDate(task.getCreateDate());
 				taskHisModels.add(taskHistoryModel);
-				
+
 				customTask.setTaskHis(taskHisModels);
 				return customTask;
 			}
@@ -633,14 +634,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					itemHis.getTask().getCreator().getProposalPermissions().size();
 					itemHis.getTask().getCreator().getTaskListCreated().size();
 				}
-				
+
 				List<TaskHisModel> taskHisModels = new ArrayList<TaskHisModel>();
-				for(TaskHis itemTaskHis : taskHis) {
+				for (TaskHis itemTaskHis : taskHis) {
 					TaskHisModel taskHisModel = new TaskHisModel();
 					taskHisModel.setId(itemTaskHis.getId());
 					taskHisModel.setModifyDate(itemTaskHis.getModifyDate());
 					taskHisModel.setStatus(itemTaskHis.getStatus());
-					
+
 					EmployeeModel receiverHis = new EmployeeModel();
 					receiverHis.setId(itemTaskHis.getReceiver().getId());
 					receiverHis.setCode(itemTaskHis.getReceiver().getCode());
@@ -653,7 +654,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					receiverHis.setActive(itemTaskHis.getReceiver().isActive());
 					receiverHis.setCreateDate(itemTaskHis.getReceiver().getCreateDate());
 					taskHisModel.setReceiver(receiverHis);
-					
+
 					TaskModel customTaskHis = new TaskModel();
 					customTaskHis.setId(itemTaskHis.getTask().getId());
 					customTaskHis.setTitle(itemTaskHis.getTask().getTitle());
@@ -665,10 +666,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 					customTaskHis.setModifyDate(itemTaskHis.getTask().getModifyDate());
 					customTaskHis.setPriority(itemTaskHis.getTask().getPriority());
 					taskHisModel.setTask(customTaskHis);
-					
+
 					taskHisModels.add(taskHisModel);
 				}
-				
+
 				customTask.setTaskHis(taskHisModels);
 			}
 		} catch (Exception e) {
@@ -763,7 +764,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			taskHis.add(taskHistory);
 			task.setTaskHis(taskHis);
 			session.update(task);
-			
+
 			List<TaskHisModel> taskHisModels = new ArrayList<TaskHisModel>();
 			TaskHisModel taskHistoryModel = new TaskHisModel();
 			taskHistoryModel.setTask(customTask);
@@ -771,7 +772,7 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			taskHistoryModel.setReceiver(receiverTemp);
 			taskHistoryModel.setModifyDate(task.getCreateDate());
 			taskHisModels.add(taskHistoryModel);
-			
+
 			customTask.setTaskHis(taskHisModels);
 			return customTask;
 
@@ -994,6 +995,152 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			LOGGER.error(e.getMessage());
 		}
 		return task;
+	}
+
+	@Override
+	public List<TaskModel> findAllTaskAssigeToMe(Integer employeeId, List<Integer> creatorIds,
+			List<Integer> departmentIds, List<Integer> statusIds, Integer rate, String startDate, String finishDate,
+			String sort, String order, Integer offset, Integer limit) {
+		try {
+			List<TaskModel> customTasks = null;
+			Session session = sessionFactory.getCurrentSession();
+			StringBuilder hql = new StringBuilder();
+			hql.append("FROM tasks AS tas ");
+			hql.append("INNER JOIN tas.creator ");
+			hql.append("INNER JOIN tas.status AS st ");
+			hql.append("INNER JOIN tas.receiver ");
+			hql.append("WHERE tas.creator.id = " + employeeId + " OR tas.receiver.id = " + employeeId);
+			hql.append(" AND st.id IN (:statusIds) ");
+			if (rate != null) {
+				hql.append("AND tas.rate = :rate ");
+			}
+			if (startDate != null) {
+				hql.append("AND tas.startDate = :startDate ");
+			}
+			if (finishDate != null) {
+				hql.append("AND tas.finishDate = :finishDate");
+			}
+			hql.append("ORDER BY tas." + sort + " " + order);
+			LOGGER.info(hql.toString());
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("statusIds", statusIds);
+			if (startDate != null) {
+				query.setParameter("startDate", startDate);
+			}
+			if (finishDate != null) {
+				query.setParameter("finishDate", finishDate);
+			}
+			if (rate != null) {
+				query.setParameter("rate", rate);
+			}
+			customTasks = new ArrayList<TaskModel>();
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] obj = (Object[]) it.next();
+				Task task = (Task) obj[0];
+				TaskModel customTask = new TaskModel();
+				customTask.setId(task.getId());
+				customTask.setTitle(task.getTitle());
+
+				EmployeeModel creatorTemp = new EmployeeModel();
+				creatorTemp.setId(task.getCreator().getId());
+				creatorTemp.setCode(task.getCreator().getCode());
+				creatorTemp.setName(task.getCreator().getName());
+				creatorTemp.setAvatar(task.getCreator().getAvatar());
+				creatorTemp.setGender(task.getCreator().getGender());
+				creatorTemp.setDateOfBirth(task.getCreator().getDateOfBirth());
+				creatorTemp.setEmail(task.getCreator().getEmail());
+				creatorTemp.setPhoneNumber(task.getCreator().getPhoneNumber());
+				creatorTemp.setActive(task.getCreator().isActive());
+				creatorTemp.setCreateDate(task.getCreator().getCreateDate());
+				customTask.setCreator(creatorTemp);
+
+				EmployeeModel receiverTemp = new EmployeeModel();
+				receiverTemp.setId(task.getReceiver().getId());
+				receiverTemp.setCode(task.getReceiver().getCode());
+				receiverTemp.setName(task.getReceiver().getName());
+				receiverTemp.setAvatar(task.getReceiver().getAvatar());
+				receiverTemp.setGender(task.getReceiver().getGender());
+				receiverTemp.setDateOfBirth(task.getReceiver().getDateOfBirth());
+				receiverTemp.setEmail(task.getReceiver().getEmail());
+				receiverTemp.setPhoneNumber(task.getReceiver().getPhoneNumber());
+				receiverTemp.setActive(task.getReceiver().isActive());
+				receiverTemp.setCreateDate(task.getReceiver().getCreateDate());
+				customTask.setReceiver(receiverTemp);
+
+				customTask.setCreateDate(task.getCreateDate());
+				customTask.setFinishDate(task.getFinishDate());
+				customTask.setModifyDate(task.getModifyDate());
+				customTask.setStartDate(task.getStartDate());
+
+				List<DepartmentModel> departmentModels = new ArrayList<DepartmentModel>();
+				for (Department department : task.getCreator().getDepartments()) {
+					DepartmentModel dModel = new DepartmentModel();
+					dModel.setCode(department.getCode());
+					dModel.setDescription(department.getDescription());
+					dModel.setId(department.getId());
+					dModel.setName(department.getName());
+					dModel.setLevel(department.getLevel());
+					departmentModels.add(dModel);
+				}
+				customTask.setDepartment(departmentModels);
+				customTask.setStatus(task.getStatus());
+				customTask.setDescription(task.getDescription());
+				customTask.setRate(task.getRate());
+				customTask.setPriority(task.getPriority());
+				customTasks.add(customTask);
+
+			}
+			return customTasks;
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
+	}
+
+	@Override
+	public Integer countAllTaskAssigeToMe(Integer employeeId, List<Integer> creatorIds, List<Integer> departmentIds,
+			List<Integer> statusIds, Integer rate, String startDate, String finishDate, String sort, String order,
+			Integer offset, Integer limit) {
+		try {
+			Integer countTotal = 0;
+			Session session = sessionFactory.getCurrentSession();
+			StringBuilder hql = new StringBuilder();
+			hql.append("FROM tasks AS tas ");
+			hql.append("INNER JOIN tas.creator ");
+			hql.append("INNER JOIN tas.status AS st ");
+			hql.append("INNER JOIN tas.receiver ");
+			hql.append("WHERE tas.creator.id = " + employeeId + " OR tas.receiver.id = " + employeeId);
+			hql.append(" AND st.id IN (:statusIds) ");
+			if (rate != null) {
+				hql.append("AND tas.rate = :rate ");
+			}
+			if (startDate != null) {
+				hql.append("AND tas.startDate = :startDate ");
+			}
+			if (finishDate != null) {
+				hql.append("AND tas.finishDate = :finishDate");
+			}
+			LOGGER.info(hql.toString());
+			Query query = session.createQuery(hql.toString());
+			query.setParameter("statusIds", statusIds);
+			if (startDate != null) {
+				query.setParameter("startDate", startDate);
+			}
+			if (finishDate != null) {
+				query.setParameter("finishDate", finishDate);
+			}
+			if (rate != null) {
+				query.setParameter("rate", rate);
+			}
+			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
+				Object[] obj = (Object[]) it.next();
+				countTotal++;
+			}
+			return countTotal;
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return 0;
 	}
 
 }

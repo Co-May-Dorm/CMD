@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.service;
 
+import static org.mockito.ArgumentMatchers.nullable;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -421,6 +424,95 @@ public class TaskService {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("OK", "Query produce successfully ", taskHis));	
 			}
+		}
+		
+		public ResponseEntity<Object> findAllTaskAssigeToMe(String json, String sort, String order, String page){
+			List<TaskModel> taskModels = null;
+			JsonMapper jsonMapper = new JsonMapper();
+			JsonNode jsonObject;
+			String startDate = null;
+			String finishDate = null;
+			List<Integer> creatorIds = new ArrayList<Integer>();
+			List<Integer> receiverIds = new ArrayList<Integer>();
+			List<Integer> statusIds = new ArrayList<Integer>();
+			List<Integer> departmentIds = new ArrayList<Integer>();;
+			Integer rate = null;
+			Integer employeeId = null;
+			Integer limit = CMDConstrant.LIMIT;
+			Integer totalItem = 0;
+			/*
+			 (Integer employeeId, List<Integer> creatorId, List<Integer> reveiverId,
+			List<Integer> departmentId, List<Integer> statusId, Integer rate, String createDate, String finishDate,
+			String sort, String order, Integer offset, Integer limit) 
+			*/
+			UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			try {
+				page = page == null ? "1" : page.trim();
+				int offset = (Integer.valueOf(page) - 1) * limit;
+				jsonObject = jsonMapper.readTree(json);
+//				JsonNode jsonCreatorIds = jsonObject.get("creatorIds");
+//				JsonNode jsonReceiverIds = jsonObject.get("receiverIds");
+				JsonNode jsonStatusObject = jsonObject.get("statusIds");
+				rate = (jsonObject.get("rate") != null && !jsonObject.get("rate").asText().equals("null")
+						&& jsonObject.get("rate").asInt() != 0) ? jsonObject.get("rate").asInt() : null;
+				employeeId = (jsonObject.get("employeeId") != null && !jsonObject.get("employeeId").asText().equals("null")
+						&& jsonObject.get("employeeId").asInt() != 0) ? jsonObject.get("employeeId").asInt() : null;
+				if(null == employeeId) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("ERROR", message.getMessageByItemCode("TASKE4"), ""));
+				}
+				
+				startDate = (jsonObject.get("startDate") != null
+						&& !jsonObject.get("startDate").asText().equals("null")
+						&& !jsonObject.get("startDate").asText().equals(""))
+								? jsonObject.get("startDate").asText()
+								: null;
+				finishDate = (jsonObject.get("finishDate") != null
+						&& !jsonObject.get("finishDate").asText().equals("null")
+						&& !jsonObject.get("finishDate").asText().equals("")) ? jsonObject.get("finishDate").asText()
+								: null;
+//				for (JsonNode creatorId : jsonCreatorIds) {
+//					creatorIds.add(Integer.valueOf(creatorId.toString()));
+//				}
+				for (JsonNode statusId : jsonStatusObject) {
+					statusIds.add(Integer.valueOf(statusId.toString()));
+				}
+				// Order by defaut
+				if (sort == null || sort == "") {
+					sort = "id";
+				}
+				if (order == null || order == "") {
+					order = "desc";
+				}
+				if (statusIds.size() == 0) {
+					List<Status> statuses = statusRepositotyImpl.findAll();
+					for (Status status : statuses) {
+						statusIds.add(status.getId());
+					}
+				}
+				taskModels = taskRepository.findAllTaskAssigeToMe(employeeId, creatorIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, offset, limit);
+				totalItem = taskRepository.countAllTaskAssigeToMe(employeeId, creatorIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, totalItem, limit);
+				Pagination pagination = new Pagination();
+				pagination.setLimit(limit);
+				pagination.setPage(Integer.valueOf(page));
+				pagination.setTotalItem(totalItem);
+				Map<String, Object> results = new TreeMap<String, Object>();
+				results.put("pagination", pagination);
+				results.put("tasks", taskModels);
+				
+				if (results.size() > 0) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("OK", "Query produce successfully: ", results));
+				} else {
+					pagination.setPage(1);
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", results));
+				}
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			}
+
 		}
 }
 
