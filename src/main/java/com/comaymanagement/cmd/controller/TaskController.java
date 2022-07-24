@@ -169,7 +169,7 @@ public class TaskController {
 		return taskService.findAllHistoryByTaskID(taskId);
 	}
 	@PreAuthorize("@customRoleService.canView('task',principal)")
-	@PostMapping(value= "/AssigeToMe",produces = "application/json")
+	@PostMapping(value= "/assigeToMe",produces = "application/json")
 	public ResponseEntity<Object> findAllTaskAssigeToMe(@RequestBody String json,
 			@RequestParam(value="page",required = false) String page, 
 			@RequestParam(value="sort", required = false) String sort,
