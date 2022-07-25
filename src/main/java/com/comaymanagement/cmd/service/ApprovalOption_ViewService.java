@@ -1,0 +1,41 @@
+package com.comaymanagement.cmd.service;
+
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.comaymanagement.cmd.constant.Message;
+import com.comaymanagement.cmd.entity.ApprovalOption_View;
+import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.model.DepartmentModel;
+import com.comaymanagement.cmd.repositoryimpl.ApprovalOption_ViewRepository;
+import com.comaymanagement.cmd.repositoryimpl.ApprovalStepRepositoryImpl;
+import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class ApprovalOption_ViewService {
+	@Autowired
+	Message message;
+	@Autowired
+	ApprovalOption_ViewRepository approvalOptionReposiroty;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalOption_ViewService.class);
+	public ResponseEntity<Object> findAll(String name) {
+		name = name == null ? "" : name.trim();
+		List<ApprovalOption_View> approvalOption_Views = approvalOptionReposiroty.findAll(name);
+		
+		if (approvalOption_Views.size() > 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", approvalOption_Views));
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", ""));
+		}
+
+	}
+}

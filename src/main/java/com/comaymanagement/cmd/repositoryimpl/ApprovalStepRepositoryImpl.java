@@ -46,8 +46,14 @@ public class ApprovalStepRepositoryImpl implements IApprovalStepRepository{
 	
 	}
 	
-//	public List<ApprovalStepModel> toModel(List<ApprovalStep> approvalSteps){
-//		List<ApprovalStepModel> approvalStepModel = new ArrayList<>();
-////		 3 
-//	}
+	public List<ApprovalStepModel> toModel(List<ApprovalStep> approvalSteps){
+		List<ApprovalStepModel> approvalStepModels = new ArrayList<>();
+		for(ApprovalStep approvalStep : approvalSteps) {
+			ApprovalStepModel approvalStepModel = new ApprovalStepModel();
+			approvalStepModel.setIndex(approvalStep.getApprovalStepIndex());
+			approvalStepModel.setName(approvalStep.getApprovalStepName());
+			approvalStepModels.add(approvalStepModel);
+		}
+		return approvalStepModels;
+	}
 }

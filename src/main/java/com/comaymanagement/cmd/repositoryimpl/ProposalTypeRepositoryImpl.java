@@ -36,5 +36,19 @@ public class ProposalTypeRepositoryImpl implements IProposalTypeRepository{
 		}
 		return proposalType;
 	}
-
+	
+	public ProposalType findAll(String id) {
+		ProposalType proposalType = null;
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			StringBuilder hql = new StringBuilder();
+			hql.append("FROM proposal_types AS pt WHERE ");
+			Query<?> query = session.createQuery(hql.toString());
+			query.setParameter("id", Integer.valueOf(id));
+			proposalType = (ProposalType) query.getSingleResult();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+		}
+		return proposalType;
+	}
 }
