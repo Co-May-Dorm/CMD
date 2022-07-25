@@ -25,7 +25,7 @@ import com.comaymanagement.cmd.repository.IDepartmentRepository;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class DepartmentRepositoryImpl implements IDepartmentRepository {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DepartmentRepositoryImpl.class);
 	@Autowired
 	private SessionFactory sessionFactory;
 
