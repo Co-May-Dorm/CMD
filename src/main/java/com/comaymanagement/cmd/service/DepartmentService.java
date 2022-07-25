@@ -320,11 +320,12 @@ public class DepartmentService {
 		try {
 			Department dep = departmentRepository.findById(id);
 			DepartmentModel departmentModel = departmentRepository.toModel(dep);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("OK","", departmentModel));
 		} catch (Exception e) {
 			LOGGER.error("Error has occured at findById() ", e);
-			return null;
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("OK","Not found", ""));
 		}
 	}
 }

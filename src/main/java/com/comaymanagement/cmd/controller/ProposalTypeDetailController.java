@@ -22,10 +22,10 @@ public class ProposalTypeDetailController {
 	ProposalTypeDetailService proposalTypeDetailService;
 	
 	
-	@PreAuthorize("@customRoleService.canView('employee',principal) or @customRoleService.canViewAll('employee', principal)")
-	@GetMapping(value = "{id}", produces = "application/json")
-	public ResponseEntity<Object> findById(@PathVariable Integer id) {
-		ResponseEntity<Object> result = proposalTypeDetailService.findById(id);
-		return result;
-	}
+//	@PreAuthorize("@customRoleService.canView('employee',principal) or @customRoleService.canViewAll('employee', principal)")
+//	@GetMapping(value = "{id}", produces = "application/json")
+//	public ResponseEntity<Object> findById(@PathVariable Integer id) {
+//		ResponseEntity<Object> result = proposalTypeDetailService.findById(id);
+//		return result;
+//	}
 }

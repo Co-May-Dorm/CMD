@@ -309,11 +309,12 @@ public class TeamService {
 		try {
 			Team team = teamRepository.findById(id);
 			TeamModel teamModel = teamRepository.toModel(team);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseObject("OK","", teamModel));
 		} catch (Exception e) {
 			LOGGER.error("Error has occured at findById() ", e);
-			return null;
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR","Not found", ""));
 		}
 	}
 }
