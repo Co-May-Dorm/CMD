@@ -2,8 +2,6 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 import org.springframework.data.repository.query.Param;
 
 import com.comaymanagement.cmd.entity.Task;
@@ -20,22 +18,10 @@ public interface ITaskRepository {
 			@Param("offset") Integer offset,
 			@Param("limit") Integer limit);
 	
-	List<TaskModel> findAll( 
-			@Param("dep") String dep, 
-			@Param("title") String title, 
-			@Param("status") String status, 
-			@Param("creator") String creator, 
-			@Param("receiver") String receiver,
-			@Param("createDate") String createDate,
-			@Param("finishDate") String finishDate,
-			@Param("priority") String priority,
-			@Param("rate") String rate,
-			@Param("sort") String sort,
-			@Param("order") String order,
-			@Param("offset") Integer offset,
-			@Param("limit") Integer limit);
-	Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate,String priority, String rate, String sort, String order);
+	List<TaskModel> findAll(List<Integer> departmentIds, String title, List<Integer> status, List<Integer> creators, List<Integer> receivers,
+			String startDate, String finishDate,String priority, String rate, String sort, String order,Integer offset, Integer limit);
+	Integer countAllPaging(List<Integer> departmentIds, String title, List<Integer> status, List<Integer> creators, List<Integer> receivers,
+			String startDate, String finishDate,String priority, String rate, String sort, String order,Integer offset, Integer limit);
 	Integer countFindByIds(List<Integer> ids);
 	List<TaskModel> findByStatusIds(
 			@Param("status_id") List<Integer> statusIds,

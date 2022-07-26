@@ -79,29 +79,51 @@ public class TaskService {
 
 	}
 	
-	public ResponseEntity<Object> findAll(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate,String priority, String rate,String sort, String order, String page) {
-		dep = dep == null ? "" : dep.trim();
-		title = title == null ? "" : title.trim();
-		status = status == null ? "" : status.trim();
-		creator = creator == null ? "" : creator.trim();
-		receiver = receiver == null ? "" : receiver.trim();
-		createDate = createDate == null ? "" : createDate.trim();
-		finishDate = finishDate == null ? "" : finishDate.trim();
-		priority = priority == null ? "" : priority.trim();
-		rate = rate == null ? "" : rate.trim();
+	public ResponseEntity<Object> findAll(String json,String sort,String order,String page) {
+		JsonNode jsonObjectTask = null;
+		JsonMapper jsonMapper = new JsonMapper();
 		order = order == null || order == "" ? "DESC" : order;
 		sort = sort == null || sort == "" ? "id" : sort;
-		page = page == null ? "1" : page.trim();
+		page = ((page == null) || (page == "")) ? "1" : page.trim();
 		Integer limit = CMDConstrant.LIMIT;
 		// Caculator offset
-		int offset = (Integer.parseInt(page) - 1) * limit;
-		List<TaskModel> taskModelResult = new ArrayList<TaskModel>();
-		List<TaskModel> taskModelListTMP = new ArrayList<TaskModel>();
+		String title = null,startDate = null,finishDate = null,priority = null,rate = null;
+		List<TaskModel> taskModelResult = null;
+		List<TaskModel> taskModelListTMP = null;
+		List<Integer> statusIds = new ArrayList<Integer>();
+		List<Integer> creators = new ArrayList<Integer>();
+		List<Integer> receivers = new ArrayList<Integer>();
+		List<Integer> departmentIds = new ArrayList<Integer>();
+		
 		try {
-			Integer totalItem = taskRepository.countAllPaging(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order);
-			taskModelListTMP = taskRepository.findAll(dep, title, status, creator, receiver, createDate, finishDate, priority, rate, sort, order, offset, limit);
-			if(!dep.trim().equals("")) {
+			int offset = (Integer.valueOf(page) - 1) * limit;
+			jsonObjectTask = jsonMapper.readTree(json);
+			title = ((jsonObjectTask.get("title")== null)||(jsonObjectTask.get("title").asText() =="")) ? "": jsonObjectTask.get("title").asText();
+			startDate = ((jsonObjectTask.get("startDate")== null)||(jsonObjectTask.get("startDate").asText() =="")) 
+					? "": jsonObjectTask.get("startDate").asText();
+			finishDate = ((jsonObjectTask.get("finishDate")== null)||(jsonObjectTask.get("finishDate").asText() =="")) 
+					? "": jsonObjectTask.get("finishDate").asText();
+			priority = ((jsonObjectTask.get("priority")== null)||(jsonObjectTask.get("priority").asText() =="")) 
+					? "": jsonObjectTask.get("priority").asText();
+			rate = ((jsonObjectTask.get("rate")== null)||(jsonObjectTask.get("rate").asText() =="")) 
+					? "": jsonObjectTask.get("rate").asText();
+			
+			for(JsonNode jsonNode: jsonObjectTask.get("statusIds")) {
+				statusIds.add(jsonNode.asInt());
+			}
+			for(JsonNode jsonNode: jsonObjectTask.get("creatorIds")) {
+				creators.add(jsonNode.asInt());
+			}
+			for(JsonNode jsonNode: jsonObjectTask.get("receiverIds")) {
+				receivers.add(jsonNode.asInt());
+			}
+			for(JsonNode jsonNode: jsonObjectTask.get("departmentIds")) {
+				departmentIds.add(jsonNode.asInt());
+			}
+			Integer totalItem = taskRepository.countAllPaging(departmentIds, title, statusIds, creators, receivers, startDate, finishDate, priority, rate, sort, order,offset,limit);
+			taskModelListTMP = taskRepository.findAll(departmentIds, title, statusIds, creators, receivers, startDate, finishDate, priority, rate, sort, order,offset,limit);
+			taskModelResult = new ArrayList<TaskModel>();
+			if(departmentIds.size()>0) {
 				for(int i = offset; i < totalItem; i++) {
 					if(taskModelResult.size() >= limit) {
 						break;
@@ -115,7 +137,7 @@ public class TaskService {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
-			pagination.setTotalItem(totalItem);
+//			pagination.setTotalItem(totalItem);
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("tasks", taskModelResult);
