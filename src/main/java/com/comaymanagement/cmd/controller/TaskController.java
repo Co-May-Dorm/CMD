@@ -73,23 +73,15 @@ public class TaskController {
 	}*/
 	
 	@PreAuthorize("@customRoleService.canView('task',principal)")
-	@GetMapping(value= "",produces = "application/json")
+	@PostMapping(value= "",produces = "application/json")
 	public ResponseEntity<Object> findAll(				
-			@RequestParam(value="page",required = false) String page, 
-			@RequestParam(value="dep",required = false) String dep, 
-			@RequestParam(value="title",required = false) String title, 
-			@RequestParam(value="status", required = false) String status,  
-			@RequestParam(value="creator", required = false) String creator, 
-			@RequestParam(value="receiver", required = false) String receiver, 
-			@RequestParam(value="dateCreated", required = false) String createDate,
-			@RequestParam(value="dateFinish", required = false) String finishDate,
-			@RequestParam(value="priority", required = false) String priority,
-			@RequestParam(value="rate", required = false) String rate,
+			@RequestBody String json, 
+			@RequestParam(value="page", required = false) String page,
 			@RequestParam(value="sort", required = false) String sort,
 			@RequestParam(value="order", required = false) String order
 			) {
 		LOGGER.info("Get task list");
-		return taskService.findAll(dep,title,status,creator,receiver,createDate,finishDate,priority,rate,sort,order,page);
+		return taskService.findAll(json,sort,order,page);
 	}
 	
 	@PreAuthorize("@customRoleService.canCreate('task',principal)")

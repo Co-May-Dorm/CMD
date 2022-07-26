@@ -125,8 +125,8 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public List<TaskModel> findAll(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String priority, String rate, String sort, String order,
+	public List<TaskModel> findAll(List<Integer> departmentIds, String title, List<Integer> statusIds, List<Integer> creatorIds, List<Integer> receiverIds,
+			String startDate, String finishDate, String priority, String rate, String sort, String order,
 			Integer offset, Integer limit) {
 		Set<Task> taskSet = new LinkedHashSet<Task>();
 		List<TaskModel> customTaskList = new ArrayList<TaskModel>();
@@ -137,10 +137,17 @@ public class TaskRepositoryImpl implements ITaskRepository {
 //		hql.append("INNER JOIN c.departments as dep ");
 //		hql.append("WHERE dep.name LIKE CONCAT('%',:dep,'%') ");
 		hql.append("WHERE t.title LIKE CONCAT('%',:title,'%') ");
-		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
-		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
-		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
-		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
+		if(statusIds.size()>0) {
+			hql.append("AND s.id IN :statusIds ");
+		}
+		if(creatorIds.size()>0) {
+			hql.append("AND c.id IN :creatorIds ");
+		}
+		if(receiverIds.size()>0) {
+			hql.append("AND r.id IN :receiverIds ");
+		}
+
+		hql.append("AND t.createDate LIKE CONCAT('%',:startDate,'%') ");
 		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
 		hql.append("AND t.priority LIKE CONCAT('%',:priority,'%') ");
 		hql.append("AND t.rate LIKE CONCAT('%',:rate,'%') ");
@@ -151,14 +158,20 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
 			query.setParameter("title", title);
-			query.setParameter("status", status);
-			query.setParameter("creator", creator);
-			query.setParameter("receiver", receiver);
-			query.setParameter("createDate", createDate);
+			if(statusIds.size()>0) {
+				query.setParameter("statusIds", statusIds);
+			}
+			if(creatorIds.size()>0) {
+				query.setParameter("creatorIds", creatorIds);
+			}
+			if(receiverIds.size()>0) {
+				query.setParameter("receiverIds", receiverIds);
+			}
+			query.setParameter("startDate", startDate);
 			query.setParameter("finishDate", finishDate);
 			query.setParameter("priority", priority);
 			query.setParameter("rate", rate);
-			if (dep.trim().equals("")) {
+			if (departmentIds.size()==0) {
 				query.setFirstResult(offset);
 				query.setMaxResults(limit);
 			}
@@ -219,15 +232,17 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
 				customTask.setPriority(task.getPriority());
-				if (dep.trim().equals("")) {
+				if (departmentIds.size()==0) {
 					customTaskList.add(customTask);
 				} else {
 					boolean addFlag = false;
 					for (DepartmentModel departmentModel : departmentModels) {
-
-						if (departmentModel.getName().contains(dep)) {
-							addFlag = true;
+						for(Integer id : departmentIds) {
+							if (departmentModel.getId() == id) {
+								addFlag = true;
+							}
 						}
+
 					}
 					if (addFlag) {
 						customTaskList.add(customTask);
@@ -243,47 +258,66 @@ public class TaskRepositoryImpl implements ITaskRepository {
 	}
 
 	@Override
-	public Integer countAllPaging(String dep, String title, String status, String creator, String receiver,
-			String createDate, String finishDate, String priority, String rate, String sort, String order) {
+	public Integer countAllPaging(List<Integer> departmentIds, String title, List<Integer> statusIds, List<Integer> creatorIds, List<Integer> receiverIds,
+			String startDate, String finishDate, String priority, String rate, String sort, String order,
+			Integer offset, Integer limit) {
 		Integer count = 0;
 		StringBuilder hql = new StringBuilder("FROM tasks AS t ");
 		hql.append("INNER JOIN t.creator as c ");
 		hql.append("INNER JOIN t.status as s ");
 		hql.append("INNER JOIN t.receiver as r ");
+//		hql.append("INNER JOIN c.departments as dep ");
+//		hql.append("WHERE dep.name LIKE CONCAT('%',:dep,'%') ");
 		hql.append("WHERE t.title LIKE CONCAT('%',:title,'%') ");
-		hql.append("AND s.name LIKE CONCAT('%',:status,'%') ");
-		hql.append("AND c.name LIKE CONCAT('%',:creator,'%') ");
-		hql.append("AND r.name LIKE CONCAT('%',:receiver,'%') ");
+		if(statusIds.size()>0) {
+			hql.append("AND s.id IN :statusIds ");
+		}
+		if(creatorIds.size()>0) {
+			hql.append("AND c.id IN :creatorIds ");
+		}
+		if(receiverIds.size()>0) {
+			hql.append("AND r.id IN :receiverIds ");
+		}
+
+		hql.append("AND t.createDate LIKE CONCAT('%',:startDate,'%') ");
+		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
 		hql.append("AND t.priority LIKE CONCAT('%',:priority,'%') ");
 		hql.append("AND t.rate LIKE CONCAT('%',:rate,'%') ");
-		hql.append("AND t.createDate LIKE CONCAT('%',:createDate,'%') ");
-		hql.append("AND t.finishDate LIKE CONCAT('%',:finishDate,'%') ");
-		hql.append("order by t." + sort + " " + order);
-
 		try {
 			Session session = sessionFactory.getCurrentSession();
 			Query query = session.createQuery(hql.toString());
 			LOGGER.info(hql.toString());
 			query.setParameter("title", title);
-			query.setParameter("status", status);
-			query.setParameter("creator", creator);
-			query.setParameter("receiver", receiver);
-			query.setParameter("createDate", createDate);
+			if(statusIds.size()>0) {
+				query.setParameter("status", statusIds);
+			}
+			if(creatorIds.size()>0) {
+				query.setParameter("creatorIds", creatorIds);
+			}
+			if(receiverIds.size()>0) {
+				query.setParameter("receiverIds", receiverIds);
+			}
+			query.setParameter("startDate", startDate);
 			query.setParameter("finishDate", finishDate);
 			query.setParameter("priority", priority);
 			query.setParameter("rate", rate);
+			if (departmentIds.size()==0) {
+				query.setFirstResult(offset);
+				query.setMaxResults(limit);
+			}
 
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();
 				Task task = (Task) obj[0];
-				if (dep.trim().equals("")) {
+				if (departmentIds.size()==0) {
 					count++;
 				} else {
 					boolean addFlag = false;
 					for (Department department : task.getCreator().getDepartments()) {
-
-						if (department.getName().contains(dep)) {
-							addFlag = true;
+						for(Integer id : departmentIds) {
+							if (department.getId() == id) {
+								addFlag = true;
+							}
 						}
 					}
 					if (addFlag) {
