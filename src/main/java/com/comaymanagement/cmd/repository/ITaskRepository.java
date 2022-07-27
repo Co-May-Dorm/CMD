@@ -60,10 +60,20 @@ public interface ITaskRepository {
 			@Param("department") String department
 	);
 	List<TaskHis> findAllHistoryByTaskID(Integer taskId);
+	
 	List<TaskModel> findAllTaskAssigeToMe(Integer employeeId,List<Integer> creatorIds,
 			List<Integer> departmentIds, List<Integer> statusIds,Integer rate,String startDate,
 			String finishDate, String sort, String order, Integer offset, Integer limit);
+	
 	Integer countAllTaskAssigeToMe(Integer employeeId,List<Integer> creatorIds,
+			List<Integer> departmentIds, List<Integer> statusIds,Integer rate,String startDate,
+			String finishDate, String sort, String order, Integer offset, Integer limit);
+	
+	List<TaskModel> findAllTaskCreatedByMe(Integer employeeId,List<Integer> receiverIds,
+			List<Integer> departmentIds, List<Integer> statusIds,Integer rate,String startDate,
+			String finishDate, String sort, String order, Integer offset, Integer limit);
+	
+	Integer countAllTaskCreatedByMe(Integer employeeId,List<Integer> receiverIds,
 			List<Integer> departmentIds, List<Integer> statusIds,Integer rate,String startDate,
 			String finishDate, String sort, String order, Integer offset, Integer limit);
 }

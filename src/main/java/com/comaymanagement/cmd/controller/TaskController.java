@@ -166,5 +166,13 @@ public class TaskController {
 			@RequestParam(value="order", required = false) String order){
 		return taskService.findAllTaskAssigeToMe(json, sort, order, page);
 	}
+	@PreAuthorize("@customRoleService.canView('task',principal)")
+	@PostMapping(value= "/create-by-me",produces = "application/json")
+	public ResponseEntity<Object> findAllTaskCreatedByMe(@RequestBody String json,
+			@RequestParam(value="page",required = false) String page, 
+			@RequestParam(value="sort", required = false) String sort,
+			@RequestParam(value="order", required = false) String order){
+		return taskService.findAllTaskTaskCreatedByMe(json, sort, order, page);
+	}
 }
 

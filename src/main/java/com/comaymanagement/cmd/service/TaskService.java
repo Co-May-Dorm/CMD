@@ -541,5 +541,97 @@ public class TaskService {
 			}
 
 		}
+public ResponseEntity<Object> findAllTaskTaskCreatedByMe(String json, String sort, String order, String page){
+			
+			JsonMapper jsonMapper = new JsonMapper();
+			JsonNode jsonObject;
+			String startDate = null;
+			String finishDate = null;
+			List<Integer> receiverIds = new ArrayList<Integer>();
+			List<Integer> statusIds = new ArrayList<Integer>();
+			List<Integer> departmentIds = new ArrayList<Integer>();;
+			List<TaskModel> taskModelResult = null;
+			List<TaskModel> taskModelListTMP = null;
+			Integer rate = null;
+			Integer limit = CMDConstrant.LIMIT;
+			Integer totalItem = 0;
+			UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			try {
+				page = page == null ? "1" : page.trim();
+				int offset = (Integer.valueOf(page) - 1) * limit;
+				jsonObject = jsonMapper.readTree(json);
+				JsonNode jsonCreatorIds = jsonObject.get("receiverIds");
+//				JsonNode jsonReceiverIds = jsonObject.get("receiverIds");
+				JsonNode jsonStatusObject = jsonObject.get("statusIds");
+				rate = (jsonObject.get("rate") != null && !jsonObject.get("rate").asText().equals("null")
+						&& jsonObject.get("rate").asInt() != 0) ? jsonObject.get("rate").asInt() : null;
+				
+				startDate = (jsonObject.get("startDate") != null
+						&& !jsonObject.get("startDate").asText().equals("null")
+						&& !jsonObject.get("startDate").asText().equals(""))
+								? jsonObject.get("startDate").asText()
+								: null;
+				finishDate = (jsonObject.get("finishDate") != null
+						&& !jsonObject.get("finishDate").asText().equals("null")
+						&& !jsonObject.get("finishDate").asText().equals("")) ? jsonObject.get("finishDate").asText()
+								: null;
+				for (JsonNode receiverId : jsonCreatorIds) {
+					receiverIds.add(Integer.valueOf(receiverId.toString()));
+				}
+				for (JsonNode statusId : jsonStatusObject) {
+					statusIds.add(Integer.valueOf(statusId.toString()));
+				}
+				for(JsonNode jsonNode: jsonObject.get("departmentIds")) {
+					departmentIds.add(jsonNode.asInt());
+				}
+				// Order by defaut
+				if (sort == null || sort == "") {
+					sort = "id";
+				}
+				if (order == null || order == "") {
+					order = "desc";
+				}
+				if (statusIds.size() == 0) {
+					List<Status> statuses = statusRepositotyImpl.findAll();
+					for (Status status : statuses) {
+						statusIds.add(status.getId());
+					}
+				}
+				
+				taskModelListTMP = taskRepository.findAllTaskCreatedByMe(userDetail.getId(), receiverIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, offset, limit);
+				totalItem = taskRepository.countAllTaskCreatedByMe(userDetail.getId(), receiverIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, totalItem, limit);
+				taskModelResult = new ArrayList<TaskModel>();
+				if(departmentIds.size()>0) {
+					for(int i = offset; i < totalItem; i++) {
+						if(taskModelResult.size() >= limit) {
+							break;
+						}
+						taskModelResult.add(taskModelListTMP.get(i));
+					}
+				}else {
+					taskModelResult = taskModelListTMP;
+				}
+				Pagination pagination = new Pagination();
+				pagination.setLimit(limit);
+				pagination.setPage(Integer.valueOf(page));
+				pagination.setTotalItem(totalItem);
+				Map<String, Object> results = new TreeMap<String, Object>();
+				results.put("pagination", pagination);
+				results.put("tasks", taskModelResult);
+				
+				if (results.size() > 0) {
+					return ResponseEntity.status(HttpStatus.OK)
+							.body(new ResponseObject("OK", "Query produce successfully: ", results));
+				} else {
+					pagination.setPage(1);
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Not found", "Not found", results));
+				}
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObject("ERROR", e.getMessage(), ""));
+			}
+
+		}
 }
 
