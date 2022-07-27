@@ -1,6 +1,8 @@
 package com.comaymanagement.cmd.repositoryimpl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,11 +12,15 @@ import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Post;
+import com.comaymanagement.cmd.model.LikeModel;
 import com.comaymanagement.cmd.repository.IPostRepository;
+import com.comaymanagement.cmd.service.UserDetailsImpl;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class PostRepositoryImpl implements IPostRepository{
@@ -23,6 +29,9 @@ public class PostRepositoryImpl implements IPostRepository{
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@Autowired
+	EmployeeRepositoryImpl employeeRepository;
+	
 	@Override
 	public List<Post> findAll(String title, String content, String sort, String order) {
 		StringBuilder hql = new StringBuilder();
@@ -100,6 +109,45 @@ public class PostRepositoryImpl implements IPostRepository{
 			LOGGER.error("Error has occured in delete() ", e);
 			return "0";
 		}
+	}
+	@Override
+	public LikeModel like(Integer postId) {
+		List<Employee> employees = null;
+		UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		Employee employee = employeeRepository.findById(userDetail.getId());
+		Post post = findById(postId);
+		if(null != post && null != post.getEmployees()) {
+			employees = post.getEmployees();
+			boolean like = true;
+			for(Employee item: employees) {
+				if(item.getId()==employee.getId()) {
+					like = false;
+					break;
+				}
+			}
+			if(like) {
+				employees.add(employee);
+				post.setLikeTotal(post.getLikeTotal()+1);
+			}else {
+				employees.remove(employee);
+				post.setLikeTotal(post.getLikeTotal()-1);
+			}
+		}else {
+			employees = new ArrayList<Employee>();
+			employees.add(employee);
+			post.setLikeTotal(post.getLikeTotal()+1);
+		}
+		Integer result = edit(post);
+		if(result != 1) {
+			return null;
+		}
+		LikeModel likeModel = new LikeModel();
+		likeModel.setPostId(postId);
+		likeModel.setLikeTotal(post.getLikeTotal());
+		String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
+		likeModel.setCreateDate(createDate);
+		return likeModel;
 	}
 
 }

@@ -18,6 +18,7 @@ import com.comaymanagement.cmd.constant.Message;
 import com.comaymanagement.cmd.entity.Employee;
 import com.comaymanagement.cmd.entity.Post;
 import com.comaymanagement.cmd.entity.ResponseObject;
+import com.comaymanagement.cmd.model.LikeModel;
 import com.comaymanagement.cmd.repository.IPostRepository;
 import com.comaymanagement.cmd.repositoryimpl.EmployeeRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -123,22 +124,41 @@ public class PostService {
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR",e.getMessage(), ""));
 		}
 	}
-	public ResponseEntity<Object> delete(Integer id){
-		Post postDelete = (Post)  postRepositoryImpl.findById(id);
+
+	public ResponseEntity<Object> delete(Integer id) {
+		Post postDelete = (Post) postRepositoryImpl.findById(id);
 		String deleteStatus = postRepositoryImpl.delete(id);
 		try {
 			if (deleteStatus.equals("1")) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", message.getMessageByItemCode("POSTS3"), ""));
-		} else {
 				return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSTS3"), ""));
+						.body(new ResponseObject("OK", message.getMessageByItemCode("POSTS3"), ""));
+			} else {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSTS3"), ""));
 
 			}
 		} catch (Exception e) {
 			LOGGER.error("Has error: ", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new ResponseObject("ERROR", e.getMessage(), ""));
-			}
 		}
+	}
+	public ResponseEntity<Object> like(Integer postId) {
+		LikeModel likeModel = null;
+		try {
+			likeModel = postRepositoryImpl.like(postId);
+			if (null != likeModel) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("OK", message.getMessageByItemCode("POSTS4"), likeModel));
+			} else {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseObject("ERROR", message.getMessageByItemCode("POSTE4"), likeModel));
+			}
+		} catch (Exception e) {
+			LOGGER.error("Has error: ", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseObject("ERROR", e.getMessage(), ""));
+		}
+	}
 	
 }

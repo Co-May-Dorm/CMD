@@ -1,11 +1,15 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -41,4 +45,12 @@ public class Post {
 	private String createDate;
 	@Column(name="modify_date")
 	private String modifyDate;
+	@Column(name="like_total")
+	private Integer likeTotal;
+	
+	@ManyToMany()
+	@JoinTable(name = "post_favourite", joinColumns = {
+			@JoinColumn(name = "post_id", referencedColumnName = "id") }, inverseJoinColumns = {
+					@JoinColumn(name = "employee_id", referencedColumnName = "id") })
+	private List<Employee> employees;
 }
