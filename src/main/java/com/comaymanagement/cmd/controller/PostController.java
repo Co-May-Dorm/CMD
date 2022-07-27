@@ -52,4 +52,11 @@ public class PostController {
 		return postService.delete(id);
 	}
 	
+	@PreAuthorize("@customRoleService.canDelete('post',principal)")
+	@GetMapping("/{postId}/likes")
+	public ResponseEntity<Object> like(
+			@PathVariable(name = "postId") Integer postId) {
+		return postService.like(postId);
+	}
+	
 }
