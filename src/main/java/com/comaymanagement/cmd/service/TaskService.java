@@ -137,7 +137,7 @@ public class TaskService {
 			Pagination pagination = new Pagination();
 			pagination.setLimit(limit);
 			pagination.setPage(Integer.valueOf(page));
-//			pagination.setTotalItem(totalItem);
+			pagination.setTotalItem(totalItem);
 			Map<String, Object> results = new TreeMap<String, Object>();
 			results.put("pagination", pagination);
 			results.put("tasks", taskModelResult);
