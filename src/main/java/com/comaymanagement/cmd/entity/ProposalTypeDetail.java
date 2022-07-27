@@ -29,7 +29,9 @@ public class ProposalTypeDetail {
 	@Column(name="field_id")
 	private String fieldId;
 	@Column(name="field_name")
-	private String fieldName;
+	private String name;
+	@Column(name="label")
+	private String label;
 	@Column(name="create_by")
 	private Integer createBy;
 	@Column(name="modify_by")
@@ -46,4 +48,10 @@ public class ProposalTypeDetail {
 	@OneToOne()
 	@JoinColumn(name = "data_type_id")
 	private DataType dataType;
+	private String placeholder;
+	private String description;
+	@Column(name="is_required")
+	private boolean isRequired;
+	private String feedback;
+	
 }

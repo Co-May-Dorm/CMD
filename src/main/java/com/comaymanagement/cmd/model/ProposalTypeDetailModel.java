@@ -28,8 +28,14 @@ public class ProposalTypeDetailModel {
 //	private ProposalType proposalType;
 	// Array of field
 	private Integer id; // field id
-	private String fieldName;
+	private String name;
+	private String label;
+	private String placeholder;
+	private String description;
+	private boolean isRequired;
+	private String feedback;
 	private DataType dataType;
+	
 //	List<ApprovalStepModel> approvalStepModels; 
 }
 
