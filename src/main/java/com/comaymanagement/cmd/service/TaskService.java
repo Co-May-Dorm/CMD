@@ -207,7 +207,7 @@ public class TaskService {
 			Task task = new Task();
 			Integer statusId = jsonObjectTask.get("statusId") != null ? jsonObjectTask.get("statusId").asInt() : -1;
 			Integer receiverId = jsonObjectTask.get("receiverId") != null ? jsonObjectTask.get("receiverId").asInt() : -1;
-			Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
+//			Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
 			String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
 			String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
 			String createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime());
@@ -216,8 +216,9 @@ public class TaskService {
 			Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
 			Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;
 			String startDate = jsonObjectTask.get("startDate") != null ? jsonObjectTask.get("startDate").asText() : "";
-			
-			Employee creator = employeeRepositoryImpl.findById(creatorId);
+			UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			Employee creator = employeeRepositoryImpl.findById(userDetail.getId());
 			if(creator == null) {
 				return ResponseEntity.status(HttpStatus.OK)
 						.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("EMPE8"), ""));
@@ -334,7 +335,7 @@ public class TaskService {
 				Integer id = jsonObjectTask.get("id").asInt();
 				Integer statusId = jsonObjectTask.get("statusId") != null ? jsonObjectTask.get("statusId").asInt() : -1;
 				Integer receiverId = jsonObjectTask.get("receiverId") != null ? jsonObjectTask.get("receiverId").asInt() : -1;
-				Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
+//				Integer creatorId = jsonObjectTask.get("creatorId") != null ? jsonObjectTask.get("creatorId").asInt() : -1;
 				String title = jsonObjectTask.get("title") != null ? jsonObjectTask.get("title").asText() : "";
 				String description = jsonObjectTask.get("description") != null ? jsonObjectTask.get("description").asText() : "";
 				String createDate = jsonObjectTask.get("createDate") != null ? jsonObjectTask.get("createDate").asText() : "";;
@@ -343,8 +344,9 @@ public class TaskService {
 				Integer rate = jsonObjectTask.get("rate") != null ? jsonObjectTask.get("rate").asInt() : 1;
 				Integer priority = jsonObjectTask.get("priority") != null ? jsonObjectTask.get("priority").asInt() : 1;
 				String startDate = jsonObjectTask.get("startDate") != null ? jsonObjectTask.get("startDate").asText() : "";
-				
-				Employee creator = employeeRepositoryImpl.findById(creatorId);
+				UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+						.getPrincipal();
+				Employee creator = employeeRepositoryImpl.findById(userDetail.getId());
 				if(creator == null) {
 					return ResponseEntity.status(HttpStatus.OK)
 							.body(new ResponseObject("NOT FOUND",message.getMessageByItemCode("EMPE8"), ""));
