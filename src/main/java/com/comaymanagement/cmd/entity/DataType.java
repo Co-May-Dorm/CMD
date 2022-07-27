@@ -29,7 +29,6 @@ public class DataType {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String name;
-	private String description;
 
 	@OneToMany
 	@JoinColumn(name = "data_type_id")

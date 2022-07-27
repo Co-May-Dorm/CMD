@@ -57,7 +57,12 @@ private static final Logger LOGGER = LoggerFactory.getLogger(PositionRepositoryI
 		for(ProposalTypeDetail proTypeDetail : proposalTypeDetails) {
 			ProposalTypeDetailModel proTypeDetailModel = new ProposalTypeDetailModel();
 			proTypeDetailModel.setId(proTypeDetail.getId());
-			proTypeDetailModel.setFieldName(proTypeDetail.getFieldName());
+			proTypeDetailModel.setName(proTypeDetail.getName());
+			proTypeDetailModel.setLabel(proTypeDetail.getLabel());
+			proTypeDetailModel.setPlaceholder(proTypeDetail.getPlaceholder());
+			proTypeDetailModel.setRequired(proTypeDetail.isRequired());
+			proTypeDetailModel.setDescription(proTypeDetail.getDescription());
+			proTypeDetailModel.setFeedback(proTypeDetail.getFeedback());
 			proTypeDetailModel.setDataType(proTypeDetail.getDataType());
 			proTypeDetailModels.add(proTypeDetailModel);
 		}

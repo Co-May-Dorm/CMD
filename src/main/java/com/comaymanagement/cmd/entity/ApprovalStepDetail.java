@@ -1,5 +1,7 @@
 package com.comaymanagement.cmd.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,11 +34,11 @@ public class ApprovalStepDetail {
 	private ApprovalStep approvalStep;
 
 	@Column(name = "department_id")
-	private String departmentId;
+	private Integer departmentId;
 
 	@Column(name = "position_id")
-	private String positionId;
+	private Integer positionId;
 
 	@Column(name = "employee_id")
-	private String employeeId;
+	private Integer employeeId;
 }

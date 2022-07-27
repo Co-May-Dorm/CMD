@@ -1,11 +1,14 @@
 package com.comaymanagement.cmd.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.comaymanagement.cmd.entity.ApprovalOption_View;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -20,7 +23,8 @@ import lombok.Setter;
 @Entity
 @JsonInclude(Include.NON_NULL)
 public class ApprovalStepModel {
-//	private Integer id;
+	private Integer id;
 	private String index;
 	private String name;
+	private List<ApprovalOption_View>  approvalConfigTargets;
 }

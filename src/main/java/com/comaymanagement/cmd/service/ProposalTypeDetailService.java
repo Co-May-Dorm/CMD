@@ -13,11 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.comaymanagement.cmd.constant.Message;
+import com.comaymanagement.cmd.entity.ApprovalOption_View;
 import com.comaymanagement.cmd.entity.ApprovalStep;
+import com.comaymanagement.cmd.entity.ApprovalStepDetail;
 import com.comaymanagement.cmd.entity.ProposalTypeDetail;
 import com.comaymanagement.cmd.entity.ResponseObject;
 import com.comaymanagement.cmd.model.ApprovalStepModel;
 import com.comaymanagement.cmd.model.ProposalTypeDetailModel;
+import com.comaymanagement.cmd.repositoryimpl.ApprovalOption_ViewRepository;
+import com.comaymanagement.cmd.repositoryimpl.ApprovalStepDetailRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.ApprovalStepRepositoryImpl;
 import com.comaymanagement.cmd.repositoryimpl.ProposalTypeDetailRepositoryImpl;
 
@@ -31,20 +35,48 @@ public class ProposalTypeDetailService {
 	ProposalTypeDetailRepositoryImpl proposalTypeDetailReposiotory;
 	@Autowired
 	ApprovalStepRepositoryImpl approvalStepRepository;
-	
+	@Autowired
+	ApprovalStepDetailRepositoryImpl approvalStepDetailRepository;
+	@Autowired
+	ApprovalOption_ViewRepository approvalOptionReposiroty;
 	public ResponseEntity<Object> findById(Integer id){
 		List<ProposalTypeDetail> proposalTypeDetails= new ArrayList<>();
 		List<ApprovalStep> approvalSteps = new ArrayList<>();
 		List<ProposalTypeDetailModel> proposalTypeDetailModels = new ArrayList<>();
 		List<ApprovalStepModel> approvalStepModels = new ArrayList<>();
-		
+//		List<ApprovalStepDetail> approvalStepDetails = new ArrayList<>();
+		List<ApprovalOption_View> approvalOptionViews;
 		approvalSteps = approvalStepRepository.findByProposalTypeId(id);
-		
 		proposalTypeDetails = proposalTypeDetailReposiotory.findById(id);
-		
-		if (proposalTypeDetails.size() > 0) {
+		List<ApprovalStepDetail> tmp = new ArrayList<>();
+		if (proposalTypeDetails.size() > 0 && approvalSteps.size() > 0) {
 			proposalTypeDetailModels = proposalTypeDetailReposiotory.toModel(proposalTypeDetails);
 			approvalStepModels = approvalStepRepository.toModel(approvalSteps);
+			// have list of all emp or dep or position in all step of proposal
+			for(ApprovalStepModel approvalStepModel : approvalStepModels) {
+				tmp  = approvalStepDetailRepository.findAllByApprovalStepId(approvalStepModel.getId());
+				approvalOptionViews = new ArrayList<>();
+				for(ApprovalStepDetail appStepDetail : tmp) {
+					// have list of all emp or dep or position in all step of proposal
+//					approvalStepDetails.add(appStepDetail);
+					ApprovalOption_View approvalOptionEmp = approvalOptionReposiroty.findById(appStepDetail.getEmployeeId(),"employees");
+					ApprovalOption_View approvalOptionDep  = approvalOptionReposiroty.findById(appStepDetail.getDepartmentId(),"departments");
+					ApprovalOption_View approvalOptionPos  = approvalOptionReposiroty.findById(appStepDetail.getPositionId(),"positions");
+					if(approvalOptionEmp!=null) {
+						approvalOptionViews.add(approvalOptionEmp);
+					}
+					if(approvalOptionDep!=null) {
+						approvalOptionViews.add(approvalOptionDep);
+					}
+					if(approvalOptionPos!=null) {
+						approvalOptionViews.add(approvalOptionPos);
+					}
+					
+				}
+				tmp.clear();
+				approvalStepModel.setApprovalConfigTargets(approvalOptionViews);
+			}
+			
 			Map<String, Object> result = new TreeMap<>();
 			result.put("fields", proposalTypeDetailModels);
 			result.put("steps", approvalStepModels);

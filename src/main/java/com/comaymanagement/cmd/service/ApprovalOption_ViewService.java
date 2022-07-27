@@ -28,7 +28,7 @@ public class ApprovalOption_ViewService {
 	ApprovalOption_ViewRepository approvalOptionReposiroty;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalOption_ViewService.class);
 	public ResponseEntity<Object> findAll(String name) {
-		name = name == null ? "" : name.trim();
+		name = name != null ? name.trim() : "";
 		List<ApprovalOption_View> approvalOption_Views = approvalOptionReposiroty.findAll(name);
 		
 		if (approvalOption_Views.size() > 0) {
@@ -38,4 +38,17 @@ public class ApprovalOption_ViewService {
 		}
 
 	}
+	public ResponseEntity<Object> findById(Integer id, String table) {
+		id = id != null ? id : -1;
+		table = table !=null ? table : "";
+		ApprovalOption_View approvalOption_View = approvalOptionReposiroty.findById(id, table);
+		
+		if (approvalOption_View!=null) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", "", approvalOption_View));
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("ERROR", "Not found", ""));
+		}
+		
+	}
+	
 }
