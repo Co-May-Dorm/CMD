@@ -449,41 +449,31 @@ public class TaskService {
 		}
 		
 		public ResponseEntity<Object> findAllTaskAssigeToMe(String json, String sort, String order, String page){
+			
 			List<TaskModel> taskModels = null;
 			JsonMapper jsonMapper = new JsonMapper();
 			JsonNode jsonObject;
 			String startDate = null;
 			String finishDate = null;
 			List<Integer> creatorIds = new ArrayList<Integer>();
-			List<Integer> receiverIds = new ArrayList<Integer>();
 			List<Integer> statusIds = new ArrayList<Integer>();
 			List<Integer> departmentIds = new ArrayList<Integer>();;
+			List<TaskModel> taskModelResult = null;
+			List<TaskModel> taskModelListTMP = null;
 			Integer rate = null;
-			Integer employeeId = null;
 			Integer limit = CMDConstrant.LIMIT;
 			Integer totalItem = 0;
-			/*
-			 (Integer employeeId, List<Integer> creatorId, List<Integer> reveiverId,
-			List<Integer> departmentId, List<Integer> statusId, Integer rate, String createDate, String finishDate,
-			String sort, String order, Integer offset, Integer limit) 
-			*/
 			UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 			try {
 				page = page == null ? "1" : page.trim();
 				int offset = (Integer.valueOf(page) - 1) * limit;
 				jsonObject = jsonMapper.readTree(json);
-//				JsonNode jsonCreatorIds = jsonObject.get("creatorIds");
+				JsonNode jsonCreatorIds = jsonObject.get("creatorIds");
 //				JsonNode jsonReceiverIds = jsonObject.get("receiverIds");
 				JsonNode jsonStatusObject = jsonObject.get("statusIds");
 				rate = (jsonObject.get("rate") != null && !jsonObject.get("rate").asText().equals("null")
 						&& jsonObject.get("rate").asInt() != 0) ? jsonObject.get("rate").asInt() : null;
-				employeeId = (jsonObject.get("employeeId") != null && !jsonObject.get("employeeId").asText().equals("null")
-						&& jsonObject.get("employeeId").asInt() != 0) ? jsonObject.get("employeeId").asInt() : null;
-				if(null == employeeId) {
-					return ResponseEntity.status(HttpStatus.OK)
-							.body(new ResponseObject("ERROR", message.getMessageByItemCode("TASKE4"), ""));
-				}
 				
 				startDate = (jsonObject.get("startDate") != null
 						&& !jsonObject.get("startDate").asText().equals("null")
@@ -494,11 +484,14 @@ public class TaskService {
 						&& !jsonObject.get("finishDate").asText().equals("null")
 						&& !jsonObject.get("finishDate").asText().equals("")) ? jsonObject.get("finishDate").asText()
 								: null;
-//				for (JsonNode creatorId : jsonCreatorIds) {
-//					creatorIds.add(Integer.valueOf(creatorId.toString()));
-//				}
+				for (JsonNode creatorId : jsonCreatorIds) {
+					creatorIds.add(Integer.valueOf(creatorId.toString()));
+				}
 				for (JsonNode statusId : jsonStatusObject) {
 					statusIds.add(Integer.valueOf(statusId.toString()));
+				}
+				for(JsonNode jsonNode: jsonObject.get("departmentIds")) {
+					departmentIds.add(jsonNode.asInt());
 				}
 				// Order by defaut
 				if (sort == null || sort == "") {
@@ -513,15 +506,27 @@ public class TaskService {
 						statusIds.add(status.getId());
 					}
 				}
-				taskModels = taskRepository.findAllTaskAssigeToMe(employeeId, creatorIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, offset, limit);
-				totalItem = taskRepository.countAllTaskAssigeToMe(employeeId, creatorIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, totalItem, limit);
+				
+				taskModelListTMP = taskRepository.findAllTaskAssigeToMe(userDetail.getId(), creatorIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, offset, limit);
+				totalItem = taskRepository.countAllTaskAssigeToMe(userDetail.getId(), creatorIds, departmentIds, statusIds, rate, startDate, finishDate, sort, order, totalItem, limit);
+				taskModelResult = new ArrayList<TaskModel>();
+				if(departmentIds.size()>0) {
+					for(int i = offset; i < totalItem; i++) {
+						if(taskModelResult.size() >= limit) {
+							break;
+						}
+						taskModelResult.add(taskModelListTMP.get(i));
+					}
+				}else {
+					taskModelResult = taskModelListTMP;
+				}
 				Pagination pagination = new Pagination();
 				pagination.setLimit(limit);
 				pagination.setPage(Integer.valueOf(page));
 				pagination.setTotalItem(totalItem);
 				Map<String, Object> results = new TreeMap<String, Object>();
 				results.put("pagination", pagination);
-				results.put("tasks", taskModels);
+				results.put("tasks", taskModelResult);
 				
 				if (results.size() > 0) {
 					return ResponseEntity.status(HttpStatus.OK)

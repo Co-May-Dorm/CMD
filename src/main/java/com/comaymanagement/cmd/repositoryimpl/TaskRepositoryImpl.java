@@ -1039,11 +1039,14 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			Session session = sessionFactory.getCurrentSession();
 			StringBuilder hql = new StringBuilder();
 			hql.append("FROM tasks AS tas ");
-			hql.append("INNER JOIN tas.creator ");
+			hql.append("INNER JOIN tas.creator AS cre ");
 			hql.append("INNER JOIN tas.status AS st ");
 			hql.append("INNER JOIN tas.receiver ");
-			hql.append("WHERE tas.creator.id = " + employeeId + " OR tas.receiver.id = " + employeeId);
+			hql.append("WHERE tas.receiver.id = " + employeeId);
 			hql.append(" AND st.id IN (:statusIds) ");
+			if(creatorIds.size()>0) {
+				hql.append("AND cre.id IN (:creatorIds) ");
+			}
 			if (rate != null) {
 				hql.append("AND tas.rate = :rate ");
 			}
@@ -1057,6 +1060,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			LOGGER.info(hql.toString());
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("statusIds", statusIds);
+			if(creatorIds.size()>0) {
+				query.setParameter("creatorIds", creatorIds);
+			}
 			if (startDate != null) {
 				query.setParameter("startDate", startDate);
 			}
@@ -1065,6 +1071,10 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			}
 			if (rate != null) {
 				query.setParameter("rate", rate);
+			}
+			if (departmentIds.size()==0) {
+				query.setFirstResult(offset);
+				query.setMaxResults(limit);
 			}
 			customTasks = new ArrayList<TaskModel>();
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
@@ -1120,7 +1130,22 @@ public class TaskRepositoryImpl implements ITaskRepository {
 				customTask.setDescription(task.getDescription());
 				customTask.setRate(task.getRate());
 				customTask.setPriority(task.getPriority());
-				customTasks.add(customTask);
+				if (departmentIds.size()==0) {
+					customTasks.add(customTask);
+				} else {
+					boolean addFlag = false;
+					for (DepartmentModel departmentModel : departmentModels) {
+						for(Integer id : departmentIds) {
+							if (departmentModel.getId() == id) {
+								addFlag = true;
+							}
+						}
+
+					}
+					if (addFlag) {
+						customTasks.add(customTask);
+					}
+				}
 
 			}
 			return customTasks;
@@ -1136,14 +1161,18 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			Integer offset, Integer limit) {
 		try {
 			Integer countTotal = 0;
+			List<TaskModel> customTasks = null;
 			Session session = sessionFactory.getCurrentSession();
 			StringBuilder hql = new StringBuilder();
 			hql.append("FROM tasks AS tas ");
-			hql.append("INNER JOIN tas.creator ");
+			hql.append("INNER JOIN tas.creator AS cre ");
 			hql.append("INNER JOIN tas.status AS st ");
 			hql.append("INNER JOIN tas.receiver ");
-			hql.append("WHERE tas.creator.id = " + employeeId + " OR tas.receiver.id = " + employeeId);
+			hql.append("WHERE tas.receiver.id = " + employeeId);
 			hql.append(" AND st.id IN (:statusIds) ");
+			if(creatorIds.size()>0) {
+				hql.append("AND cre.id IN (:creatorIds)");
+			}
 			if (rate != null) {
 				hql.append("AND tas.rate = :rate ");
 			}
@@ -1153,9 +1182,11 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			if (finishDate != null) {
 				hql.append("AND tas.finishDate = :finishDate");
 			}
-			LOGGER.info(hql.toString());
 			Query query = session.createQuery(hql.toString());
 			query.setParameter("statusIds", statusIds);
+			if(creatorIds.size()>0) {
+				query.setParameter("creatorIds", creatorIds);
+			}
 			if (startDate != null) {
 				query.setParameter("startDate", startDate);
 			}
@@ -1165,9 +1196,28 @@ public class TaskRepositoryImpl implements ITaskRepository {
 			if (rate != null) {
 				query.setParameter("rate", rate);
 			}
+			if (departmentIds.size()==0) {
+				query.setFirstResult(offset);
+				query.setMaxResults(limit);
+			}
 			for (Iterator it = query.getResultList().iterator(); it.hasNext();) {
 				Object[] obj = (Object[]) it.next();
-				countTotal++;
+				Task task = (Task) obj[0];
+				if (departmentIds.size()==0) {
+					countTotal++;
+				} else {
+					boolean addFlag = false;
+					for (Department department : task.getCreator().getDepartments()) {
+						for(Integer id : departmentIds) {
+							if (department.getId() == id) {
+								addFlag = true;
+							}
+						}
+					}
+					if (addFlag) {
+						countTotal++;
+					}
+				}
 			}
 			return countTotal;
 		} catch (Exception e) {
