@@ -159,7 +159,7 @@ public class TaskController {
 		return taskService.findAllHistoryByTaskID(taskId);
 	}
 	@PreAuthorize("@customRoleService.canView('task',principal)")
-	@PostMapping(value= "/assige-to-me",produces = "application/json")
+	@PostMapping(value= "/assiged-to-me",produces = "application/json")
 	public ResponseEntity<Object> findAllTaskAssigeToMe(@RequestBody String json,
 			@RequestParam(value="page",required = false) String page, 
 			@RequestParam(value="sort", required = false) String sort,
@@ -167,7 +167,7 @@ public class TaskController {
 		return taskService.findAllTaskAssigeToMe(json, sort, order, page);
 	}
 	@PreAuthorize("@customRoleService.canView('task',principal)")
-	@PostMapping(value= "/create-by-me",produces = "application/json")
+	@PostMapping(value= "/created-by-me",produces = "application/json")
 	public ResponseEntity<Object> findAllTaskCreatedByMe(@RequestBody String json,
 			@RequestParam(value="page",required = false) String page, 
 			@RequestParam(value="sort", required = false) String sort,
