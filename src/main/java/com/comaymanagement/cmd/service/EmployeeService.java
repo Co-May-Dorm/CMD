@@ -487,7 +487,7 @@ public class EmployeeService {
 			String path = currentRelativePath.toAbsolutePath().toString();
 			String pathFull = "";
 			if(path.contains("jenkins")) {
-				pathFull = path + "CMD-BE/src/main/resources/Import";
+				pathFull = path + "/CMD-BE/src/main/resources/Import";
 			}else {
 				pathFull = path + "/src/main/resources/Import";
 			}
