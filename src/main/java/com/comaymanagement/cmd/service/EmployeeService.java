@@ -485,15 +485,21 @@ public class EmployeeService {
 					.getPrincipal();
 			Path currentRelativePath = Paths.get("");
 			String path = currentRelativePath.toAbsolutePath().toString();
+			String pathFull = "";
+			if(path.contains("jenkins")) {
+				pathFull = path + "/CMD-BE/src/main/resources/Import";
+			}else {
+				pathFull = path + "/src/main/resources/Import";
+			}
 			if (countFile == 0) {
-				File deleteAllFile = new File(path + "/src/main/resources/Import");
+				File deleteAllFile = new File(pathFull);
 				FileUtils.cleanDirectory(deleteAllFile); 
 			}
 			StringBuilder nameFile = new StringBuilder();
 			nameFile.append("CMD-");
 			nameFile.append(countFile);
 			nameFile.append(".csv");
-			File file = new File(path + "/src/main/resources/Import/" + nameFile.toString());
+			File file = new File(pathFull + nameFile.toString());
 			if(file.exists() && !file.isDirectory()) { 
 				PrintWriter writer = new PrintWriter(file);
 				writer.print("");
@@ -501,8 +507,8 @@ public class EmployeeService {
 			}
 			multipartFile.transferTo(file);
 
-			final File csvFile = new File(path + "/src/main/resources/Import/" + nameFile.toString());
-			CSVReader reader = new CSVReaderBuilder(new FileReader(path + "/src/main/resources/Import/" + nameFile.toString()))
+			final File csvFile = new File(pathFull + nameFile.toString());
+			CSVReader reader = new CSVReaderBuilder(new FileReader(pathFull + nameFile.toString()))
 					.withSkipLines(1).build();
 
 			Set<Employee> employees = reader.readAll().stream().map(data -> {
