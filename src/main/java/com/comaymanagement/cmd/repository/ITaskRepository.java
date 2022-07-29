@@ -2,8 +2,6 @@ package com.comaymanagement.cmd.repository;
 
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 import org.springframework.data.repository.query.Param;
 
 import com.comaymanagement.cmd.entity.Task;
