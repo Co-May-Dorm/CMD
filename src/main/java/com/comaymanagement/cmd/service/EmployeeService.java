@@ -2,7 +2,9 @@ package com.comaymanagement.cmd.service;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,11 +16,13 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,7 +70,7 @@ public class EmployeeService {
 	@Autowired
 	Message message;
 
-
+	static int countFile = 0;
 
 	// Find all employee and search
 	public ResponseEntity<Object> employeePaging(String page, String name, String dob, String email, String phone,
@@ -475,20 +479,32 @@ public class EmployeeService {
 
 	}
 
-	public ResponseEntity<Object> importEmployees(MultipartFile multipartFile, Integer creatorId) {
-
+	public ResponseEntity<Object> importEmployees(MultipartFile multipartFile) {
 		try {
-			Path paths = CMDConstrant.path;
-			String path = System.getProperty("user.dir");
-			int length = path.length() - path.indexOf("CMD");
-			if(length > 3) {
-				path = CMDConstrant.path.toAbsolutePath().toString();
+			UserDetailsImpl userDetail = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			Path currentRelativePath = Paths.get("");
+			String path = currentRelativePath.toAbsolutePath().toString();
+			if (countFile == 0) {
+				File deleteAllFile = new File(path + "/src/main/resources/Import");
+				FileUtils.cleanDirectory(deleteAllFile); 
 			}
-			File file = new File(path + "/src/main/resources/CMD.csv");
+			StringBuilder nameFile = new StringBuilder();
+			nameFile.append("CMD-");
+			nameFile.append(countFile);
+			nameFile.append(".csv");
+			File file = new File(path + "/src/main/resources/Import/" + nameFile.toString());
+			if(file.exists() && !file.isDirectory()) { 
+				PrintWriter writer = new PrintWriter(file);
+				writer.print("");
+				writer.close();
+			}
 			multipartFile.transferTo(file);
-			final File csvFile = new File(path + "/src/main/resources/CMD.csv");
-			CSVReader reader = new CSVReaderBuilder(new FileReader(path + "/src/main/resources/CMD.csv"))
+
+			final File csvFile = new File(path + "/src/main/resources/Import/" + nameFile.toString());
+			CSVReader reader = new CSVReaderBuilder(new FileReader(path + "/src/main/resources/Import/" + nameFile.toString()))
 					.withSkipLines(1).build();
+
 			Set<Employee> employees = reader.readAll().stream().map(data -> {
 				Employee employee = new Employee();
 				String name, email, dob, phone, dep, pos, gender, code;
@@ -523,8 +539,8 @@ public class EmployeeService {
 				employee.setCreateDate(createDate);
 				employee.setModifyDate(createDate);
 				employee.setCode(code);
-				employee.setCreateBy(creatorId);
-				employee.setModifyBy(creatorId);
+				employee.setCreateBy(userDetail.getId());
+				employee.setModifyBy(userDetail.getId());
 				employee.setActiveFlag(true);
 				employee.setActive(true);
 				employee.setPassword("cmdcmdcmd");
@@ -534,13 +550,12 @@ public class EmployeeService {
 				employee.setUsername(email);
 				return employee;
 			}).collect(Collectors.toSet());
-
 			boolean success = employeeRepository.add(employees);
 			
-
-			
 			if (success) {
+				countFile++;
 				String messageSuccess = message.getMessageByItemCode("EMPS1");
+				
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("OK", messageSuccess, ""));
 			} else {
 				String messageError = message.getMessageByItemCode("EMPE3");
